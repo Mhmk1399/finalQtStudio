@@ -918,15 +918,10 @@ const ContentCreationLab = () => {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Animated particles */}
           {[...Array(20)].map((_, i) => {
-            const size = Math.random() * 4 + 2;
             const duration = Math.random() * 20 + 10;
-            const initialX = Math.random() * 100;
             const initialY = Math.random() * 100;
             const delay = Math.random() * 5;
-            const color =
-              contentElements[
-                Math.floor(Math.random() * contentElements.length)
-              ].color;
+           
 
             return (
               <motion.div

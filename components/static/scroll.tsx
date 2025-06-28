@@ -130,11 +130,11 @@ const CinematicProjection = () => {
   );
 
   return (
-    <div className="relative   "  ref={sceneRef}>
+    <div className="relative   " ref={sceneRef}>
       <div className="absolute top-0 left-0 z-[-1] w-full h-screen  ">
         <video
           ref={videoRef}
-          src='/assets/video/video4.mp4'
+          src="/assets/video/video4.mp4"
           onLoadedData={handleVideoLoad}
           onPlay={handleVideoPlay}
           onPause={handleVideoPause}
@@ -144,9 +144,7 @@ const CinematicProjection = () => {
           muted
         />
       </div>
-      <div className="absolute top-0 bg-black left-0 z-[-1] w-full h-screen  opacity-80 ">
-        
-      </div>
+      <div className="absolute top-0 bg-black left-0 z-[-1] w-full h-screen  opacity-80 "></div>
       {/* Fresnel Light 1 */}
       <FresnelLight
         position="top-150 left-1/8"
@@ -194,7 +192,7 @@ const CinematicProjection = () => {
             >
               نمونه هایی از هنر ما
             </h2>
-            <div className="flex items-center text-black justify-center gap-2 text-blue-200">
+            <div className="flex items-center  justify-center gap-2 text-blue-200">
               <span className="text-sm font-medium  text-black">
                 {currentVideo.title}
               </span>
@@ -352,15 +350,15 @@ const FresnelLight = ({
   );
 };
 
-// Utility function for throttling scroll events
-function throttle<T extends (...args: any[]) => any>(
-  func: T,
+// Utility function for throttling scroll events with proper TypeScript types
+function throttle<T extends unknown[]>(
+  func: (...args: T) => void,
   delay: number
-): (...args: Parameters<T>) => void {
+): (...args: T) => void {
   let timeoutId: NodeJS.Timeout | null = null;
   let lastExecTime = 0;
 
-  return (...args: Parameters<T>) => {
+  return (...args: T): void => {
     const currentTime = Date.now();
 
     if (currentTime - lastExecTime > delay) {

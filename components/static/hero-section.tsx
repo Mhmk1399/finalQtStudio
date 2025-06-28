@@ -8,7 +8,7 @@ import {
   useTransform,
   useSpring,
 } from "framer-motion";
-import { RiPlayFill, RiPauseFill } from "react-icons/ri";
+import { RiPlayFill } from "react-icons/ri";
 import { slides } from "../../data/heroSection";
 import { makeCall } from "@/utilities/callUtils";
 
@@ -20,7 +20,7 @@ const handleCallClick = () => {
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isAutoPlaying] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
   const [direction, setDirection] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
@@ -96,12 +96,8 @@ const HeroSection = () => {
     mouseX.set(0);
   };
 
-  const toggleAutoplay = () => setIsAutoPlaying(!isAutoPlaying);
 
-  const navigateSlide = (newIndex: number) => {
-    setDirection(newIndex > current ? 1 : -1);
-    setCurrent(newIndex);
-  };
+ 
 
   // Animation variants
   const slideVariants = {
@@ -168,41 +164,9 @@ const HeroSection = () => {
     },
   };
 
-  const buttonVariants = {
-    initial: {
-      scale: 1,
-      background: "rgba(255, 255, 255, 0.1)",
-      backdropFilter: "blur(8px)",
-    },
-    hover: {
-      scale: 1.05,
-      background: "rgba(255, 255, 255, 0.2)",
-      backdropFilter: "blur(12px)",
-    },
-    tap: {
-      scale: 0.95,
-    },
-  };
 
-  const indicatorVariants = {
-    inactive: {
-      width: "8px",
-      height: "8px",
-      opacity: 0.5,
-      background: "rgba(255, 255, 255, 0.5)",
-    },
-    active: {
-      width: "30px",
-      height: "8px",
-      opacity: 1,
-      background: slides[current]?.color || "#8B5CF6",
-      transition: { duration: 0.3 },
-    },
-    hover: {
-      opacity: 0.8,
-      scale: 1.1,
-    },
-  };
+
+ 
 
   const videoGridVariants = {
     hidden: { opacity: 0, y: 20 },

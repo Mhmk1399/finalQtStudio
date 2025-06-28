@@ -1,12 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  AnimatePresence,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { IoArrowUp } from "react-icons/io5";
 import { IoIosArrowBack } from "react-icons/io";
@@ -34,19 +28,7 @@ const ServicesShowcase = () => {
     });
   };
 
-  // Scroll animation
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 20,
-    stiffness: 100,
-  });
-
   // Parallax effect for background
-  const backgroundY = useTransform(smoothProgress, [0, 1], ["0%", "30%"]);
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -395,9 +377,7 @@ const ServicesShowcase = () => {
         {/* Floating particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {[...Array(15)].map((_, i) => {
-            const size = Math.random() * 4 + 2;
             const duration = Math.random() * 20 + 10;
-            const initialX = Math.random() * 100;
             const initialY = Math.random() * 100;
             const delay = Math.random() * 5;
 
