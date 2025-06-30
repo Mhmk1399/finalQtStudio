@@ -87,35 +87,8 @@ const projectSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Pre-save middleware to calculate total and final price
-projectSchema.pre('save', function (next) {
-    // Calculate total price from services
-    this.totalPrice = this.services.reduce((total, service) => {
-        return total + (service.price * service.quantity);
-    }, 0);
 
-    // Calculate final price after discount
-    this.finalPrice = this.totalPrice - this.discount;
 
-    next();
-});
-
-// Virtual for remaining payment
-projectSchema.virtual('remainingPayment').get(function () {
-    return this.finalPrice - this.paidAmount;
-});
-
-// Virtual for payment percentage
-projectSchema.virtual('paymentPercentage').get(function () {
-    if (this.finalPrice === 0) return 0;
-    return Math.round((this.paidAmount / this.finalPrice) * 100);
-});
-
-// Indexes for better query performance
-projectSchema.index({ customerId: 1 });
-projectSchema.index({ status: 1 });
-projectSchema.index({ paymentStatus: 1 });
-projectSchema.index({ createdAt: -1 });
 
 const Project = mongoose.models.Project || mongoose.model('Project', projectSchema);
 
