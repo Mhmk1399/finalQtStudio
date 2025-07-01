@@ -1,36 +1,50 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-    _id: String,
-    name: String,
-    passwordHash: String,
-    roleId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Role",
-        required: true
-    },
-    phoneNumber: String,
-    messagingPlatform: {
-        type: String,
-        enum: ["whatsapp", "telegram", "webapp"],
-        default: null
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
-    crmDetails: {
-        companyName: String,
-        address: String,
-        email: String,
-        website: String,
-        birthDate: Date,
-        imageUrl: String
-    }
+export interface IUser {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  role: string;
+  teamId?: mongoose.Types.ObjectId;
+  permissions: string;
+  isActive: boolean;
+}
+
+const userSchema = new mongoose.Schema<IUser>({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  role: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team'
+  },
+  permissions: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
+const User = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
-export default mongoose.models.userSchema ||
-    mongoose.model("userSchema", userSchema);
+export default User;
