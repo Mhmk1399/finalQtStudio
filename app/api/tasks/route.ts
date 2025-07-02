@@ -1,38 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Customer from '@/models/customersData/customers';
-import connect  from '@/lib/data';
+import Task from '@/models/tasks';
+
+// GET - Get all tasks
 export async function GET() {
   try {
-    await connect();
-    const customers = await Customer.find({});
+    const tasks = await Task.find({});
     return NextResponse.json({
       success: true,
-      data: customers
+      data: tasks
     });
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch customers'
+      error: 'Failed to fetch tasks'
     }, { status: 500 });
   }
 }
 
-// POST - Create new customer
+// POST - Create new task
 export async function POST(request: NextRequest) {
   try {
-    await connect();
     const body = await request.json();
-    const customer = new Customer(body);
-    await customer.save();
+    const task = new Task(body);
+    await task.save();
     
     return NextResponse.json({
       success: true,
-      data: customer
+      data: task
     }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to create customer'
+      error: error.message || 'Failed to create task'
     }, { status: 400 });
   }
 }

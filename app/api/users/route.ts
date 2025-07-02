@@ -1,38 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Customer from '@/models/customersData/customers';
-import connect  from '@/lib/data';
+import User from '@/models/users';
+
+// GET - Get all users
 export async function GET() {
   try {
-    await connect();
-    const customers = await Customer.find({});
+    const users = await User.find({});
     return NextResponse.json({
       success: true,
-      data: customers
+      data: users
     });
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch customers'
+      error: 'Failed to fetch users'
     }, { status: 500 });
   }
 }
 
-// POST - Create new customer
+// POST - Create new user
 export async function POST(request: NextRequest) {
   try {
-    await connect();
     const body = await request.json();
-    const customer = new Customer(body);
-    await customer.save();
+    const user = new User(body);
+    await user.save();
     
     return NextResponse.json({
       success: true,
-      data: customer
+      data: user
     }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to create customer'
+      error: error.message || 'Failed to create user'
     }, { status: 400 });
   }
 }

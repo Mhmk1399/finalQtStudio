@@ -1,38 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Customer from '@/models/customersData/customers';
-import connect  from '@/lib/data';
+import ServiceRequest from '@/models/customersData/serviceRequests';
+
+// GET - Get all service requests
 export async function GET() {
   try {
-    await connect();
-    const customers = await Customer.find({});
+    const serviceRequests = await ServiceRequest.find({});
     return NextResponse.json({
       success: true,
-      data: customers
+      data: serviceRequests
     });
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch customers'
+      error: 'Failed to fetch service requests'
     }, { status: 500 });
   }
 }
 
-// POST - Create new customer
+// POST - Create new service request
 export async function POST(request: NextRequest) {
   try {
-    await connect();
     const body = await request.json();
-    const customer = new Customer(body);
-    await customer.save();
+    const serviceRequest = new ServiceRequest(body);
+    await serviceRequest.save();
     
     return NextResponse.json({
       success: true,
-      data: customer
+      data: serviceRequest
     }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to create customer'
+      error: error.message || 'Failed to create service request'
     }, { status: 400 });
   }
 }

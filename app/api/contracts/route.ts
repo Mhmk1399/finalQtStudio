@@ -1,38 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Customer from '@/models/customersData/customers';
-import connect  from '@/lib/data';
+import Contract from '@/models/customersData/contracts';
+
+// GET - Get all contracts
 export async function GET() {
   try {
-    await connect();
-    const customers = await Customer.find({});
+    const contracts = await Contract.find({});
     return NextResponse.json({
       success: true,
-      data: customers
+      data: contracts
     });
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch customers'
+      error: 'Failed to fetch contracts'
     }, { status: 500 });
   }
 }
 
-// POST - Create new customer
+// POST - Create new contract
 export async function POST(request: NextRequest) {
   try {
-    await connect();
     const body = await request.json();
-    const customer = new Customer(body);
-    await customer.save();
+    const contract = new Contract(body);
+    await contract.save();
     
     return NextResponse.json({
       success: true,
-      data: customer
+      data: contract
     }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to create customer'
+      error: error.message || 'Failed to create contract'
     }, { status: 400 });
   }
 }
