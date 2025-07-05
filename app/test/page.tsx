@@ -1,9 +1,8 @@
-import CustomerLoginForm from "@/components/forms/customerLoginForm";
-
+import { TeamForm } from "@/components/forms";
 const page = () => {
   return (
     <div>
-      <CustomerLoginForm />
+      <TeamForm />
     </div>
   );
 };

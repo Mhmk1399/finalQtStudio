@@ -27,42 +27,54 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
     });
 
     setFormState(prev => ({ ...prev, data: initialFormData }));
-  }, [  ]);
+  }, [config.fields]);
 
-  const validateField = (field: FormField, value: string | number | boolean): string | null => {
-    if (field.required && (!value || value === '')) {
-      return `${field.label} is required`;
-    }
-
-    if (field.validation) {
-      const { min, max, pattern, minLength, maxLength } = field.validation;
-      const stringValue = String(value);
-
-      if (minLength && stringValue.length < minLength) {
-        return `${field.label} must be at least ${minLength} characters`;
-      }
-
-      if (maxLength && stringValue.length > maxLength) {
-        return `${field.label} must not exceed ${maxLength} characters`;
-      }
-
-      if (pattern && !new RegExp(pattern).test(stringValue)) {
-        return `${field.label} format is invalid`;
-      }
-
-      if (field.type === 'number') {
-        const numValue = Number(value);
-        if (min !== undefined && numValue < min) {
-          return `${field.label} must be at least ${min}`;
-        }
-        if (max !== undefined && numValue > max) {
-          return `${field.label} must not exceed ${max}`;
+  const validateField = (field: FormField, value: string | number | boolean | File): string | null => {
+      if (field.required) {
+        if (
+          value === undefined ||
+          value === null ||
+          value === '' ||
+          (value instanceof File && value.size === 0)
+        ) {
+          return `${field.label} is required`;
         }
       }
-    }
-
-    return null;
-  };
+  
+      // Skip further validation for File type
+      if (value instanceof File) {
+        return null;
+      }
+  
+      if (field.validation) {
+        const { min, max, pattern, minLength, maxLength } = field.validation;
+        const stringValue = String(value);
+  
+        if (minLength && stringValue.length < minLength) {
+          return `${field.label} must be at least ${minLength} characters`;
+        }
+  
+        if (maxLength && stringValue.length > maxLength) {
+          return `${field.label} must not exceed ${maxLength} characters`;
+        }
+  
+        if (pattern && !new RegExp(pattern).test(stringValue)) {
+          return `${field.label} format is invalid`;
+        }
+  
+        if (field.type === 'number') {
+          const numValue = Number(value);
+          if (min !== undefined && numValue < min) {
+            return `${field.label} must be at least ${min}`;
+          }
+          if (max !== undefined && numValue > max) {
+            return `${field.label} must not exceed ${max}`;
+          }
+        }
+      }
+  
+      return null;
+    };
 
   const handleInputChange = (fieldName: string, value: string | number | boolean) => {
     setFormState(prev => ({
@@ -76,9 +88,13 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
+    // Validate all fields (skip hidden fields validation for display)
     const errors: { [key: string]: string } = {};
     config.fields.forEach(field => {
+      // Skip validation for hidden fields if they have default values
+      if (field.type === 'hidden' && field.defaultValue !== undefined) {
+        return;
+      }
       const error = validateField(field, formState.data[field.name]);
       if (error) {
         errors[field.name] = error;
@@ -91,6 +107,13 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
     }
 
     setFormState(prev => ({ ...prev, loading: true, errors: {} }));
+
+    // Debug: Log the form data being submitted
+    console.log('=== FORM SUBMISSION DEBUG ===');
+    console.log('Form endpoint:', config.endpoint);
+    console.log('Form method:', config.method || 'POST');
+    console.log('Form data being submitted:', JSON.stringify(formState.data, null, 2));
+    console.log('All form fields:', config.fields.map(f => ({ name: f.name, type: f.type, required: f.required })));
 
     try {
       const response = await fetch(config.endpoint, {

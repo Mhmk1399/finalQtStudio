@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import DynamicForm from "./DynamicForm";
+import DynamicForm from "../DynamicForm";
 import { FormConfig } from "@/types/form";
 
 interface CustomerLoginFormProps {
