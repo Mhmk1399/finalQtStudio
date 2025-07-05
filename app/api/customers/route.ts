@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Customer from "@/models/customersData/customers";
 import connect from "@/lib/data";
+import bcrypt from "bcryptjs";
 
 ///get all the customers
 export async function GET() {
@@ -24,10 +25,15 @@ export async function GET() {
 
 // POST - Create new customer
 export async function POST(request: NextRequest) {
-  try {
-    await connect();
-    const body = await request.json();
+try {
+await connect();
+const body = await request.json();
 
+// Hash password if provided
+if (body.password) {
+      body.password = await bcrypt.hash(body.password, 10);
+    }
+    
     const customer = new Customer(body);
     await customer.save();
 

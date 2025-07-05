@@ -62,11 +62,11 @@ export async function PATCH(request: NextRequest) {
       success: true,
       data: contract,
     });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update contract",
+        error: error instanceof Error ? error.message : "Failed to update contract",
       },
       { status: 400 }
     );
@@ -86,7 +86,7 @@ export async function DELETE(request: NextRequest) {
           success: false,
           error: "Contract not found",
         },
-        { status: 444 }
+        { status: 404 }
       );
     }
 

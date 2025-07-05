@@ -17,16 +17,7 @@ export interface ICustomer {
   verifiedAt?: Date;
 }
 
-// Verification Request Types
-export interface IVerificationRequest {
-  _id: mongoose.Types.ObjectId;
-  customerId: mongoose.Types.ObjectId;
-  status: 'pending' | 'approved' | 'rejected' | 'in-review';
-  salesUserId: mongoose.Types.ObjectId;
-  notes: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 // Contract Types
 export interface IContract {
@@ -170,8 +161,6 @@ export interface PaginatedResponse<T> {
 export type CreateCustomer = Omit<ICustomer, '_id' | 'createdAt' | 'updatedAt'>;
 export type UpdateCustomer = Partial<CreateCustomer>;
 
-export type CreateVerificationRequest = Omit<IVerificationRequest, '_id' | 'createdAt' | 'updatedAt'>;
-export type UpdateVerificationRequest = Partial<CreateVerificationRequest>;
 
 export type CreateContract = Omit<IContract, '_id' | 'createdAt' | 'updatedAt'>;
 export type UpdateContract = Partial<CreateContract>;

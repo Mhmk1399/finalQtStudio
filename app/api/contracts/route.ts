@@ -31,10 +31,10 @@ export async function POST(request: NextRequest) {
       success: true,
       data: contract
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to create contract'
+      error: error instanceof Error ? error.message : 'Failed to create contract'
     }, { status: 400 });
   }
 }
