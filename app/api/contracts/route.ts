@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Contract from '@/models/customersData/contracts';
+import connect from '@/lib/data';
 
 // GET - Get all contracts
 export async function GET() {
   try {
+    await connect();
     const contracts = await Contract.find({});
     return NextResponse.json({
       success: true,
@@ -20,6 +22,7 @@ export async function GET() {
 // POST - Create new contract
 export async function POST(request: NextRequest) {
   try {
+    await connect();
     const body = await request.json();
     const contract = new Contract(body);
     await contract.save();

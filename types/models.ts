@@ -5,6 +5,7 @@ export interface ICustomer {
   _id: mongoose.Types.ObjectId;
   name: string;
   phoneNumber: string;
+  password?: string;
   businessName: string;
   businessScale: string;
   address: string;
@@ -37,7 +38,7 @@ export interface IContract {
   expiryDate?: Date;
   totalValue: number;
   terms: string;
-  salesPersonId: mongoose.Types.ObjectId;
+  verifier: mongoose.Types.ObjectId;
   contractType: 'standard' | 'premium' | 'enterprise' | 'custom';
 }
 
