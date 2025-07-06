@@ -1,25 +1,13 @@
 import mongoose from "mongoose";
+import { IServiceRequest } from "@/types/models";
 
-export interface IServiceRequest {
-  _id: mongoose.Types.ObjectId;
-  projectId: mongoose.Types.ObjectId;
-  serviceId: mongoose.Types.ObjectId;
-  quantity: number;
-  agreedPrice: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'pending' | 'approved' | 'in-progress' | 'completed' | 'cancelled';
-  requestedDate: Date;
-  scheduledDate?: Date;
-  requirements: string;
-  notes: string;
-  requestedBy: mongoose.Types.ObjectId;
-  approvedBy?: mongoose.Types.ObjectId;
-  approvedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 const serviceRequestSchema = new mongoose.Schema<IServiceRequest>({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
@@ -35,11 +23,6 @@ const serviceRequestSchema = new mongoose.Schema<IServiceRequest>({
     required: true,
     min: 1,
     default: 1
-  },
-  agreedPrice: {
-    type: Number,
-    required: true,
-    min: 0
   },
   priority: {
     type: String,
@@ -72,8 +55,7 @@ const serviceRequestSchema = new mongoose.Schema<IServiceRequest>({
   },
   requestedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'Customer',
   },
   approvedBy: {
     type: mongoose.Schema.Types.ObjectId,

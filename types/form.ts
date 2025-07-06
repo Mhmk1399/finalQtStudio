@@ -1,5 +1,16 @@
 // Form field types
-export type FormFieldType = 'text' | 'email' | 'tel' | 'password' | 'select' | 'textarea' | 'number' | 'date' | 'checkbox' | 'radio' | 'hidden';
+export type FormFieldType =
+  | "text"
+  | "email"
+  | "tel"
+  | "password"
+  | "select"
+  | "textarea"
+  | "number"
+  | "date"
+  | "checkbox"
+  | "radio"
+  | "hidden";
 
 export interface FormFieldOption {
   value: string;
@@ -25,6 +36,7 @@ export interface FormField {
   className?: string;
   readonly?: boolean;
   hidden?: boolean;
+  onChange?: (fieldName: string, value: string) => void;
 }
 
 export interface FormConfig {
@@ -32,10 +44,11 @@ export interface FormConfig {
   description?: string;
   fields: FormField[];
   endpoint: string;
-  method?: 'POST' | 'PUT' | 'PATCH';
+  method?: "POST" | "PUT" | "PATCH";
   submitButtonText?: string;
   onSuccess?: (data: any) => void;
   onError?: (error: string) => void;
+  onChange?: (fieldName: string, value: string | number | boolean) => void;
   className?: string;
 }
 

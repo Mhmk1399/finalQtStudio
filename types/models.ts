@@ -38,11 +38,8 @@ export interface IService {
   _id: mongoose.Types.ObjectId;
   name: string;
   description: string;
-  category: string;
   basePrice: number;
-  duration: string;
-  requirements: string;
-  teamType: string;
+  teamId: mongoose.Types.ObjectId;
   isActive: boolean;
 }
 
@@ -71,6 +68,7 @@ export interface IProject {
 
 // Service Request Types
 export interface IServiceRequest {
+  title: string;
   _id: mongoose.Types.ObjectId;
   projectId: mongoose.Types.ObjectId;
   serviceId: mongoose.Types.ObjectId;

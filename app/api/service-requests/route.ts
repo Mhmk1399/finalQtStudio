@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ServiceRequest from '@/models/customersData/serviceRequests';
+import connect from '@/lib/data';
 
 // GET - Get all service requests
 export async function GET() {
@@ -20,6 +21,7 @@ export async function GET() {
 // POST - Create new service request
 export async function POST(request: NextRequest) {
   try {
+    await connect ();
     const body = await request.json();
     const serviceRequest = new ServiceRequest(body);
     await serviceRequest.save();

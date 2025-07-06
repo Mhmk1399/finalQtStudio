@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { FormConfig, FormData, FormState, FormField } from '@/types/form';
+import React, { useState, useEffect } from "react";
+import { FormConfig, FormData, FormState, FormField } from "@/types/form";
 
 interface DynamicFormProps {
   config: FormConfig;
   initialData?: FormData;
 }
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({
+  config,
+  initialData = {},
+}) => {
   const [formState, setFormState] = useState<FormState>({
     data: initialData,
     errors: {},
@@ -19,31 +22,27 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
   // Initialize form data with default values
   useEffect(() => {
     const initialFormData: FormData = { ...initialData };
-    
-    config.fields.forEach(field => {
+
+    config.fields.forEach((field) => {
       if (field.defaultValue !== undefined && !initialFormData[field.name]) {
         initialFormData[field.name] = field.defaultValue;
       }
     });
 
-    setFormState(prev => ({ ...prev, data: initialFormData }));
+    setFormState((prev) => ({ ...prev, data: initialFormData }));
   }, [config.fields]);
 
-  const validateField = (field: FormField, value: string | number | boolean | File): string | null => {
-      if (field.required) {
-        if (
-          value === undefined ||
-          value === null ||
-          value === '' ||
-          (value instanceof File && value.size === 0)
-        ) {
-          return `${field.label} is required`;
-        }
-      }
-  
-      // Skip further validation for File type
+  const validateField = (
+      field: FormField,
+      value: string | number | boolean | File
+    ): string | null => {
+      // Skip validation for File type fields
       if (value instanceof File) {
         return null;
+      }
+  
+      if (field.required && (!value || value === "")) {
+        return `${field.label} is required`;
       }
   
       if (field.validation) {
@@ -62,7 +61,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
           return `${field.label} format is invalid`;
         }
   
-        if (field.type === 'number') {
+        if (field.type === "number") {
           const numValue = Number(value);
           if (min !== undefined && numValue < min) {
             return `${field.label} must be at least ${min}`;
@@ -76,23 +75,32 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
       return null;
     };
 
-  const handleInputChange = (fieldName: string, value: string | number | boolean) => {
-    setFormState(prev => ({
+  const handleInputChange = (
+    fieldName: string,
+    value: string | number | boolean
+  ) => {
+    setFormState((prev) => ({
       ...prev,
       data: { ...prev.data, [fieldName]: value },
-      errors: { ...prev.errors, [fieldName]: '' },
+      errors: { ...prev.errors, [fieldName]: "" },
       success: false,
     }));
+
+    // Call field-specific onChange if provided
+    const field = config.fields.find((f) => f.name === fieldName);
+    if (field && field.onChange) {
+      field.onChange(value , formState.data[fieldName]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate all fields (skip hidden fields validation for display)
     const errors: { [key: string]: string } = {};
-    config.fields.forEach(field => {
+    config.fields.forEach((field) => {
       // Skip validation for hidden fields if they have default values
-      if (field.type === 'hidden' && field.defaultValue !== undefined) {
+      if (field.type === "hidden" && field.defaultValue !== undefined) {
         return;
       }
       const error = validateField(field, formState.data[field.name]);
@@ -102,24 +110,20 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
     });
 
     if (Object.keys(errors).length > 0) {
-      setFormState(prev => ({ ...prev, errors }));
+      setFormState((prev) => ({ ...prev, errors }));
       return;
     }
 
-    setFormState(prev => ({ ...prev, loading: true, errors: {} }));
+    setFormState((prev) => ({ ...prev, loading: true, errors: {} }));
 
     // Debug: Log the form data being submitted
-    console.log('=== FORM SUBMISSION DEBUG ===');
-    console.log('Form endpoint:', config.endpoint);
-    console.log('Form method:', config.method || 'POST');
-    console.log('Form data being submitted:', JSON.stringify(formState.data, null, 2));
-    console.log('All form fields:', config.fields.map(f => ({ name: f.name, type: f.type, required: f.required })));
+    console.log("Submitting form data:", formState.data);
 
     try {
       const response = await fetch(config.endpoint, {
-        method: config.method || 'POST',
+        method: config.method || "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formState.data),
       });
@@ -127,18 +131,23 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Form submission failed');
+        throw new Error(result.error || "Form submission failed");
       }
 
-      setFormState(prev => ({ ...prev, loading: false, success: true }));
-      
+      setFormState((prev) => ({ ...prev, loading: false, success: true }));
+
       if (config.onSuccess) {
         config.onSuccess(result);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-      setFormState(prev => ({ ...prev, loading: false, errors: { submit: errorMessage } }));
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "An error occurred";
+      setFormState((prev) => ({
+        ...prev,
+        loading: false,
+        errors: { submit: errorMessage },
+      }));
+
       if (config.onError) {
         config.onError(errorMessage);
       }
@@ -146,24 +155,29 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
   };
 
   const renderField = (field: FormField) => {
-    const value = formState.data[field.name] || '';
+    const value = formState.data[field.name] || "";
     const error = formState.errors[field.name];
     const fieldId = `field-${field.name}`;
 
     // Don't render hidden fields
-    if (field.type === 'hidden' || field.hidden) {
+    if (field.type === "hidden" || field.hidden) {
       return null;
     }
 
     const baseClassName = `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-      error ? 'border-red-500' : 'border-gray-300'
-    } ${field.readonly ? 'bg-gray-100 cursor-not-allowed' : ''} ${field.className || ''}`;
+      error ? "border-red-500" : "border-gray-300"
+    } ${field.readonly ? "bg-gray-100 cursor-not-allowed" : ""} ${
+      field.className || ""
+    }`;
 
     switch (field.type) {
-      case 'select':
+      case "select":
         return (
-          <div key={field.name} className="mb-4" dir='rtl'>
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-2">
+          <div key={field.name} className="mb-4" dir="rtl">
+            <label
+              htmlFor={fieldId}
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -174,22 +188,26 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
               className={baseClassName}
               required={field.required}
             >
-              <option value="">Select {field.label}</option>
-              {field.options?.map(option => (
+              {field.options?.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </select>
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            {field.description && <p className="text-gray-500 text-sm mt-1">{field.description}</p>}
+            {field.description && (
+              <p className="text-gray-500 text-sm mt-1">{field.description}</p>
+            )}
           </div>
         );
 
-      case 'textarea':
+      case "textarea":
         return (
-          <div key={field.name} className="mb-4" dir='rtl'>
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-2">
+          <div key={field.name} className="mb-4" dir="rtl">
+            <label
+              htmlFor={fieldId}
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -202,19 +220,23 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
               required={field.required}
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            {field.description && <p className="text-gray-500 text-sm mt-1">{field.description}</p>}
+            {field.description && (
+              <p className="text-gray-500 text-sm mt-1">{field.description}</p>
+            )}
           </div>
         );
 
-      case 'checkbox':
+      case "checkbox":
         return (
-          <div key={field.name} className="mb-4" dir='rtl'>
+          <div key={field.name} className="mb-4" dir="rtl">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id={fieldId}
                 checked={Boolean(value)}
-                onChange={(e) => handleInputChange(field.name, e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange(field.name, e.target.checked)
+                }
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor={fieldId} className="ml-2 text-sm text-gray-700">
@@ -223,19 +245,21 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
               </label>
             </div>
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            {field.description && <p className="text-gray-500 text-sm mt-1">{field.description}</p>}
+            {field.description && (
+              <p className="text-gray-500 text-sm mt-1">{field.description}</p>
+            )}
           </div>
         );
 
-      case 'radio':
+      case "radio":
         return (
-          <div key={field.name} className="mb-4" dir='rtl'>
+          <div key={field.name} className="mb-4" dir="rtl">
             <fieldset>
               <legend className="block text-sm font-medium text-gray-700 mb-2">
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </legend>
-              {field.options?.map(option => (
+              {field.options?.map((option) => (
                 <div key={option.value} className="flex items-center mb-2">
                   <input
                     type="radio"
@@ -243,24 +267,34 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
                     name={field.name}
                     value={option.value}
                     checked={String(value) === option.value}
-                    onChange={(e) => handleInputChange(field.name, e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(field.name, e.target.value)
+                    }
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
-                  <label htmlFor={`${fieldId}-${option.value}`} className="ml-2 text-sm text-gray-700">
+                  <label
+                    htmlFor={`${fieldId}-${option.value}`}
+                    className="ml-2 text-sm text-gray-700"
+                  >
                     {option.label}
                   </label>
                 </div>
               ))}
             </fieldset>
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            {field.description && <p className="text-gray-500 text-sm mt-1">{field.description}</p>}
+            {field.description && (
+              <p className="text-gray-500 text-sm mt-1">{field.description}</p>
+            )}
           </div>
         );
 
       default:
         return (
-          <div key={field.name} className="mb-4" dir='rtl'>
-            <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-2">
+          <div key={field.name} className="mb-4" dir="rtl">
+            <label
+              htmlFor={fieldId}
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -269,7 +303,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
               id={fieldId}
               value={String(value)}
               onChange={(e) => {
-                const inputValue = field.type === 'number' ? Number(e.target.value) : e.target.value;
+                const inputValue =
+                  field.type === "number"
+                    ? Number(e.target.value)
+                    : e.target.value;
                 handleInputChange(field.name, inputValue);
               }}
               placeholder={field.placeholder}
@@ -283,16 +320,25 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
               pattern={field.validation?.pattern}
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            {field.description && <p className="text-gray-500 text-sm mt-1">{field.description}</p>}
+            {field.description && (
+              <p className="text-gray-500 text-sm mt-1">{field.description}</p>
+            )}
           </div>
         );
     }
   };
 
   return (
-    <div className={`max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md ${config.className || ''}`} dir='rtl'>
+    <div
+      className={`max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md ${
+        config.className || ""
+      }`}
+      dir="rtl"
+    >
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{config.title}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {config.title}
+        </h2>
         {config.description && (
           <p className="text-gray-600">{config.description}</p>
         )}
@@ -319,11 +365,13 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ config, initialData = {} }) =
             disabled={formState.loading}
             className={`px-6 py-3 rounded-md font-medium transition-colors ${
               formState.loading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             } text-white`}
           >
-            {formState.loading ? 'Submitting...' : (config.submitButtonText || 'Submit')}
+            {formState.loading
+              ? "Submitting..."
+              : config.submitButtonText || "Submit"}
           </button>
         </div>
       </form>
