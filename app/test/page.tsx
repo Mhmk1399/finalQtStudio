@@ -1,10 +1,9 @@
-import { ServiceForm } from "@/components/forms"; 
-import CustomerLoginForm from "@/components/forms/customers/customerLoginForm";
-import ProjectForm from "@/components/forms/projectAndServices/ProjectForm";
+import CustomersTable from "@/components/tables/CustomersTable";
+import ProjectsTable from "@/components/tables/ProjectsTable";
 const page = () => {
   return (
-    <div>
-      <ProjectForm />
+    <div className="flex flex-col gap-4 items-center justify-center h-screen" dir="rtl">
+      <ProjectsTable />
     </div>
   );
 };

@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import CustomerForm from "./forms/customers/CustomerForm";
-import ContractFormHidden from "./forms/ContractForm";
-import UserRegisterForm from "./forms/usersAndTeams/UserRegisterForm";
-import TeamForm from "./forms/usersAndTeams/TeamForm";
-import ServiceForm from "./forms/ServiceForm";
-import ServiceRequestForm from "./forms/ServiceRequestForm";
-import TaskForm from "./forms/TaskForm";
-import ProjectForm from "./forms/projectAndServices/ProjectForm";
+import CustomerForm from "../forms/customers/CustomerForm";
+import ContractFormHidden from "../forms/ContractForm";
+import UserRegisterForm from "../forms/usersAndTeams/UserRegisterForm";
+import TeamForm from "../forms/usersAndTeams/TeamForm";
+import ServiceForm from "../forms/ServiceForm";
+import ServiceRequestForm from "../forms/ServiceRequestForm";
+import TaskForm from "../forms/TaskForm";
+import ProjectForm from "../forms/projectAndServices/ProjectForm";
 
 type FormType =
   | "customer"
@@ -28,7 +28,7 @@ interface FormOption {
   description: string;
 }
 
-const FormsSidebar: React.FC = () => {
+const CustomerSideBar: React.FC = () => {
   const [activeForm, setActiveForm] = useState<FormType>("customer");
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -36,71 +36,62 @@ const FormsSidebar: React.FC = () => {
   } | null>(null);
 
   const formOptions: FormOption[] = [
-    // Customer Management
+    // مالی و حسابداری
     {
-      id: "customer",
-      label: "Customer Registration",
-      icon: "👥",
-      category: "Customer Management",
-      description: "Register new customers",
-    },
-    {
-      id: "contract",
-      label: "Contract Creation",
+      id: "contracts-list",
+      label: "لیست قراردادها",
       icon: "📋",
-      category: "Customer Management",
-      description: "Create customer contracts",
+      category: "مالی و حسابداری",
+      description: "مشاهده و مدیریت قراردادهای شما",
     },
-
-    // Project Management
     {
-      id: "project",
-      label: "Project Creation",
-      icon: "🚀",
-      category: "Project Management",
-      description: "Create and manage projects",
+      id: "transactions",
+      label: "تراکنش‌ها",
+      icon: "💰",
+      category: "مالی و حسابداری",
+      description: "تاریخچه پرداخت‌ها و تراکنش‌های مالی",
     },
-
-    // User & Team Management
     {
-      id: "user-register",
-      label: "User Registration",
+      id: "personal-info",
+      label: "اطلاعات شخصی",
       icon: "👤",
-      category: "User & Team Management",
-      description: "Register new users",
-    },
-    {
-      id: "team",
-      label: "Team Creation",
-      icon: "👥",
-      category: "User & Team Management",
-      description: "Create new teams",
+      category: "مالی و حسابداری",
+      description: "مدیریت اطلاعات حساب کاربری",
     },
 
-    // Service Management
+    // پروژه‌ها و خدمات
     {
-      id: "service",
-      label: "Service Creation",
-      icon: "⚙️",
-      category: "Service Management",
-      description: "Define new services",
+      id: "projects-list",
+      label: "لیست پروژه‌ها",
+      icon: "🚀",
+      category: "پروژه‌ها و خدمات",
+      description: "مشاهده پروژه‌های در حال اجرا و تکمیل شده",
     },
     {
-      id: "service-request",
-      label: "Service Request",
+      id: "service-requests-list",
+      label: "لیست درخواست خدمات",
       icon: "📝",
-      category: "Service Management",
-      description: "Request service delivery",
+      category: "پروژه‌ها و خدمات",
+      description: "پیگیری درخواست‌های خدماتی شما",
     },
 
-    // Task Management
+    // آموزش‌ها و بلاگ‌ها
     {
-      id: "task",
-      label: "Task Creation",
-      icon: "✅",
-      category: "Task Management",
-      description: "Create execution tasks",
+      id: "latest-blogs",
+      label: "آخرین بلاگ‌ها",
+      icon: "📚",
+      category: "آموزش‌ها و بلاگ‌ها",
+      description: "مطالعه جدیدترین مقالات و راهنماها",
     },
+    {
+      id: "latest-videos",
+      label: "آخرین ویدیوها",
+      icon: "🎥",
+      category: "آموزش‌ها و بلاگ‌ها",
+      description: "تماشای آموزش‌های ویدیویی جدید",
+    },
+
+   
   ];
 
   // Group forms by category
@@ -249,4 +240,4 @@ const FormsSidebar: React.FC = () => {
   );
 };
 
-export default FormsSidebar;
+export default CustomerSideBar;

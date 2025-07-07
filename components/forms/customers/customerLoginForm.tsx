@@ -22,8 +22,6 @@ const CustomerLoginForm: React.FC<CustomerLoginFormProps> = ({
       localStorage.setItem("customerToken", response.data.token);
       
 
-      console.log("Token stored:", response.data.token); // Debug log
-      console.log("Customer data stored:", response.data.customer); // Debug log
     } else {
       console.error("Token not found in response:", response);
     }
@@ -33,7 +31,7 @@ const CustomerLoginForm: React.FC<CustomerLoginFormProps> = ({
       onSuccess(response);
     } else {
       // Default success behavior - redirect to dashboard or home
-      window.location.href = "/customer/dashboard";
+      window.location.href = "/customers/admin";
     }
   };
 

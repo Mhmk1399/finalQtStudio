@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import Project from "@/models/customersData/projects";
+import User from "@/models/users";
 import connect from "@/lib/data";
 
-// GET - Get project by ID
+// GET - Get user by ID
 export async function GET(request: NextRequest) {
   try {
     await connect();
     const id = request.headers.get("id");
-    const project = await Project.findById(id);
+    const user = await User.findById(id);
 
-    if (!project) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
-          error: "Project not found",
+          error: "User not found",
         },
         { status: 404 }
       );
@@ -21,35 +21,35 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: project,
+      data: user,
     });
   } catch (error) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch project",
+        error: "Failed to fetch user",
       },
       { status: 500 }
     );
   }
 }
 
-// PUT - Update project by ID
+// PUT - Update user by ID
 export async function PATCH(request: NextRequest) {
   try {
     await connect();
     const id = request.headers.get("id");
     const body = await request.json();
-    const project = await Project.findByIdAndUpdate(id, body, {
+    const user = await User.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
 
-    if (!project) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
-          error: "Project not found",
+          error: "User not found",
         },
         { status: 404 }
       );
@@ -57,31 +57,31 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: project,
+      data: user,
     });
   } catch (error: any) {
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update project",
+        error: error.message || "Failed to update user",
       },
       { status: 400 }
     );
   }
 }
 
-// DELETE - Delete project by ID
+// DELETE - Delete user by ID
 export async function DELETE(request: NextRequest) {
   try {
     await connect();
     const id = request.headers.get("id");
-    const project = await Project.findByIdAndDelete(id);
+    const user = await User.findByIdAndDelete(id);
 
-    if (!project) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
-          error: "Project not found",
+          error: "User not found",
         },
         { status: 404 }
       );
@@ -89,13 +89,13 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Project deleted successfully",
+      message: "User deleted successfully",
     });
   } catch (error) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to delete project",
+        error: "Failed to delete user",
       },
       { status: 500 }
     );
