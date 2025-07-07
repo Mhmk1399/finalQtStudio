@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useImperativeHandle } from "react";
+import {
+  HiOutlineEye,
+  HiOutlinePencilAlt,
+  HiOutlineTrash,
+} from "react-icons/hi";
+// Remove the DynamicModal import - we don't need it here
 
 export interface TableColumn {
   key: string;
@@ -18,8 +24,6 @@ export interface CustomAction {
   condition?: (row: any) => boolean;
 }
 
-
-
 export interface TableConfig {
   title: string;
   description?: string;
@@ -34,15 +38,19 @@ export interface TableConfig {
   };
   onView?: (row: any) => void;
   onEdit?: (row: any) => void;
-  onDelete?: (id: string) => void;
+  onDelete?: (row: any) => void; // Change this to accept the full row object instead of just id
   className?: string;
+  
 }
 
 interface DynamicTableProps {
   config: TableConfig;
 }
 
-const DynamicTable: React.FC<DynamicTableProps> = ({ config }) => {
+const DynamicTable = React.forwardRef<
+  { refreshData: () => void },
+  DynamicTableProps
+>(({ config }, ref) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +62,7 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ config }) => {
   useEffect(() => {
     fetchData();
   }, [config.endpoint]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -133,40 +142,13 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ config }) => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("آیا از حذف این آیتم اطمینان دارید؟")) {
-      return;
-    }
-
-    try {
-      // Use the detailes endpoint for delete operations
-      const deleteEndpoint = config.endpoint.includes("/detailes")
-        ? config.endpoint
-        : `${config.endpoint}/detailes`;
-
-      const response = await fetch(deleteEndpoint, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          id: id,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete item");
-      }
-
-      // Refresh data after successful deletion
-      await fetchData();
-
-      if (config.onDelete) {
-        config.onDelete(id);
-      }
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("خطا در حذف آیتم");
-    }
+  const refreshData = () => {
+    fetchData();
   };
+
+  useImperativeHandle(ref, () => ({
+    refreshData,
+  }));
 
   if (loading) {
     return (
@@ -265,34 +247,71 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ config }) => {
                     config.actions?.edit ||
                     config.actions?.delete) && (
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2 space-x-reverse">
+                      <div className="flex gap-1">
                         {config.actions?.view && (
-                          <button
-                            onClick={() => config.onView?.(row)}
-                            className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-50"
-                            title="مشاهده جزئیات"
-                          >
-                            👁
-                          </button>
+                          <div className="relative group">
+                            <button
+                              onClick={() => config.onView?.(row)}
+                              className="text-blue-600 border hover:text-blue-900 px-3 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200 flex items-center justify-center"
+                            >
+                              <HiOutlineEye className="w-4 h-4" />
+                            </button>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                              مشاهده جزئیات
+                            </span>
+                          </div>
                         )}
                         {config.actions?.edit && (
-                          <button
-                            onClick={() => config.onEdit?.(row)}
-                            className="text-yellow-600 hover:text-yellow-900 px-2 py-1 rounded hover:bg-yellow-50"
-                            title="ویرایش"
-                          >
-                            ✏️
-                          </button>
+                          <div className="relative group">
+                            <button
+                              onClick={() => config.onEdit?.(row)}
+                              className="text-amber-600 border hover:text-amber-900 px-3 py-2 rounded-lg hover:bg-amber-50 transition-all duration-200 flex items-center justify-center"
+                            >
+                              <HiOutlinePencilAlt className="w-4 h-4" />
+                            </button>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                              ویرایش
+                            </span>
+                          </div>
                         )}
                         {config.actions?.delete && (
-                          <button
-                            onClick={() => handleDelete(row._id || row.id)}
-                            className="text-red-600 hover:text-red-900 px-2 py-1 rounded hover:bg-red-50"
-                            title="حذف"
-                          >
-                            🗑️
-                          </button>
+                          <div className="relative group">
+                            <button
+                              onClick={() => config.onDelete?.(row)}
+                              className="text-red-600 border hover:text-red-900 px-3 py-2 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center"
+                            >
+                              <HiOutlineTrash className="w-4 h-4" />
+                            </button>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                              حذف
+                            </span>
+                          </div>
                         )}
+                        {config.actions?.custom?.map((action, index) => (
+                          <div key={index} className="relative group">
+                            <button
+                              onClick={() => action.onClick(row)}
+                              className={`px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
+                                action.className ||
+                                "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                              }`}
+                              style={{
+                                display: action.condition
+                                  ? action.condition(row)
+                                    ? "flex"
+                                    : "none"
+                                  : "flex",
+                              }}
+                            >
+                              <span className="w-4 h-4 text-sm flex items-center justify-center">
+                                {action.icon}
+                              </span>
+                            </button>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                              {action.label}
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     </td>
                   )}
@@ -319,6 +338,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ config }) => {
       </div>
     </div>
   );
-};
+});
+
+DynamicTable.displayName = "DynamicTable";
 
 export default DynamicTable;

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import DynamicForm from './DynamicForm';
-import { FormConfig } from '@/types/form';
+import React, { useState, useEffect } from "react";
+import DynamicForm from "./DynamicForm";
+import { FormConfig } from "@/types/form";
 
 interface ServiceRequestFormProps {
   onSuccess?: (data: any) => void;
@@ -20,7 +20,10 @@ interface Service {
   basePrice: number;
 }
 
-const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ onSuccess, onError }) => {
+const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
+  onSuccess,
+  onError,
+}) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,8 +33,8 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ onSuccess, onEr
     const fetchData = async () => {
       try {
         const [projectsResponse, servicesResponse] = await Promise.all([
-          fetch('/api/projects'),
-          fetch('/api/services')
+          fetch("/api/projects"),
+          fetch("/api/services"),
         ]);
 
         const projectsResult = await projectsResponse.json();
@@ -45,7 +48,7 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ onSuccess, onEr
           setServices(servicesResult.data);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -55,110 +58,123 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ onSuccess, onEr
   }, []);
 
   const serviceRequestFormConfig: FormConfig = {
-    title: 'Create Service Request',
-    description: 'Submit a request for service delivery',
-    endpoint: '/api/service-requests',
-    method: 'POST',
-    submitButtonText: 'Submit Request',
+    title: "ساخت درخواست سرویس",
+    description: "ایجاد یک درخواست سرویس جدید",
+    endpoint: "/api/service-requests",
+    method: "POST",
+    submitButtonText: "ثبت درخواست سرویس",
     onSuccess,
     onError,
+    successMessage: "درخواست سرویس با موفقیت ایجاد شد",
+    errorMessage: "خطا در ایجاد درخواست سرویس.",
+    validationErrorMessage: "لطفا فیلدها را به درستی پر کنید",
     fields: [
       {
-        name: 'projectId',
-        label: 'Project',
-        type: 'select',
+        name: "projectId",
+        label: "پروژه",
+        type: "select",
         required: true,
-        options: projects.map(project => ({
-          value: project._id,
-          label: project.title
-        })),
-        description: 'Select the project this service request belongs to',
+        options: [
+          { value: "", label: "انتخاب کنید" }, // Add this as the first option
+          ...projects.map((project) => ({
+            value: project._id,
+            label: project.title,
+          })),
+        ],
+
+        description:
+          "پروژه‌ای را که این درخواست سرویس به آن تعلق دارد انتخاب کنید",
       },
       {
-        name: 'serviceId',
-        label: 'Service',
-        type: 'select',
+        name: "serviceId",
+        label: "سرویس",
+        type: "select",
         required: true,
-        options: services.map(service => ({
-          value: service._id,
-          label: `${service.name} ($${service.basePrice})`
-        })),
-        description: 'Select the service you want to request',
+        options: [
+          { value: "", label: "انتخاب کنید" },
+          ...services.map((service) => ({
+            value: service._id,
+            label: `${service.name} (${service.basePrice})`,
+          })),
+        ],
+
+        description: "سرویس مورد نظر خود را برای درخواست انتخاب کنید",
       },
       {
-        name: 'quantity',
-        label: 'Quantity',
-        type: 'number',
-        placeholder: 'Enter quantity',
+        name: "quantity",
+        label: "تعداد ",
+        type: "number",
+        placeholder: "تعداد سرویس مورد نظر را وارد کنید",
         required: true,
         defaultValue: 1,
         validation: {
           min: 1,
           max: 100,
         },
-        description: 'Number of service units requested',
+        description: "تعداد واحدهای خدماتی درخواستی",
       },
       {
-        name: 'priority',
-        label: 'Priority Level',
-        type: 'select',
+        name: "priority",
+        label: "اولویت",
+        type: "select",
         required: true,
-        defaultValue: 'medium',
+        defaultValue: "medium",
         options: [
-          { value: 'low', label: 'Low Priority' },
-          { value: 'medium', label: 'Medium Priority' },
-          { value: 'high', label: 'High Priority' },
-          { value: 'urgent', label: 'Urgent' },
+          { value: "", label: "انتخاب کنید" },
+          { value: "low", label: "کم اولویت" },
+          { value: "medium", label: "متوسط اولویت" },
+          { value: "high", label: "بالا اولویت" },
+          { value: "urgent", label: "فوری" },
         ],
-        description: 'Priority level for this service request',
+        description: "سطح اولویت برای این درخواست سرویس",
       },
       {
-        name: 'requestedDate',
-        label: 'Requested Start Date',
-        type: 'date',
+        name: "requestedDate",
+        label: "تاریخ درخواست",
+        type: "date",
         required: true,
-        description: 'When do you need this service to start?',
+        description: "چه زمانی به شروع این سرویس نیاز دارید؟",
       },
       {
-        name: 'scheduledDate',
-        label: 'Preferred Scheduled Date',
-        type: 'date',
+        name: "scheduledDate",
+        label: "تاریخ پیشنهادی",
+        type: "date",
         required: false,
-        description: 'Optional: Preferred date for service delivery',
+        description: "اختیاری: تاریخ ترجیحی برای ارائه خدمات",
       },
       {
-        name: 'requirements',
-        label: 'Requirements',
-        type: 'textarea',
-        placeholder: 'Enter detailed requirements for this service',
+        name: "requirements",
+        label: "توضیحات و نیازهای خاص",
+        type: "textarea",
+        placeholder: "الزامات دقیق برای این سرویس را وارد کنید",
         required: true,
         validation: {
           minLength: 10,
           maxLength: 1000,
         },
-        description: 'Detailed requirements and specifications',
+        description: "الزامات و مشخصات دقیق",
       },
       {
-        name: 'notes',
-        label: 'Additional Notes',
-        type: 'textarea',
-        placeholder: 'Any additional notes or comments',
+        name: "notes",
+        label: "توضیحات و نکات اضافی",
+        type: "textarea",
+        placeholder: "هرگونه یادداشت یا نظر اضافی",
         required: false,
         validation: {
           maxLength: 500,
         },
-        description: 'Optional additional notes or special instructions',
+        description: "یادداشت‌های اضافی اختیاری یا دستورالعمل‌های ویژه",
       },
       {
-        name: 'title',
-        label: 'title ',
-        type: 'text',
-        placeholder: 'Any additional notes or comments',
+        name: "title",
+        label: "عنوان",
+        type: "text",
+        placeholder: "توضیحات و نکات اضافی",
         required: true,
         validation: {
           maxLength: 500,
         },
-        description: 'Optional additional notes or special instructions',
+        description: "یادداشت‌های اضافی اختیاری یا دستورالعمل‌های ویژه",
       },
     ],
   };
@@ -169,7 +185,9 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ onSuccess, onEr
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading projects and services...</p>
+          <p className="mt-2 text-gray-600">
+            در حال بارگذاری پروژه‌ها و خدمات...
+          </p>
         </div>
       </div>
     );
@@ -181,9 +199,9 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ onSuccess, onEr
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <p className="text-red-600">
-            {projects.length === 0 && 'No projects available. '}
-            {services.length === 0 && 'No services available. '}
-            Please create projects and services first.
+            {projects.length === 0 && "No projects available. "}
+            {services.length === 0 && "No services available. "}
+            لطفا ابتدا پروژه‌ها و سرویس‌ها را ایجاد کنید.
           </p>
         </div>
       </div>

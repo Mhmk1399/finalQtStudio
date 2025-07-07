@@ -41,61 +41,64 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onSuccess, onError }) => {
     fetchTeams();
   }, []);
   const serviceFormConfig: FormConfig = {
-    title: "Create New Service",
-    description: "Fill out the form below to create a new service offering",
+    title: "ساخت سرویس جدید",
+    description: "برای ایجاد یک سرویس جدید، فرم زیر را پر کنید",
     endpoint: "/api/services",
     method: "POST",
-    submitButtonText: "Create Service",
+    submitButtonText: "ثبت سرویس",
     onSuccess,
     onError,
+    successMessage: "سرویس با موفقیت ایجاد شد.",
+    errorMessage: "خطا در ایجاد سرویس.",
+    validationErrorMessage: "لطفا فیلدهای مورد نظر را به درستی وارد کنید.",
     fields: [
       {
         name: "name",
-        label: "Service Name",
+        label: "نام سرویس",
         type: "text",
-        placeholder: "Enter service name",
+        placeholder: "نام سرویس را وارد کنید",
         required: true,
         validation: {
           minLength: 2,
           maxLength: 100,
         },
-        description: "Clear and descriptive name for the service",
+        description: "نام واضح و توصیفی برای سرویس",
       },
       {
         name: "description",
-        label: "Service Description",
+        label: "توضیحات سرویس",
         type: "textarea",
-        placeholder: "Enter detailed description of the service",
+        placeholder: "توضیحات سرویس را وارد کنید",
         required: false,
         validation: {
           maxLength: 1000,
         },
-        description: "Optional description of what this service includes",
+        description: "توضیحات مفصل و کامل سرویس",
       },
 
       {
         name: "basePrice",
-        label: "Base Price (USD)",
+        label: "قیمت پایه",
         type: "number",
-        placeholder: "Enter base price",
+        placeholder: "قیمت پایه را وارد کنید",
         required: true,
         validation: {
           min: 0,
           max: 1000000,
         },
-        description: "Starting price for this service in USD",
+        description: "قیمت اصلی سرویس",
       },
 
       {
         name: "teamId",
-        label: "Assigned Team",
+        label: "تیم انجام دهنده سرویس",
         type: "select",
         required: true,
         options: teams.map((team) => ({
           value: team._id,
           label: `${team.name} (${team.specialization})`,
         })),
-        description: "Select the team responsible for delivering this service",
+        description: "تیمی را که مسئول ارائه این سرویس است انتخاب کنید",
       },
     ],
   };
@@ -106,7 +109,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onSuccess, onError }) => {
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading teams...</p>
+          <p className="mt-2 text-gray-600">در حال بارگیری تیم ها...</p>
         </div>
       </div>
     );
@@ -118,7 +121,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onSuccess, onError }) => {
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <p className="text-red-600">
-            No teams available. Please create teams first.
+            تیمی موجود نیست. لطفاً ابتدا تیم‌ها را ایجاد کنید.
           </p>
         </div>
       </div>

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import DynamicForm from './DynamicForm';
-import { FormConfig } from '@/types/form';
+import React, { useState, useEffect } from "react";
+import DynamicForm from "./DynamicForm";
+import { FormConfig } from "@/types/form";
 
 interface TaskFormProps {
   onSuccess?: (data: any) => void;
@@ -11,7 +11,10 @@ interface TaskFormProps {
 
 interface ServiceRequest {
   _id: string;
+  notes: string;
   requirements: string;
+  title: string;
+
   projectId: {
     title: string;
   };
@@ -42,13 +45,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, onError }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [serviceRequestsResponse, teamsResponse, usersResponse] = await Promise.all([
-          fetch('/api/service-requests'),
-          fetch('/api/teams'),
-          fetch('/api/users')
-        ]);
+        const [serviceRequestsResponse, teamsResponse, usersResponse] =
+          await Promise.all([
+            fetch("/api/service-requests"),
+            fetch("/api/teams"),
+            fetch("/api/users"),
+          ]);
 
         const serviceRequestsResult = await serviceRequestsResponse.json();
+        console.log("serviceRequestsResult:", serviceRequestsResult);
         const teamsResult = await teamsResponse.json();
         const usersResult = await usersResponse.json();
 
@@ -64,7 +69,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, onError }) => {
           setUsers(usersResult.data);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -74,135 +79,153 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, onError }) => {
   }, []);
 
   const taskFormConfig: FormConfig = {
-    title: 'Create New Task',
-    description: 'Create a task for service request execution',
-    endpoint: '/api/tasks',
-    method: 'POST',
-    submitButtonText: 'Create Task',
+    title: "ساخت وظیفه جدید",
+    description: "ایجاد یک وظیفه برای اجرای درخواست سرویس",
+    endpoint: "/api/tasks",
+    method: "POST",
+    submitButtonText: "ثبت وظیفه",
     onSuccess,
     onError,
+    errorMessage: "خطا در ثبت وظیفه",
+    successMessage: "وظیفه با موفقیت ثبت شد",
+    validationErrorMessage: "لطفا همه فیلدها را به درستی پر کنید",
     fields: [
       {
-        name: 'serviceRequestId',
-        label: 'Service Request',
-        type: 'select',
+        name: "serviceRequestId",
+        label: "درخواست سرویس",
+        type: "select",
         required: true,
-        options: serviceRequests.map(request => ({
-          value: request._id,
-          label: `${request.projectId?.title} - ${request.serviceId?.name} (${request.requirements.substring(0, 50)}...)`
-        })),
-        description: 'Select the service request this task belongs to',
+        options: [
+          { value: "", label: "انتخاب کنید" },
+          ...serviceRequests.map((request) => ({
+            value: request._id,
+            label: `${request?.title} (${request.requirements.substring(
+              0,
+              50
+            )}...)`,
+          })),
+        ],
+        description:
+          "درخواست سرویسی که این وظیفه به آن تعلق دارد را انتخاب کنید",
       },
       {
-        name: 'title',
-        label: 'Task Title',
-        type: 'text',
-        placeholder: 'Enter task title',
+        name: "title",
+        label: "نام وظیفه",
+        type: "text",
+        placeholder: "نام وظیفه را وارد کنید",
         required: true,
         validation: {
           minLength: 3,
           maxLength: 100,
         },
-        description: 'Clear and descriptive title for the task',
+        description: "عنوان واضح و توصیفی برای وظیفه",
       },
       {
-        name: 'description',
-        label: 'Task Description',
-        type: 'textarea',
-        placeholder: 'Enter detailed description of the task',
+        name: "description",
+        label: "توضیحات وظیفه",
+        type: "textarea",
+        placeholder: "شرح مفصلی از وظیفه را وارد کنید",
         required: true,
         validation: {
           minLength: 10,
           maxLength: 1000,
         },
-        description: 'Detailed description of what needs to be done',
+        description: "شرح مفصلی از آنچه باید انجام شود",
       },
       {
-        name: 'priority',
-        label: 'Priority Level',
-        type: 'select',
+        name: "priority",
+        label: "اولویت وظیفه",
+        type: "select",
         required: true,
-        defaultValue: 'medium',
+        defaultValue: "medium",
         options: [
-          { value: 'low', label: 'Low Priority' },
-          { value: 'medium', label: 'Medium Priority' },
-          { value: 'high', label: 'High Priority' },
-          { value: 'urgent', label: 'Urgent' },
+          { value: "", label: "انتخاب کنید" },
+
+          { value: "low", label: "کم اولویت" },
+          { value: "medium", label: "متوسط اولویت" },
+          { value: "high", label: "بالا اولویت" },
+          { value: "urgent", label: "فوری" },
         ],
-        description: 'Priority level for this task',
+        description: "سطح اولویت برای این وظیفه",
       },
       {
-        name: 'status',
-        label: 'Task Status',
-        type: 'select',
+        name: "status",
+        label: "وضعیت وظیفه",
+        type: "select",
         required: true,
-        defaultValue: 'todo',
+        defaultValue: "todo",
         options: [
-          { value: 'todo', label: 'To Do' },
-          { value: 'in-progress', label: 'In Progress' },
-          { value: 'review', label: 'In Review' },
-          { value: 'completed', label: 'Completed' },
-          { value: 'cancelled', label: 'Cancelled' },
+          { value: "todo", label: "انجام نشده" },
+          { value: "in-progress", label: "در حال انجام" },
+          { value: "review", label: "در حال بررسی" },
+          { value: "completed", label: "انجام شده" },
+          { value: "cancelled", label: "لغو شده" },
         ],
-        description: 'Current status of the task',
+        description: "وضعیت فعلی وظیفه",
       },
       {
-        name: 'assignedTeamId',
-        label: 'Assigned Team (Optional)',
-        type: 'select',
+        name: "assignedTeamId",
+        label: "تیم تعیین‌شده (اختیاری)",
+        type: "select",
         required: false,
-        options: teams.map(team => ({
-          value: team._id,
-          label: `${team.name} (${team.specialization})`
-        })),
-        description: 'Optional: Assign this task to a specific team',
+        options: [
+          { value: "", label: "انتخاب کنید" },
+          ...teams.map((team) => ({
+            value: team._id,
+            label: `${team.name} (${team.specialization})`,
+          })),
+        ],
+        description: "اختیاری: این وظیفه را به یک تیم خاص اختصاص دهید",
       },
       {
-        name: 'assignedUserId',
-        label: 'Assigned User (Optional)',
-        type: 'select',
+        name: "assignedUserId",
+        label: "کاربر تعیین‌شده (اختیاری)",
+        type: "select",
         required: false,
-        options: users.map(user => ({
-          value: user._id,
-          label: `${user.name} (${user.role})`
-        })),
-        description: 'Optional: Assign this task to a specific user',
+        options: [
+          { value: "", label: "انتخاب کنید" },
+          ...users.map((user) => ({
+            value: user._id,
+            label: `${user.name} (${user.role})`,
+          })),
+        ],
+        description: "اختیاری: این وظیفه را به یک کاربر خاص اختصاص دهید",
       },
       {
-        name: 'startDate',
-        label: 'Start Date',
-        type: 'date',
+        name: "startDate",
+        label: "تاریخ شروع",
+        type: "date",
         required: false,
-        description: 'Optional: When should this task start?',
+        description: "اختیاری: تاریخ شروع وظیفه",
       },
       {
-        name: 'dueDate',
-        label: 'Due Date',
-        type: 'date',
+        name: "dueDate",
+        label: "تاریخ انقضا",
+        type: "date",
         required: false,
-        description: 'Optional: When should this task be completed?',
+        description: "اختیاری: تاریخ انقضا وظیفه",
       },
       {
-        name: 'deliverables',
-        label: 'Expected Deliverables',
-        type: 'textarea',
-        placeholder: 'Describe the expected deliverables',
+        name: "deliverables",
+        label: "تاریخ تحویل",
+        type: "textarea",
+        placeholder: "تاریخ تحویل وظیفه را وارد کنید",
         required: false,
         validation: {
           maxLength: 500,
         },
-        description: 'Optional: What deliverables are expected from this task?',
+        description: "اختیاری: تاریخ تحویل وظیفه",
       },
       {
-        name: 'notes',
-        label: 'Task Notes',
-        type: 'textarea',
-        placeholder: 'Any additional notes or instructions',
+        name: "notes",
+        label: "یادداشت‌ها",
+        type: "textarea",
+        placeholder: "یادداشت‌های اضافی یا دستورالعمل‌های ویژه را وارد کنید",
         required: false,
         validation: {
           maxLength: 500,
         },
-        description: 'Optional: Additional notes or special instructions',
+        description: "اختیاری: یادداشت‌های اضافی یا دستورالعمل‌های ویژه",
       },
     ],
   };
@@ -213,7 +236,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, onError }) => {
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading service requests, teams, and users...</p>
+          <p className="mt-2 text-gray-600">
+            در حال بارگیری درخواست‌های سرویس، تیم‌ها و کاربران...
+          </p>
         </div>
       </div>
     );
@@ -224,7 +249,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSuccess, onError }) => {
     return (
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
-          <p className="text-red-600">No service requests available. Please create service requests first.</p>
+          <p className="text-red-600">
+            هیچ درخواست خدماتی موجود نیست. لطفاً ابتدا درخواست‌های خدماتی ایجاد
+            کنید.
+          </p>
         </div>
       </div>
     );

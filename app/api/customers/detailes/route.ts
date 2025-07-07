@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import Customer from "@/models/customersData/customers";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import connect from "@/lib/data";
 
 // GET - Get customer by ID

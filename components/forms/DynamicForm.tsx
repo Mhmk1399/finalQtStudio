@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FormConfig, FormData, FormState, FormField } from "@/types/form";
+import toast from "react-hot-toast";
 
 interface DynamicFormProps {
   config: FormConfig;
@@ -33,47 +34,47 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   }, [config.fields]);
 
   const validateField = (
-      field: FormField,
-      value: string | number | boolean | File
-    ): string | null => {
-      // Skip validation for File type fields
-      if (value instanceof File) {
-        return null;
-      }
-  
-      if (field.required && (!value || value === "")) {
-        return `${field.label} is required`;
-      }
-  
-      if (field.validation) {
-        const { min, max, pattern, minLength, maxLength } = field.validation;
-        const stringValue = String(value);
-  
-        if (minLength && stringValue.length < minLength) {
-          return `${field.label} must be at least ${minLength} characters`;
-        }
-  
-        if (maxLength && stringValue.length > maxLength) {
-          return `${field.label} must not exceed ${maxLength} characters`;
-        }
-  
-        if (pattern && !new RegExp(pattern).test(stringValue)) {
-          return `${field.label} format is invalid`;
-        }
-  
-        if (field.type === "number") {
-          const numValue = Number(value);
-          if (min !== undefined && numValue < min) {
-            return `${field.label} must be at least ${min}`;
-          }
-          if (max !== undefined && numValue > max) {
-            return `${field.label} must not exceed ${max}`;
-          }
-        }
-      }
-  
+    field: FormField,
+    value: string | number | boolean | File
+  ): string | null => {
+    // Skip validation for File type fields
+    if (value instanceof File) {
       return null;
-    };
+    }
+
+    if (field.required && (!value || value === "")) {
+      return `${field.label} is required`;
+    }
+
+    if (field.validation) {
+      const { min, max, pattern, minLength, maxLength } = field.validation;
+      const stringValue = String(value);
+
+      if (minLength && stringValue.length < minLength) {
+        return `${field.label} must be at least ${minLength} characters`;
+      }
+
+      if (maxLength && stringValue.length > maxLength) {
+        return `${field.label} must not exceed ${maxLength} characters`;
+      }
+
+      if (pattern && !new RegExp(pattern).test(stringValue)) {
+        return `${field.label} format is invalid`;
+      }
+
+      if (field.type === "number") {
+        const numValue = Number(value);
+        if (min !== undefined && numValue < min) {
+          return `${field.label} must be at least ${min}`;
+        }
+        if (max !== undefined && numValue > max) {
+          return `${field.label} must not exceed ${max}`;
+        }
+      }
+    }
+
+    return null;
+  };
 
   const handleInputChange = (
     fieldName: string,
@@ -89,7 +90,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     // Call field-specific onChange if provided
     const field = config.fields.find((f) => f.name === fieldName);
     if (field && field.onChange) {
-      field.onChange(value , formState.data[fieldName]);
+      field.onChange(value, formState.data[fieldName]);
     }
   };
 
@@ -111,6 +112,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
     if (Object.keys(errors).length > 0) {
       setFormState((prev) => ({ ...prev, errors }));
+      // Show validation error toast
+      toast.error(
+        config.validationErrorMessage || "لطفاً خطاهای فرم را بررسی کنید"
+      );
       return;
     }
 
@@ -136,6 +141,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
       setFormState((prev) => ({ ...prev, loading: false, success: true }));
 
+      // Show success toast
+      toast.success(config.successMessage || "فرم با موفقیت ارسال شد!");
+
       if (config.onSuccess) {
         config.onSuccess(result);
       }
@@ -147,6 +155,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         loading: false,
         errors: { submit: errorMessage },
       }));
+
+      // Show error toast
+      toast.error(config.errorMessage || `خطا در ارسال فرم: ${errorMessage}`);
 
       if (config.onError) {
         config.onError(errorMessage);
@@ -330,7 +341,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   return (
     <div
-      className={`max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md ${
+      className={`max-w-5xl mx-auto p-6 bg-white rounded-lg  ${
         config.className || ""
       }`}
       dir="rtl"
@@ -347,30 +358,18 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4">
         {config.fields.map(renderField)}
 
-        {formState.errors.submit && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-700">{formState.errors.submit}</p>
-          </div>
-        )}
-
-        {formState.success && (
-          <div className="bg-green-50 border border-green-200 rounded-md p-4">
-            <p className="text-green-700">Form submitted successfully!</p>
-          </div>
-        )}
-
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <button
             type="submit"
             disabled={formState.loading}
-            className={`px-6 py-3 rounded-md font-medium transition-colors ${
+            className={`px-6 py-3 w-50 rounded-md cursor-pointer font-medium transition-colors ${
               formState.loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                : "bg-emerald-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             } text-white`}
           >
             {formState.loading
-              ? "Submitting..."
+              ? "در حال ارسال..."
               : config.submitButtonText || "Submit"}
           </button>
         </div>

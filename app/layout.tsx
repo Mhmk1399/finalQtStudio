@@ -22,9 +22,9 @@ export default function RootLayout({
         <Avatar />
         <div className="relative">
           <Navbar />
+          <Toaster position="top-center" reverseOrder={false} />
         </div>
         <div className="relative z-10">{children}</div>
-        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

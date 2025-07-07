@@ -1,6 +1,30 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaUser,
+  FaFileContract,
+  FaDollarSign,
+  FaProjectDiagram,
+  FaServicestack,
+  FaBlog,
+  FaVideo,
+  FaChevronLeft,
+  FaBars,
+  FaTimes,
+  FaCog,
+  FaUserCircle,
+} from "react-icons/fa";
+import {
+  HiOutlineDocumentText,
+  HiOutlineCurrencyDollar,
+  HiOutlineUser,
+  HiOutlineCollection,
+  HiOutlineClipboardList,
+  HiOutlineBookOpen,
+  HiOutlineVideoCamera,
+} from "react-icons/hi";
 import CustomerForm from "../forms/customers/CustomerForm";
 import ContractFormHidden from "../forms/ContractForm";
 import UserRegisterForm from "../forms/usersAndTeams/UserRegisterForm";
@@ -9,6 +33,7 @@ import ServiceForm from "../forms/ServiceForm";
 import ServiceRequestForm from "../forms/ServiceRequestForm";
 import TaskForm from "../forms/TaskForm";
 import ProjectForm from "../forms/projectAndServices/ProjectForm";
+import CustomerInfoTable from "../customerSidebar/tables/customerTable";
 
 type FormType =
   | "customer"
@@ -18,18 +43,27 @@ type FormType =
   | "service"
   | "service-request"
   | "task"
-  | "project";
+  | "project"
+  | "contracts-list"
+  | "transactions"
+  | "personal-info"
+  | "projects-list"
+  | "service-requests-list"
+  | "latest-blogs"
+  | "latest-videos";
 
 interface FormOption {
   id: FormType;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   category: string;
   description: string;
+  color: string;
 }
 
 const CustomerSideBar: React.FC = () => {
-  const [activeForm, setActiveForm] = useState<FormType>("customer");
+  const [activeForm, setActiveForm] = useState<FormType>("contracts-list");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -40,58 +74,63 @@ const CustomerSideBar: React.FC = () => {
     {
       id: "contracts-list",
       label: "لیست قراردادها",
-      icon: "📋",
+      icon: <HiOutlineDocumentText className="w-5 h-5" />,
       category: "مالی و حسابداری",
       description: "مشاهده و مدیریت قراردادهای شما",
+      color: "bg-blue-500",
     },
     {
       id: "transactions",
       label: "تراکنش‌ها",
-      icon: "💰",
+      icon: <HiOutlineCurrencyDollar className="w-5 h-5" />,
       category: "مالی و حسابداری",
       description: "تاریخچه پرداخت‌ها و تراکنش‌های مالی",
+      color: "bg-blue-500",
     },
     {
       id: "personal-info",
       label: "اطلاعات شخصی",
-      icon: "👤",
+      icon: <HiOutlineUser className="w-5 h-5" />,
       category: "مالی و حسابداری",
       description: "مدیریت اطلاعات حساب کاربری",
+      color: "bg-blue-500",
     },
 
     // پروژه‌ها و خدمات
     {
       id: "projects-list",
       label: "لیست پروژه‌ها",
-      icon: "🚀",
+      icon: <FaProjectDiagram className="w-5 h-5" />,
       category: "پروژه‌ها و خدمات",
       description: "مشاهده پروژه‌های در حال اجرا و تکمیل شده",
+      color: "bg-green-500",
     },
     {
       id: "service-requests-list",
       label: "لیست درخواست خدمات",
-      icon: "📝",
+      icon: <HiOutlineClipboardList className="w-5 h-5" />,
       category: "پروژه‌ها و خدمات",
       description: "پیگیری درخواست‌های خدماتی شما",
+      color: "bg-green-500",
     },
 
     // آموزش‌ها و بلاگ‌ها
     {
       id: "latest-blogs",
       label: "آخرین بلاگ‌ها",
-      icon: "📚",
+      icon: <HiOutlineBookOpen className="w-5 h-5" />,
       category: "آموزش‌ها و بلاگ‌ها",
       description: "مطالعه جدیدترین مقالات و راهنماها",
+      color: "bg-purple-500",
     },
     {
       id: "latest-videos",
       label: "آخرین ویدیوها",
-      icon: "🎥",
+      icon: <HiOutlineVideoCamera className="w-5 h-5" />,
       category: "آموزش‌ها و بلاگ‌ها",
       description: "تماشای آموزش‌های ویدیویی جدید",
+      color: "bg-purple-500",
     },
-
-   
   ];
 
   // Group forms by category
@@ -104,19 +143,19 @@ const CustomerSideBar: React.FC = () => {
   }, {} as Record<string, FormOption[]>);
 
   const handleSuccess = (data: any) => {
-    setMessage({ type: "success", text: "Form submitted successfully!" });
+    setMessage({ type: "success", text: "عملیات با موفقیت انجام شد!" });
     console.log("Success:", data);
-
-    // Auto-clear message after 5 seconds
     setTimeout(() => setMessage(null), 5000);
   };
 
   const handleError = (error: string) => {
     setMessage({ type: "error", text: error });
     console.error("Error:", error);
-
-    // Auto-clear message after 8 seconds
     setTimeout(() => setMessage(null), 8000);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const renderForm = () => {
@@ -143,99 +182,412 @@ const CustomerSideBar: React.FC = () => {
         );
       case "task":
         return <TaskForm onSuccess={handleSuccess} onError={handleError} />;
+      case "contracts-list":
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              📋
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              لیست قراردادها
+            </h3>
+            <p className="text-gray-500">
+              در اینجا می‌توانید تمام قراردادهای خود را مشاهده کنید
+            </p>
+          </div>
+        );
+      case "transactions":
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              💰
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              تراکنش‌های مالی
+            </h3>
+            <p className="text-gray-500">
+              تاریخچه پرداخت‌ها و تراکنش‌های مالی شما
+            </p>
+          </div>
+        );
+      case "personal-info":
+        return <CustomerInfoTable />;
+      case "projects-list":
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              🚀
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              پروژه‌های شما
+            </h3>
+            <p className="text-gray-500">
+              مشاهده پروژه‌های در حال اجرا و تکمیل شده
+            </p>
+          </div>
+        );
+      case "service-requests-list":
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              📝
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              درخواست‌های خدماتی
+            </h3>
+            <p className="text-gray-500">پیگیری درخواست‌های خدماتی شما</p>
+          </div>
+        );
+      case "latest-blogs":
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              📚
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              آخرین مقالات
+            </h3>
+            <p className="text-gray-500">مطالعه جدیدترین مقالات و راهنماها</p>
+          </div>
+        );
+      case "latest-videos":
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              🎥
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              آخرین ویدیوها
+            </h3>
+            <p className="text-gray-500">تماشای آموزش‌های ویدیویی جدید</p>
+          </div>
+        );
       default:
-        return <div>Select a form from the sidebar</div>;
+        return (
+          <div className="text-center p-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              🏠
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              خوش آمدید
+            </h3>
+            <p className="text-gray-500">
+              یکی از گزینه‌های موجود در نوار کناری را انتخاب کنید
+            </p>
+          </div>
+        );
     }
   };
 
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-80 bg-white shadow-lg overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Form Management</h1>
-          <p className="text-gray-600 text-sm mt-1">
-            Create and manage system entities
-          </p>
-        </div>
+  const itemVariants = {
+    open: {
+      x: 0,
+      opacity: 1,
+      transition: { type: "spring" as const, stiffness: 300, damping: 30 },
+    },
+    closed: {
+      x: 50,
+      opacity: 0,
+      transition: { type: "spring" as const, stiffness: 300, damping: 30 },
+    },
+  };
 
-        <div className="p-4">
-          {Object.entries(groupedForms).map(([category, forms]) => (
-            <div key={category} className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                {category}
-              </h3>
-              <div className="space-y-1">
-                {forms.map((form) => (
-                  <button
-                    key={form.id}
-                    onClick={() => setActiveForm(form.id)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${
-                      activeForm === form.id
-                        ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
-                        : "hover:bg-gray-50 text-gray-700"
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-xl mr-3">{form.icon}</span>
-                      <div>
-                        <div className="font-medium text-sm">{form.label}</div>
-                        <div className="text-xs text-gray-500">
-                          {form.description}
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
+  const currentForm = formOptions.find((f) => f.id === activeForm);
+
+  return (
+    <div className="flex h-screen bg-gray-50" dir="rtl">
+      {/* Sidebar Toggle Button */}
+      <motion.button
+        onClick={toggleSidebar}
+        className={`fixed top-6 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
+          isSidebarOpen
+            ? "left-6 bg-gray-600 text-white hover:bg-gray-700"
+            : "left-6 bg-blue-600 text-white hover:bg-blue-700"
+        }`}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        {isSidebarOpen ? (
+          <FaTimes className="w-5 h-5" />
+        ) : (
+          <FaBars className="w-5 h-5" />
+        )}
+      </motion.button>
+
+      {/* Backdrop */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-20 z-30 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Animated Sidebar */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 30,
+            }}
+            className="fixed lg:relative w-80 bg-white shadow-2xl overflow-y-auto z-40 h-full"
+          >
+            {/* Header */}
+            <motion.div
+              variants={itemVariants}
+              className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-white">پنل مشتری</h1>
+                  <p className="text-blue-100 text-sm mt-1">
+                    مدیریت حساب کاربری و خدمات
+                  </p>
+                </div>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="text-white"
+                >
+                  <FaUserCircle className="w-8 h-8" />
+                </motion.div>
               </div>
+            </motion.div>
+
+            {/* Navigation Items */}
+            <div className="p-4">
+              {Object.entries(groupedForms).map(
+                ([category, forms], categoryIndex) => (
+                  <motion.div
+                    key={category}
+                    variants={itemVariants}
+                    initial="closed"
+                    animate="open"
+                    className="mb-6"
+                  >
+                    <div className="flex items-center mb-3">
+                      <div
+                        className={`w-3 h-3 rounded-full ml-2 ${
+                          categoryIndex === 0
+                            ? "bg-blue-500"
+                            : categoryIndex === 1
+                            ? "bg-green-500"
+                            : "bg-purple-500"
+                        }`}
+                      />
+                      <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                        {category}
+                      </h3>
+                    </div>
+
+                    <div className="space-y-2">
+                      {forms.map((form, index) => (
+                        <motion.button
+                          key={form.id}
+                          onClick={() => {
+                            setActiveForm(form.id);
+                            if (window.innerWidth < 1024) {
+                              setIsSidebarOpen(false);
+                            }
+                          }}
+                          className={`w-full text-right p-4 rounded-xl transition-all duration-300 group ${
+                            activeForm === form.id
+                              ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-md"
+                              : "hover:bg-gray-50 border-2 border-transparent hover:border-gray-200"
+                          }`}
+                          whileHover={{ scale: 1.02, x: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{
+                            delay: categoryIndex * 0.1 + index * 0.05,
+                          }}
+                        >
+                          <div className="flex items-center">
+                            <motion.div
+                              className={`p-2 rounded-lg ml-3 ${
+                                activeForm === form.id
+                                  ? form.color + " text-white shadow-lg"
+                                  : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
+                              }`}
+                              whileHover={{ rotate: 5 }}
+                            >
+                              {form.icon}
+                            </motion.div>
+                            <div className="text-right flex-1">
+                              <div
+                                className={`font-medium text-sm ${
+                                  activeForm === form.id
+                                    ? "text-blue-700"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                {form.label}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {form.description}
+                              </div>
+                            </div>
+                            {activeForm === form.id && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-2 h-2 bg-blue-500 rounded-full mr-2"
+                              />
+                            )}
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )
+              )}
             </div>
-          ))}
-        </div>
-      </div>
+
+            {/* Footer */}
+            <motion.div
+              variants={itemVariants}
+              className="p-4 border-t border-gray-200 bg-gray-50"
+            >
+              <div className="text-center text-xs text-gray-500">
+                <p>نسخه 1.0.0</p>
+                <p className="mt-1">© 2024 Qt Studio</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto">
+      <motion.div
+        className="flex-1 overflow-y-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
         <div className="p-6">
           {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center">
-              <span className="text-2xl mr-3">
-                {formOptions.find((f) => f.id === activeForm)?.icon}
-              </span>
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  {formOptions.find((f) => f.id === activeForm)?.label}
-                </h2>
-                <p className="text-gray-600">
-                  {formOptions.find((f) => f.id === activeForm)?.description}
-                </p>
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <motion.div
+                  className={`p-3 rounded-xl ml-4 ${
+                    currentForm?.color || "bg-blue-500"
+                  } text-white shadow-lg`}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  {currentForm?.icon || <FaUser className="w-6 h-6" />}
+                </motion.div>
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    {currentForm?.label || "خوش آمدید"}
+                  </h2>
+                  <p className="text-gray-600 mt-1">
+                    {currentForm?.description ||
+                      "یکی از گزینه‌های موجود را انتخاب کنید"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Breadcrumb */}
+              <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
+                <span>پنل مشتری</span>
+                <FaChevronLeft className="w-3 h-3" />
+                <span>{currentForm?.category}</span>
+                <FaChevronLeft className="w-3 h-3" />
+                <span className="text-gray-900">{currentForm?.label}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Message Display */}
-          {message && (
-            <div
-              className={`mb-6 p-4 rounded-md ${
-                message.type === "success"
-                  ? "bg-green-50 border border-green-200"
-                  : "bg-red-50 border border-red-200"
-              }`}
-            >
-              <p
-                className={`${
-                  message.type === "success" ? "text-green-700" : "text-red-700"
+          {/* <AnimatePresence>
+            {message && (
+              <motion.div
+                initial={{ opacity: 0, y: -50, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -50, scale: 0.9 }}
+                className={`mb-6 p-4 rounded-xl border-r-4 ${
+                  message.type === "success"
+                    ? "bg-green-50 border-green-400 text-green-700"
+                    : "bg-red-50 border-red-400 text-red-700"
                 }`}
               >
-                {message.text}
-              </p>
-            </div>
-          )}
+                <div className="flex items-center">
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5 }}
+                    className="mr-3"
+                  >
+                    {message.type === "success" ? "✅" : "❌"}
+                  </motion.div>
+                  <p className="font-medium">{message.text}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence> */}
 
           {/* Form Content */}
-          {renderForm()}
+          <motion.div
+            className="bg-white rounded-2xl shadow-sm overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="p-6">{renderForm()}</div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

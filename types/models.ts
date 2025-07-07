@@ -57,6 +57,7 @@ export interface IProject {
   actualEndDate?: Date;
   paymentStatus: 'pending' | 'partial' | 'paid' | 'overdue';
   paidAmount: number;
+  services: mongoose.Types.ObjectId[];
   totalPrice: number;
   finalPrice: number;
   discount: number;

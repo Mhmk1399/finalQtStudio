@@ -64,24 +64,24 @@ const ContractFormHidden: React.FC<ContractFormHiddenProps> = ({
   console.log('Current customer ID:', currentCustomerId);
 
   const contractFormConfig: FormConfig = {
-    title: "Create New Contract",
-    description: "Fill out the form below to create a new contract",
+    title: "ساخت قرارداد",
+    description: "ساخت قرارداد جدید",
     endpoint: "/api/contracts",
     method: "POST",
-    submitButtonText: "Create Contract",
+    submitButtonText: "ثبت قرارداد",
     onSuccess: handleFormSuccess,
     onError: handleFormError,
     fields: [
       {
         name: "customerId",
-        label: "Customer ID",
+        label: "شناسسه مشتری",
         type: "hidden", // This field will be hidden from the user
         defaultValue: currentCustomerId,
         required: true,
       },
       {
         name: "contractNumber",
-        label: "Contract Number",
+        label: "شماره قرارداد",
         type: "text",
         placeholder: "Enter unique contract number",
         required: true,
@@ -92,7 +92,7 @@ const ContractFormHidden: React.FC<ContractFormHiddenProps> = ({
       },
       {
         name: "contractType",
-        label: "Contract Type",
+        label: "نوع قرارداد",
         type: "select",
         required: true,
         defaultValue: "standard",

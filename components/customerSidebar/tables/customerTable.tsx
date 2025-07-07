@@ -1,8 +1,8 @@
 "use client";
 
+import DynamicModal, { ModalConfig } from "@/components/DynamicModal";
+import DynamicTable, { TableConfig } from "@/components/tables/DynamicTable";
 import React, { useState } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
-import DynamicModal, { ModalConfig } from "../../components/DynamicModal";
 import toast from "react-hot-toast";
 
 const CustomersTable: React.FC = () => {

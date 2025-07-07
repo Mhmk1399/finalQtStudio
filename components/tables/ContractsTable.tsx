@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
+import toast from "react-hot-toast";
 
 const ContractsTable: React.FC = () => {
   const [selectedContractId, setSelectedContractId] = useState<string | null>(
@@ -147,11 +148,11 @@ const ContractsTable: React.FC = () => {
       onSuccess: (data) => {
         console.log("Contract updated successfully:", data);
         setRefreshTable((prev) => prev + 1);
-        alert("قرارداد با موفقیت به‌روزرسانی شد");
+        toast.success("قرارداد با موفقیت به‌روزرسانی شد.");
       },
       onError: (error) => {
         console.error("Update error:", error);
-        alert("خطا در به‌روزرسانی قرارداد: " + error);
+        toast.error("خطا در به‌روزرسانی قرارداد.");
       },
       onClose: () => setShowModal(false),
       confirmText: "ذخیره تغییرات",
@@ -221,11 +222,11 @@ const ContractsTable: React.FC = () => {
         console.log("Contract approval updated:", data);
         setRefreshTable((prev) => prev + 1);
         const status = data.status === "approved" ? "تأیید" : "رد";
-        alert(`قرارداد با موفقیت ${status} شد`);
+        toast.success(`قرارداد با موفقیت ${status} شد`);
       },
       onError: (error) => {
         console.error("Approval error:", error);
-        alert("خطا در تأیید/رد قرارداد: " + error);
+        toast.error("خطا در تأیید/رد قرارداد: ");
       },
       onClose: () => setShowModal(false),
       confirmText: "ثبت تصمیم",
@@ -264,11 +265,11 @@ const ContractsTable: React.FC = () => {
       onSuccess: (data) => {
         console.log("Contract deleted successfully:", data);
         setRefreshTable((prev) => prev + 1);
-        alert("قرارداد با موفقیت حذف شد");
+        toast.success("قرارداد با موفقیت حذف شد");
       },
       onError: (error) => {
         console.error("Delete error:", error);
-        alert("خطا در حذف قرارداد: " + error);
+        toast.error("خطا در حذف قرارداد: ");
       },
       onClose: () => setShowModal(false),
       confirmText: "حذف قرارداد",

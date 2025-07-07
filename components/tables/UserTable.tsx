@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
+import toast from "react-hot-toast";
 
 const UsersTable: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -114,12 +115,12 @@ const UsersTable: React.FC = () => {
       ],
       onSuccess: (data) => {
         console.log("User updated successfully:", data);
+        toast.success("کاربر با موفقیت به‌روزرسانی شد.");
         setRefreshTable((prev) => prev + 1);
-        alert("کاربر با موفقیت به‌روزرسانی شد");
       },
       onError: (error) => {
         console.error("Update error:", error);
-        alert("خطا در به‌روزرسانی کاربر: " + error);
+        toast.error("خطا در به‌روزرسانی کاربر.");
       },
       onClose: () => setShowModal(false),
       confirmText: "ذخیره تغییرات",
@@ -182,11 +183,11 @@ const UsersTable: React.FC = () => {
       onSuccess: (data) => {
         console.log("User status updated:", data);
         setRefreshTable((prev) => prev + 1);
-        alert(`کاربر با موفقیت ${action} شد`);
+        toast.success(`کاربر با موفقیت ${action} شد`);
       },
       onError: (error) => {
         console.error("Status update error:", error);
-        alert(`خطا در ${action} کردن کاربر: ` + error);
+        toast.error(`خطا در ${action} کردن کاربر: `);
       },
       onClose: () => setShowModal(false),
       confirmText: `${action} کردن`,
@@ -236,11 +237,11 @@ const UsersTable: React.FC = () => {
       ),
       onSuccess: (data) => {
         console.log("Password reset successfully:", data);
-        alert("رمز عبور با موفقیت بازنشانی شد");
+        toast.success("رمز عبور با موفقیت بازنشانی شد");
       },
       onError: (error) => {
         console.error("Password reset error:", error);
-        alert("خطا در بازنشانی رمز عبور: " + error);
+        toast.error("خطا در بازنشانی رمز عبور: ");
       },
       onClose: () => setShowModal(false),
       confirmText: "بازنشانی رمز عبور",
@@ -278,12 +279,12 @@ const UsersTable: React.FC = () => {
       ),
       onSuccess: (data) => {
         console.log("User deleted successfully:", data);
+        toast.success("کاربر با موفقیت حذف شد");
         setRefreshTable((prev) => prev + 1);
-        alert("کاربر با موفقیت حذف شد");
       },
       onError: (error) => {
         console.error("Delete error:", error);
-        alert("خطا در حذف کاربر: " + error);
+        toast.error("خطا در حذف کاربر ");
       },
       onClose: () => setShowModal(false),
       confirmText: "حذف کاربر",

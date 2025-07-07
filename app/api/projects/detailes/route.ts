@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     await connect();
     const id = request.headers.get("id");
-    const project = await Project.findById(id);
+    const project = await Project.findById(id).populate("projectId");
 
     if (!project) {
       return NextResponse.json(

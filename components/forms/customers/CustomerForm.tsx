@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import DynamicForm from '../DynamicForm';
-import { FormConfig } from '@/types/form';
+import React from "react";
+import DynamicForm from "../DynamicForm";
+import { FormConfig } from "@/types/form";
 
 interface CustomerFormProps {
   onSuccess?: (data: any) => void;
@@ -11,19 +11,22 @@ interface CustomerFormProps {
 
 const CustomerForm: React.FC<CustomerFormProps> = ({ onSuccess, onError }) => {
   const customerFormConfig: FormConfig = {
-    title: 'فرم ثبت نام',
-    description: 'Fill out the form below to create a new customer account',
-    endpoint: '/api/customers',
-    method: 'POST',
-    submitButtonText: 'Create Customer',
+    title: "فرم ثبت نام",
+    description: "لطفا اطلاعات خود را وارد کنید",
+    endpoint: "/api/customers",
+    method: "POST",
+    submitButtonText: "ثبت نام",
     onSuccess,
     onError,
+    validationErrorMessage: "لطفاً اطلاعات فرم را به درستی تکمیل کنید.",
+    successMessage: "مشتری با موفقیت ثبت شد",
+    errorMessage: "خطا در ثبت نام مشتری",
     fields: [
       {
-        name: 'name',
-        label: 'Full Name',
-        type: 'text',
-        placeholder: 'Enter customer full name',
+        name: "name",
+        label: "نام",
+        type: "text",
+        placeholder: "لطفا نام خود را وارد کنید",
         required: true,
         validation: {
           minLength: 2,
@@ -31,42 +34,42 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSuccess, onError }) => {
         },
       },
       {
-        name: 'email',
-        label: 'Email Address',
-        type: 'email',
-        placeholder: 'Enter email address',
+        name: "email",
+        label: "ایمیل",
+        type: "email",
+        placeholder: "لطفا ایمیل خود را وارد کنید",
         required: true,
         validation: {
-          pattern: '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$',
+          pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
         },
       },
       {
-        name: 'phoneNumber',
-        label: 'Phone Number',
-        type: 'tel',
-        placeholder: 'Enter phone number',
+        name: "phoneNumber",
+        label: "شماره تماس",
+        type: "tel",
+        placeholder: "لطفا شماره تماس خود را وارد کنید",
         required: true,
         validation: {
-          pattern: '^[+]?[0-9]{10,15}$',
+          pattern: "^[+]?[0-9]{10,15}$",
         },
-        description: 'Enter phone number with country code (e.g., +1234567890)',
+        description: "شماره تماس باید با 09 و حداقل 10 رقم باشد",
       },
       {
-        name: 'password',
-        label: 'Password',
-        type: 'password',
-        placeholder: 'Enter password',
+        name: "password",
+        label: "رمز عبور",
+        type: "password",
+        placeholder: "لطفا رمز عبور خود را وارد کنید",
         required: false,
         validation: {
           minLength: 8,
         },
-        description: 'Leave empty if customer will set password later',
+        description: "رمز عبور باید حداقل 8 کاراکتر باشد",
       },
       {
-        name: 'businessName',
-        label: 'Business Name',
-        type: 'text',
-        placeholder: 'Enter business name',
+        name: "businessName",
+        label: "نام سازمان",
+        type: "text",
+        placeholder: "لطفا نام سازمان خود را وارد کنید",
         required: true,
         validation: {
           minLength: 2,
@@ -74,23 +77,23 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSuccess, onError }) => {
         },
       },
       {
-        name: 'businessScale',
-        label: 'Business Scale',
-        type: 'select',
+        name: "businessScale",
+        label: "مقیاس سازمان",
+        type: "select",
         required: true,
         options: [
-          { value: 'startup', label: 'Startup' },
-          { value: 'small', label: 'Small Business' },
-          { value: 'medium', label: 'Medium Business' },
-          { value: 'large', label: 'Large Business' },
-          { value: 'enterprise', label: 'Enterprise' },
+          { value: "startup", label: "استارتاپ" },
+          { value: "small", label: "کوچک" },
+          { value: "medium", label: "متوسط" },
+          { value: "large", label: "بزرگ" },
+          { value: "enterprise", label: "شرکت" },
         ],
       },
       {
-        name: 'address',
-        label: 'Business Address',
-        type: 'textarea',
-        placeholder: 'Enter complete business address',
+        name: "address",
+        label: "آدرس کامل سازمان",
+        type: "textarea",
+        placeholder: "لطفا آدرس کامل سازمان خود را وارد کنید",
         required: true,
         validation: {
           minLength: 10,
@@ -98,16 +101,16 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSuccess, onError }) => {
         },
       },
       {
-        name: 'website',
-        label: 'Website URL',
-        type: 'text',
-        placeholder: 'https://example.com',
+        name: "website",
+        label: "وبسایت",
+        type: "text",
+        placeholder: "https://example.com",
         required: false,
         validation: {
-          pattern: '^https?://.*',
+          pattern: "^https?://.*",
         },
-        description: 'Optional: Enter website URL starting with http:// or https://',
-      }
+        description: "لطفا وبسایت خود را به صورت https://example.com وارد کنید",
+      },
     ],
   };
 

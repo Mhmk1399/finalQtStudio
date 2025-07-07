@@ -5,6 +5,7 @@ import WorksContainer from "@/components/static/workContainer";
 //   title: "نمونه کارهای ما",
 //   description: "نمونه کارهای ما",
 // };
+
 export default function Works() {
   return (
     <section>

@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import ServiceRequest from '@/models/customersData/serviceRequests';
+import { NextRequest, NextResponse } from "next/server";
+import ServiceRequest from "@/models/customersData/serviceRequests";
+import connect from "@/lib/data";
 
 // GET - Get service request by ID
 export async function GET(
@@ -7,33 +8,47 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const serviceRequest = await ServiceRequest.findById(params.id);
-    
+    await connect();
+    const serviceRequest = await ServiceRequest.findById(params.id)
+      .populate("projectId", "title name")
+      .populate("serviceId", "name basePrice")
+      .populate("requestedBy", "name")
+      .populate("approvedBy", "name");
+
     if (!serviceRequest) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service request not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Service request not found",
+        },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      data: serviceRequest
+      data: serviceRequest,
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch service request'
-    }, { status: 500 });
+    console.error("GET Service Request Error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to fetch service request",
+      },
+      { status: 500 }
+    );
   }
 }
 
-// PUT - Update service request by ID
-export async function PUT(
+// PATCH - Update service request by ID
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    await connect();
+
     const body = await request.json();
     const serviceRequest = await ServiceRequest.findByIdAndUpdate(
       params.id,
@@ -42,21 +57,27 @@ export async function PUT(
     );
 
     if (!serviceRequest) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service request not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Service request not found",
+        },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      data: serviceRequest
+      data: serviceRequest,
     });
   } catch (error: any) {
-    return NextResponse.json({
-      success: false,
-      error: error.message || 'Failed to update service request'
-    }, { status: 400 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || "Failed to update service request",
+      },
+      { status: 400 }
+    );
   }
 }
 
@@ -66,23 +87,31 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    await connect();
+
     const serviceRequest = await ServiceRequest.findByIdAndDelete(params.id);
 
     if (!serviceRequest) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service request not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Service request not found",
+        },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Service request deleted successfully'
+      message: "Service request deleted successfully",
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to delete service request'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to delete service request",
+      },
+      { status: 500 }
+    );
   }
 }

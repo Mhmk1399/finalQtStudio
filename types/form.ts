@@ -50,6 +50,9 @@ export interface FormConfig {
   onError?: (error: string) => void;
   onChange?: (fieldName: string, value: string | number | boolean) => void;
   className?: string;
+  successMessage?: string;
+  errorMessage?: string;
+  validationErrorMessage?: string;
 }
 
 export interface FormData {

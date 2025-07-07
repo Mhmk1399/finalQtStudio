@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Service from '@/models/customersData/services';
+import { NextRequest, NextResponse } from "next/server";
+import Service from "@/models/customersData/services";
+import connect from "@/lib/data";
 
 // GET - Get service by ID
 export async function GET(
@@ -7,56 +8,73 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const service = await Service.findById(params.id);
-    
+    await connect();
+    const service = await Service.findById(params.id).populate(
+      "teamId",
+      "name specialization"
+    );
+
     if (!service) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Service not found",
+        },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      data: service
+      data: service,
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch service'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to fetch service",
+      },
+      { status: 500 }
+    );
   }
 }
 
-// PUT - Update service by ID
-export async function PUT(
+// PATCH - Update service by ID
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    await connect();
     const body = await request.json();
-    const service = await Service.findByIdAndUpdate(
-      params.id,
-      body,
-      { new: true, runValidators: true }
-    );
+    const service = await Service.findByIdAndUpdate(params.id, body, {
+      new: true,
+      runValidators: true,
+    }).populate("teamId", "name specialization");
 
     if (!service) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Service not found",
+        },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      data: service
+      data: service,
+      message: "Service updated successfully",
     });
   } catch (error: any) {
-    return NextResponse.json({
-      success: false,
-      error: error.message || 'Failed to update service'
-    }, { status: 400 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || "Failed to update service",
+      },
+      { status: 400 }
+    );
   }
 }
 
@@ -66,23 +84,30 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    await connect();
     const service = await Service.findByIdAndDelete(params.id);
 
     if (!service) {
-      return NextResponse.json({
-        success: false,
-        error: 'Service not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Service not found",
+        },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Service deleted successfully'
+      message: "Service deleted successfully",
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to delete service'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to delete service",
+      },
+      { status: 500 }
+    );
   }
 }

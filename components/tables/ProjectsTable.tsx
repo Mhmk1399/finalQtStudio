@@ -3,9 +3,12 @@
 import React, { useState } from "react";
 import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
+import toast from "react-hot-toast";
 
 const ProjectsTable: React.FC = () => {
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
   const [showModal, setShowModal] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
@@ -22,31 +25,35 @@ const ProjectsTable: React.FC = () => {
         { key: "customerId", label: "شناسه مشتری", type: "text" },
         { key: "contractId", label: "شناسه قرارداد", type: "text" },
         { key: "projectManagerId", label: "شناسه مدیر پروژه", type: "text" },
-        { 
-          key: "status", 
-          label: "وضعیت پروژه", 
+        {
+          key: "status",
+          label: "وضعیت پروژه",
           type: "select",
           options: [
             { value: "planning", label: "در حال برنامه‌ریزی" },
             { value: "active", label: "فعال" },
             { value: "paused", label: "متوقف شده" },
             { value: "completed", label: "تکمیل شده" },
-            { value: "cancelled", label: "لغو شده" }
-          ]
+            { value: "cancelled", label: "لغو شده" },
+          ],
         },
         { key: "startDate", label: "تاریخ شروع", type: "date" },
-        { key: "expectedEndDate", label: "تاریخ پایان پیش‌بینی شده", type: "date" },
+        {
+          key: "expectedEndDate",
+          label: "تاریخ پایان پیش‌بینی شده",
+          type: "date",
+        },
         { key: "actualEndDate", label: "تاریخ پایان واقعی", type: "date" },
-        { 
-          key: "paymentStatus", 
-          label: "وضعیت پرداخت", 
+        {
+          key: "paymentStatus",
+          label: "وضعیت پرداخت",
           type: "select",
           options: [
             { value: "pending", label: "در انتظار پرداخت" },
             { value: "partial", label: "پرداخت جزئی" },
             { value: "paid", label: "پرداخت شده" },
-            { value: "overdue", label: "معوقه" }
-          ]
+            { value: "overdue", label: "معوقه" },
+          ],
         },
         { key: "paidAmount", label: "مبلغ پرداخت شده", type: "number" },
         { key: "totalPrice", label: "قیمت کل", type: "number" },
@@ -74,13 +81,33 @@ const ProjectsTable: React.FC = () => {
       method: "PATCH",
       fields: [
         { key: "title", label: "عنوان پروژه", type: "text", required: true },
-        { key: "description", label: "توضیحات", type: "textarea", required: true },
-        { key: "customerId", label: "شناسه مشتری", type: "text", required: true },
-        { key: "contractId", label: "شناسه قرارداد", type: "text", required: true },
-        { key: "projectManagerId", label: "شناسه مدیر پروژه", type: "text", required: true },
-        { 
-          key: "status", 
-          label: "وضعیت پروژه", 
+        {
+          key: "description",
+          label: "توضیحات",
+          type: "textarea",
+          required: true,
+        },
+        {
+          key: "customerId",
+          label: "شناسه مشتری",
+          type: "text",
+          required: true,
+        },
+        {
+          key: "contractId",
+          label: "شناسه قرارداد",
+          type: "text",
+          required: true,
+        },
+        {
+          key: "projectManagerId",
+          label: "شناسه مدیر پروژه",
+          type: "text",
+          required: true,
+        },
+        {
+          key: "status",
+          label: "وضعیت پروژه",
           type: "select",
           required: true,
           options: [
@@ -88,39 +115,48 @@ const ProjectsTable: React.FC = () => {
             { value: "active", label: "فعال" },
             { value: "paused", label: "متوقف شده" },
             { value: "completed", label: "تکمیل شده" },
-            { value: "cancelled", label: "لغو شده" }
-          ]
+            { value: "cancelled", label: "لغو شده" },
+          ],
         },
         { key: "startDate", label: "تاریخ شروع", type: "date" },
-        { key: "expectedEndDate", label: "تاریخ پایان پیش‌بینی شده", type: "date" },
+        {
+          key: "expectedEndDate",
+          label: "تاریخ پایان پیش‌بینی شده",
+          type: "date",
+        },
         { key: "actualEndDate", label: "تاریخ پایان واقعی", type: "date" },
-        { 
-          key: "paymentStatus", 
-          label: "وضعیت پرداخت", 
+        {
+          key: "paymentStatus",
+          label: "وضعیت پرداخت",
           type: "select",
           required: true,
           options: [
             { value: "pending", label: "در انتظار پرداخت" },
             { value: "partial", label: "پرداخت جزئی" },
             { value: "paid", label: "پرداخت شده" },
-            { value: "overdue", label: "معوقه" }
-          ]
+            { value: "overdue", label: "معوقه" },
+          ],
         },
         { key: "paidAmount", label: "مبلغ پرداخت شده", type: "number" },
         { key: "totalPrice", label: "قیمت کل", type: "number", required: true },
-        { key: "finalPrice", label: "قیمت نهایی", type: "number", required: true },
+        {
+          key: "finalPrice",
+          label: "قیمت نهایی",
+          type: "number",
+          required: true,
+        },
         { key: "discount", label: "تخفیف", type: "number" },
         { key: "notes", label: "یادداشت‌ها", type: "textarea" },
         { key: "internalNotes", label: "یادداشت‌های داخلی", type: "textarea" },
       ],
       onSuccess: (data) => {
         console.log("Project updated successfully:", data);
-        setRefreshTable(prev => prev + 1);
-        alert("پروژه با موفقیت به‌روزرسانی شد");
+        toast.success("پروژه با موفقیت به‌روزرسانی شد.");
+        setRefreshTable((prev) => prev + 1);
       },
       onError: (error) => {
         console.error("Update error:", error);
-        alert("خطا در به‌روزرسانی پروژه: " + error);
+        toast.error("خطا در به‌روزرسانی پروژه: ");
       },
       onClose: () => setShowModal(false),
       confirmText: "ذخیره تغییرات",
@@ -140,12 +176,12 @@ const ProjectsTable: React.FC = () => {
       method: "DELETE",
       onSuccess: (data) => {
         console.log("Project deleted successfully:", data);
-        setRefreshTable(prev => prev + 1);
-        alert("پروژه با موفقیت حذف شد");
+        setRefreshTable((prev) => prev + 1);
+        toast.success("پروژه با موفقیت حذف شد.");
       },
       onError: (error) => {
         console.error("Delete error:", error);
-        alert("خطا در حذف پروژه: " + error);
+        toast.error("خطا در حذف پروژه");
       },
       onClose: () => setShowModal(false),
       confirmText: "حذف پروژه",
@@ -158,9 +194,9 @@ const ProjectsTable: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fa-IR', {
-      style: 'currency',
-      currency: 'IRR',
+    return new Intl.NumberFormat("fa-IR", {
+      style: "currency",
+      currency: "IRR",
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -195,16 +231,35 @@ const ProjectsTable: React.FC = () => {
         sortable: true,
         width: "130px",
         render: (value) => {
-          const statusConfig: { [key: string]: { label: string; className: string } } = {
-            planning: { label: "برنامه‌ریزی", className: "bg-blue-100 text-blue-800" },
+          const statusConfig: {
+            [key: string]: { label: string; className: string };
+          } = {
+            planning: {
+              label: "برنامه‌ریزی",
+              className: "bg-blue-100 text-blue-800",
+            },
             active: { label: "فعال", className: "bg-green-100 text-green-800" },
-            paused: { label: "متوقف", className: "bg-yellow-100 text-yellow-800" },
-            completed: { label: "تکمیل شده", className: "bg-purple-100 text-purple-800" },
-            cancelled: { label: "لغو شده", className: "bg-red-100 text-red-800" }
+            paused: {
+              label: "متوقف",
+              className: "bg-yellow-100 text-yellow-800",
+            },
+            completed: {
+              label: "تکمیل شده",
+              className: "bg-purple-100 text-purple-800",
+            },
+            cancelled: {
+              label: "لغو شده",
+              className: "bg-red-100 text-red-800",
+            },
           };
-          const config = statusConfig[value] || { label: value, className: "bg-gray-100 text-gray-800" };
+          const config = statusConfig[value] || {
+            label: value,
+            className: "bg-gray-100 text-gray-800",
+          };
           return (
-            <span className={`px-2 py-1 rounded-full text-xs ${config.className}`}>
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${config.className}`}
+            >
               {config.label}
             </span>
           );
@@ -217,15 +272,31 @@ const ProjectsTable: React.FC = () => {
         sortable: true,
         width: "120px",
         render: (value) => {
-          const statusConfig: { [key: string]: { label: string; className: string } } = {
-            pending: { label: "در انتظار", className: "bg-yellow-100 text-yellow-800" },
-            partial: { label: "جزئی", className: "bg-orange-100 text-orange-800" },
-            paid: { label: "پرداخت شده", className: "bg-green-100 text-green-800" },
-            overdue: { label: "معوقه", className: "bg-red-100 text-red-800" }
+          const statusConfig: {
+            [key: string]: { label: string; className: string };
+          } = {
+            pending: {
+              label: "در انتظار",
+              className: "bg-yellow-100 text-yellow-800",
+            },
+            partial: {
+              label: "جزئی",
+              className: "bg-orange-100 text-orange-800",
+            },
+            paid: {
+              label: "پرداخت شده",
+              className: "bg-green-100 text-green-800",
+            },
+            overdue: { label: "معوقه", className: "bg-red-100 text-red-800" },
           };
-          const config = statusConfig[value] || { label: value, className: "bg-gray-100 text-gray-800" };
+          const config = statusConfig[value] || {
+            label: value,
+            className: "bg-gray-100 text-gray-800",
+          };
           return (
-            <span className={`px-2 py-1 rounded-full text-xs ${config.className}`}>
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${config.className}`}
+            >
               {config.label}
             </span>
           );
@@ -295,11 +366,8 @@ const ProjectsTable: React.FC = () => {
 
   return (
     <div>
-      <DynamicTable 
-        config={projectsTableConfig} 
-        key={refreshTable}
-      />
-      
+      <DynamicTable config={projectsTableConfig} key={refreshTable} />
+
       {/* Dynamic Modal */}
       {showModal && modalConfig && (
         <DynamicModal

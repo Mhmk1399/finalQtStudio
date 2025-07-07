@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 interface CallConfig {
   phoneNumber?: string;
 }
@@ -62,11 +64,11 @@ class CallManager {
 
   private showSuccessMessage = (phoneNumber: string) => {
     // You can replace this with a toast notification
-    alert(`شماره تلفن کپی شد: ${phoneNumber}`);
+    toast.success(`شماره تلفن کپی شد: ${phoneNumber}`);
   };
 
   private showErrorMessage = () => {
-    alert('خطا در برقراری تماس. لطفاً دوباره تلاش کنید.');
+    toast.error('خطا در برقراری تماس. لطفاً دوباره تلاش کنید.');
   };
 }
 

@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import SocialModal from "./SocialModal";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const menuItems = [
   {
@@ -55,6 +56,7 @@ const menuItems = [
 ];
 
 const Navbar = () => {
+  const pathname = usePathname();
   // Refs for positioning
   const shareButtonRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
@@ -118,6 +120,10 @@ const Navbar = () => {
       setSocialModalOpen(true);
     }
   };
+
+  if(pathname === '/admin' || pathname === '/customers/admin') {
+    return null;
+  }
 
   // Desktop Navbar Component
   const DesktopNav = () => {

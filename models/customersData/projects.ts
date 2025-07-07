@@ -34,6 +34,12 @@ const projectSchema = new mongoose.Schema<IProject>(
       default: "planning",
       required: true,
     },
+    services: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service",
+      },
+    ],
     startDate: {
       type: Date,
     },

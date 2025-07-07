@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
+import toast from "react-hot-toast";
 
 const TeamsTable: React.FC = () => {
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
@@ -15,7 +16,7 @@ const TeamsTable: React.FC = () => {
       title: "مشاهده جزئیات تیم",
       type: "view",
       size: "xl",
-      endpoint: "/api/teams/detailes",
+      endpoint: `/api/teams/${team._id || team.id}`,
       fields: [
         { key: "name", label: "نام تیم", type: "text" },
         { key: "description", label: "توضیحات", type: "textarea" },
@@ -56,8 +57,8 @@ const TeamsTable: React.FC = () => {
       title: "ویرایش تیم",
       type: "edit",
       size: "xl",
-      endpoint: "/api/teams/detailes",
-      method: "PATCH",
+      endpoint: `/api/teams/${team._id}`,
+      method: "PUT",
       fields: [
         { key: "name", label: "نام تیم", type: "text", required: true },
         { key: "description", label: "توضیحات", type: "textarea", required: true },
@@ -75,12 +76,12 @@ const TeamsTable: React.FC = () => {
       ],
       onSuccess: (data) => {
         console.log("Team updated successfully:", data);
+        toast.success("تیم با موفقیت به‌روزرسانی شد.");
         setRefreshTable(prev => prev + 1);
-        alert("تیم با موفقیت به‌روزرسانی شد");
       },
       onError: (error) => {
         console.error("Update error:", error);
-        alert("خطا در به‌روزرسانی تیم: " + error);
+        toast.error("خطا در به‌روزرسانی تیم.");
       },
       onClose: () => setShowModal(false),
       confirmText: "ذخیره تغییرات",
@@ -96,7 +97,7 @@ const TeamsTable: React.FC = () => {
       title: "حذف تیم",
       type: "delete",
       size: "md",
-      endpoint: "/api/teams/detailes",
+      endpoint: `/api/teams/${team._id || team.id}`,
       method: "DELETE",
       customContent: (
         <div className="text-center">
@@ -118,11 +119,11 @@ const TeamsTable: React.FC = () => {
       onSuccess: (data) => {
         console.log("Team deleted successfully:", data);
         setRefreshTable(prev => prev + 1);
-        alert("تیم با موفقیت حذف شد");
+        toast.success("تیم با موفقیت حذف شد");
       },
       onError: (error) => {
         console.error("Delete error:", error);
-        alert("خطا در حذف تیم: " + error);
+        toast.error("خطا در حذف تیم: ");
       },
       onClose: () => setShowModal(false),
       confirmText: "حذف تیم",
