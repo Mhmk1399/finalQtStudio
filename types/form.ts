@@ -9,6 +9,7 @@ export type FormFieldType =
   | "number"
   | "date"
   | "checkbox"
+  | "checkbox-group"
   | "radio"
   | "hidden";
 

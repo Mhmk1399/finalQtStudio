@@ -78,21 +78,26 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const handleInputChange = (
     fieldName: string,
-    value: string | number | boolean
+    value: string | number | boolean | string[] // Add string[] for array values
   ) => {
     setFormState((prev) => ({
       ...prev,
       data: { ...prev.data, [fieldName]: value },
-      errors: { ...prev.errors, [fieldName]: "" },
-      success: false,
+      errors: { ...prev.errors, [fieldName]: null },
     }));
 
-    // Call field-specific onChange if provided
+    // Handle field changes and validation
     const field = config.fields.find((f) => f.name === fieldName);
-    if (field && field.onChange) {
-      field.onChange(value, formState.data[fieldName]);
+    if (field?.onChange) {
+      // For array values, pass the array directly
+      if (Array.isArray(value)) {
+        field.onChange(value);
+      } else {
+        field.onChange(value as string);
+      }
     }
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -295,6 +300,78 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
             {field.description && (
               <p className="text-gray-500 text-sm mt-1">{field.description}</p>
+            )}
+          </div>
+        );
+
+      // Add this inside the renderField function, after the existing field types
+
+      case "checkbox-group":
+        return (
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              {field.label}
+              {field.required && <span className="text-red-500 mr-1">*</span>}
+            </label>
+            {field.description && (
+              <p className="text-sm text-gray-500 mb-3">{field.description}</p>
+            )}
+            <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+              {field.options?.map((option) => {
+                const isChecked = Array.isArray(formState.data[field.name])
+                  ? formState.data[field.name].includes(option.value)
+                  : false;
+
+                return (
+                  <div
+                    key={option.value}
+                    className="flex items-start space-x-3 space-x-reverse"
+                  >
+                    <input
+                      type="checkbox"
+                      id={`${field.name}-${option.value}`}
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const currentValues = Array.isArray(
+                          formState.data[field.name]
+                        )
+                          ? formState.data[field.name]
+                          : [];
+
+                        let newValues;
+                        if (e.target.checked) {
+                          newValues = [...currentValues, option.value];
+                        } else {
+                          newValues = currentValues.filter(
+                            (val: any) => val !== option.value
+                          );
+                        }
+
+                        handleInputChange(field.name, newValues);
+                      }}
+                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor={`${field.name}-${option.value}`}
+                        className="text-sm font-medium text-gray-900 cursor-pointer"
+                      >
+                        {option.label}
+                      </label>
+                      {option.description && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {option.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {formState.errors[field.name] && (
+              <p className="text-red-500 text-sm mt-1">
+                {formState.errors[field.name]}
+              </p>
             )}
           </div>
         );

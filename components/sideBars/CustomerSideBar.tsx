@@ -33,7 +33,9 @@ import ServiceForm from "../forms/ServiceForm";
 import ServiceRequestForm from "../forms/ServiceRequestForm";
 import TaskForm from "../forms/TaskForm";
 import ProjectForm from "../forms/projectAndServices/ProjectForm";
-import CustomerInfoTable from "../customerSidebar/tables/customerTable";
+import CustomerInfoTable from "../customerAdmin/tables/customerTable";
+import ProjectOrderingComponent from "../customerAdmin/forms/serviceRequest";
+import CustomerProjectsList from "../customerAdmin/tables/projectList";
 
 type FormType =
   | "customer"
@@ -162,6 +164,8 @@ const CustomerSideBar: React.FC = () => {
     switch (activeForm) {
       case "customer":
         return <CustomerForm onSuccess={handleSuccess} onError={handleError} />;
+      case "contracts-list":
+        return <CustomerProjectsList/>;
       case "contract":
         return (
           <ContractFormHidden onSuccess={handleSuccess} onError={handleError} />
@@ -182,6 +186,8 @@ const CustomerSideBar: React.FC = () => {
         );
       case "task":
         return <TaskForm onSuccess={handleSuccess} onError={handleError} />;
+      case "service-requests-list":
+        return <ProjectOrderingComponent />;
       case "contracts-list":
         return (
           <div className="text-center p-8">
@@ -330,7 +336,7 @@ const CustomerSideBar: React.FC = () => {
   const currentForm = formOptions.find((f) => f.id === activeForm);
 
   return (
-    <div className="flex h-screen bg-gray-50" dir="rtl">
+    <div className="flex h-screen " dir="rtl">
       {/* Sidebar Toggle Button */}
       <motion.button
         onClick={toggleSidebar}
@@ -504,12 +510,12 @@ const CustomerSideBar: React.FC = () => {
 
       {/* Main Content */}
       <motion.div
-        className="flex-1 overflow-y-auto"
+        className="flex-1 bg-white overflow-y-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="p-6">
+        <div className="py-6 px-2">
           {/* Header */}
           <motion.div
             className="mb-6"
@@ -529,7 +535,7 @@ const CustomerSideBar: React.FC = () => {
                   {currentForm?.icon || <FaUser className="w-6 h-6" />}
                 </motion.div>
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900">
+                  <h2 className="md:text-3xl font-bold text-gray-900">
                     {currentForm?.label || "خوش آمدید"}
                   </h2>
                   <p className="text-gray-600 mt-1">

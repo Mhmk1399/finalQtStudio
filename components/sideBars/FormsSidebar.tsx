@@ -311,7 +311,7 @@ const FormsSidebar: React.FC = () => {
         className={`fixed top-6 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
           isSidebarOpen
             ? "left-6 bg-blue-600 text-gray-100 hover:bg-gray-50"
-            : "right-6 bg-blue-600 text-white hover:bg-blue-700"
+            : "left-6 bg-blue-600 text-white hover:bg-blue-700"
         }`}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -333,7 +333,7 @@ const FormsSidebar: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-20 z-30 lg:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-md z-30 lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
@@ -476,8 +476,8 @@ const FormsSidebar: React.FC = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <motion.div className="flex-1 overflow-y-auto">
-        <div className="p-6">
+      <motion.div className="flex-1 overflow-y-auto ">
+        <div className="py-6 px-2">
           {/* Header */}
           <motion.div
             className="mb-6"
@@ -486,13 +486,23 @@ const FormsSidebar: React.FC = () => {
             transition={{ delay: 0.3 }}
           >
             <div className="flex items-center justify-between gap-20">
-              <div className="flex items-center mr-12">
+              <div className="flex items-center ">
+                <motion.div
+                  className={`p-3 rounded-xl ml-4 ${
+                    currentForm?.color || "bg-blue-500"
+                  } text-white shadow-lg`}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  {currentForm?.icon || <FaUser className="w-6 h-6" />}
+                </motion.div>
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900">
-                    {currentForm?.label}
+                  <h2 className="md:text-3xl font-bold text-gray-900">
+                    {currentForm?.label || "خوش آمدید"}
                   </h2>
                   <p className="text-gray-600 mt-1">
-                    {currentForm?.description}
+                    {currentForm?.description ||
+                      "یکی از گزینه‌های موجود را انتخاب کنید"}
                   </p>
                 </div>
               </div>
@@ -542,7 +552,7 @@ const FormsSidebar: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="p-6">{renderForm()}</div>
+            <div className="py-6 px-2">{renderForm()}</div>
           </motion.div>
         </div>
       </motion.div>

@@ -22,9 +22,37 @@ const ProjectsTable: React.FC = () => {
       fields: [
         { key: "title", label: "عنوان پروژه", type: "text" },
         { key: "description", label: "توضیحات", type: "textarea" },
-        { key: "customerId", label: "شناسه مشتری", type: "text" },
+        {
+          key: "customerId",
+          label: "مشتری",
+          type: "text",
+          sortable: true,
+          width: "150px",
+          render: (value: unknown, row: unknown) => {
+            console.log("Customer value:", value); // Debug log
+            // Check if customerId is populated with customer object
+            if (value && typeof value === "object" && "name" in value) {
+              return value.name;
+            }
+            // If it's still just an ID string
+            if (typeof value === "string") {
+              return `مشتری: ${value.substring(0, 8)}...`;
+            }
+            return "-";
+          },
+        },
         { key: "contractId", label: "شناسه قرارداد", type: "text" },
-        { key: "projectManagerId", label: "شناسه مدیر پروژه", type: "text" },
+        {
+          key: "projectManagerId",
+          label: "مدیر پروژه",
+          type: "text",
+          render: (value: unknown) => {
+            if (value && typeof value === "object" && "name" in value && "email" in value) {
+              return `${value.name} (${value.email || ""})`;
+            }
+            return value || "-";
+          },
+        },
         {
           key: "status",
           label: "وضعیت پروژه",
@@ -219,9 +247,36 @@ const ProjectsTable: React.FC = () => {
         type: "text",
         sortable: true,
         width: "150px",
-        render: (value) => {
-          // You might want to populate this with actual customer name
-          return value ? `مشتری: ${value.substring(0, 8)}...` : "-";
+        render: (value, row) => {
+          console.log("Customer value:", value); // Debug log
+          // Check if customerId is populated with customer object
+          if (value && typeof value === "object" && value.name) {
+            return value.name;
+          }
+          // If it's still just an ID string
+          if (typeof value === "string") {
+            return `مشتری: ${value.substring(0, 8)}...`;
+          }
+          return "-";
+        },
+      },
+      {
+        key: "projectManagerId",
+        label: "مدیر پروژه",
+        type: "text",
+        sortable: true,
+        width: "150px",
+        render: (value, row) => {
+          console.log("Project Manager value:", value); // Debug log
+          // Check if projectManagerId is populated with user object
+          if (value && typeof value === "object" && value.name) {
+            return value.name;
+          }
+          // If it's still just an ID string
+          if (typeof value === "string") {
+            return `مدیر: ${value.substring(0, 8)}...`;
+          }
+          return "-";
         },
       },
       {

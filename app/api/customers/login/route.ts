@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
-const secretKey = process.env.JWT_SECRET;
+    const secretKey = process.env.JWT_SECRET;
     if (!secretKey) {
       return NextResponse.json(
         {
@@ -94,7 +94,6 @@ const secretKey = process.env.JWT_SECRET;
       secretKey,
       { expiresIn: "7d" }
     );
-
 
     // Remove password from response
     const customerData = {

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import DynamicForm from '../DynamicForm';
-import { FormConfig } from '@/types/form';
+import React, { useState, useEffect } from "react";
+import DynamicForm from "../DynamicForm";
+import { FormConfig } from "@/types/form";
 
 interface ProjectFormProps {
   onSuccess?: (data: any) => void;
@@ -14,42 +14,49 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   const [allContracts, setAllContracts] = useState<any[]>([]);
   const [filteredContracts, setFilteredContracts] = useState<any[]>([]);
   const [managers, setManagers] = useState<any[]>([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+  const [services, setServices] = useState<any[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
-
   // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch customers
-        const customersResponse = await fetch('/api/customers');
+        const customersResponse = await fetch("/api/customers");
         const customersData = await customersResponse.json();
-        
+
         // Fetch all contracts
-        const contractsResponse = await fetch('/api/contracts');
+        const contractsResponse = await fetch("/api/contracts");
         const contractsData = await contractsResponse.json();
-        
+
         // Fetch users/managers
-        const usersResponse = await fetch('/api/users');
+        const usersResponse = await fetch("/api/users");
         const usersData = await usersResponse.json();
-        
+
+        // Fetch services
+        const servicesResponse = await fetch("/api/services");
+        const servicesData = await servicesResponse.json();
+
         if (customersData.success) {
           setCustomers(customersData.data || []);
         }
-        
+
         if (contractsData.success) {
           setAllContracts(contractsData.data || []);
         }
-        
+
         if (usersData.success) {
           setManagers(usersData.data || []);
         }
-        
+
+        if (servicesData.success) {
+          setServices(servicesData.data || []);
+        }
       } catch (error) {
-        console.error('Error fetching initial data:', error);
+        console.error("Error fetching initial data:", error);
       } finally {
         setLoading(false);
       }
@@ -62,7 +69,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   useEffect(() => {
     if (selectedCustomerId) {
       const customerContracts = allContracts.filter(
-        contract => contract.customerId === selectedCustomerId
+        (contract) => contract.customerId === selectedCustomerId
       );
       setFilteredContracts(customerContracts);
     } else {
@@ -75,7 +82,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     if (!loading) {
       setFormConfig(createFormConfig());
     }
-  }, [loading, customers, filteredContracts, managers, selectedCustomerId]);
+  }, [
+    loading,
+    customers,
+    filteredContracts,
+    managers,
+    selectedCustomerId,
+    services,
+  ]); // Add services dependency
 
   const handleCustomerChange = (customerId: string) => {
     setSelectedCustomerId(customerId);
@@ -83,19 +97,22 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
 
   const createFormConfig = (): FormConfig => {
     return {
-      title: 'ایجاد پروژه جدید',
-      description: 'فرم زیر را برای ایجاد پروژه جدید تکمیل کنید',
-      endpoint: '/api/projects',
-      method: 'POST',
-      submitButtonText: 'ایجاد پروژه',
+      title: "ایجاد پروژه جدید",
+      description: "فرم زیر را برای ایجاد پروژه جدید تکمیل کنید",
+      endpoint: "/api/projects",
+      method: "POST",
+      submitButtonText: "ایجاد پروژه",
       onSuccess,
       onError,
+      successMessage: "پروژه با موفقیت ایجاد شد",
+      errorMessage: "خطا در ساخت پروژه",
+      validationErrorMessage: "لطفا تمامی فیلدهای الزامی را پر کنید",
       fields: [
         {
-          name: 'title',
-          label: 'عنوان پروژه',
-          type: 'text',
-          placeholder: 'عنوان پروژه را وارد کنید',
+          name: "title",
+          label: "عنوان پروژه",
+          type: "text",
+          placeholder: "عنوان پروژه را وارد کنید",
           required: true,
           validation: {
             minLength: 2,
@@ -103,10 +120,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           },
         },
         {
-          name: 'description',
-          label: 'توضیحات پروژه',
-          type: 'textarea',
-          placeholder: 'توضیحات کامل پروژه را وارد کنید',
+          name: "description",
+          label: "توضیحات پروژه",
+          type: "textarea",
+          placeholder: "توضیحات کامل پروژه را وارد کنید",
           required: true,
           validation: {
             minLength: 10,
@@ -114,122 +131,146 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           },
         },
         {
-          name: 'customerId',
-          label: 'مشتری',
-          type: 'select',
+          name: "customerId",
+          label: "مشتری",
+          type: "select",
           required: true,
           options: [
-            { value: '', label: 'مشتری را انتخاب کنید' },
-            ...customers.map(customer => ({
+            { value: "", label: "مشتری را انتخاب کنید" },
+            ...customers.map((customer) => ({
               value: customer._id,
               label: `${customer.name} - ${customer.businessName}`,
-            }))
+            })),
           ],
           onChange: handleCustomerChange,
         },
         {
-          name: 'contractId',
-          label: 'قرارداد',
-          type: 'select',
+          name: "contractId",
+          label: "قرارداد",
+          type: "select",
           required: true,
-          options: selectedCustomerId ? [
-            { value: '', label: 'قرارداد را انتخاب کنید' },
-            ...filteredContracts.map(contract => ({
-              value: contract._id,
-              label: contract.title || contract.contractNumber || `قرارداد ${contract._id.slice(-6)}`,
-            }))
-          ] : [
-            { value: '', label: 'ابتدا مشتری را انتخاب کنید' }
-          ],
-          description: selectedCustomerId ? 'قراردادهای مربوط به مشتری انتخاب شده' : 'ابتدا مشتری را انتخاب کنید',
+          options: selectedCustomerId
+            ? [
+                { value: "", label: "قرارداد را انتخاب کنید" },
+                ...filteredContracts.map((contract) => ({
+                  value: contract._id,
+                  label:
+                    contract.title ||
+                    contract.contractNumber ||
+                    `قرارداد ${contract._id.slice(-6)}`,
+                })),
+              ]
+            : [{ value: "", label: "ابتدا مشتری را انتخاب کنید" }],
+          description: selectedCustomerId
+            ? "قراردادهای مربوط به مشتری انتخاب شده"
+            : "ابتدا مشتری را انتخاب کنید",
         },
         {
-          name: 'projectManagerId',
-          label: 'مدیر پروژه',
-          type: 'select',
+          name: "projectManagerId",
+          label: "مدیر پروژه",
+          type: "select",
           required: true,
           options: [
-            { value: '', label: 'مدیر پروژه را انتخاب کنید' },
-            ...managers.map(manager => ({
+            { value: "", label: "مدیر پروژه را انتخاب کنید" },
+            ...managers.map((manager) => ({
               value: manager._id,
               label: manager.name || manager.username || manager.email,
-            }))
+            })),
           ],
         },
         {
-          name: 'status',
-          label: 'وضعیت پروژه',
-          type: 'select',
+          name: "services",
+          label: "خدمات پروژه",
+          type: "checkbox-group", // Changed from "select" to "checkbox-group"
+          required: false,
+          options: services.map((service) => ({
+            value: service._id,
+            label: `${service.name}`,
+            description: service.teamId
+              ? `تیم: ${service.teamId.name || "نامشخص"} - ${
+                  service.basePrice?.toLocaleString() || 0
+                } تومان`
+              : `بدون تیم - ${service.basePrice?.toLocaleString() || 0} تومان`,
+          })),
+          description:
+            "خدماتی که در این پروژه ارائه خواهد شد را انتخاب کنید (می‌توانید چندین خدمت انتخاب کنید)",
+          placeholder: "خدمات مورد نظر را انتخاب کنید",
+        },
+
+        {
+          name: "status",
+          label: "وضعیت پروژه",
+          type: "select",
           required: true,
-          defaultValue: 'planning',
+          defaultValue: "planning",
           options: [
-            { value: 'planning', label: 'در حال برنامه‌ریزی' },
-            { value: 'active', label: 'فعال' },
-            { value: 'paused', label: 'متوقف شده' },
-            { value: 'completed', label: 'تکمیل شده' },
-            { value: 'cancelled', label: 'لغو شده' },
+            { value: "planning", label: "در حال برنامه‌ریزی" },
+            { value: "active", label: "فعال" },
+            { value: "paused", label: "متوقف شده" },
+            { value: "completed", label: "تکمیل شده" },
+            { value: "cancelled", label: "لغو شده" },
           ],
         },
         {
-          name: 'startDate',
-          label: 'تاریخ شروع',
-          type: 'date',
+          name: "startDate",
+          label: "تاریخ شروع",
+          type: "date",
           required: false,
-          description: 'تاریخ شروع پروژه (اختیاری)',
+          description: "تاریخ شروع پروژه (اختیاری)",
         },
         {
-          name: 'expectedEndDate',
-          label: 'تاریخ پایان مورد انتظار',
-          type: 'date',
+          name: "expectedEndDate",
+          label: "تاریخ پایان مورد انتظار",
+          type: "date",
           required: false,
-          description: 'تاریخ مورد انتظار برای پایان پروژه',
+          description: "تاریخ مورد انتظار برای پایان پروژه",
         },
         {
-          name: 'actualEndDate',
-          label: 'تاریخ پایان واقعی',
-          type: 'date',
+          name: "actualEndDate",
+          label: "تاریخ پایان واقعی",
+          type: "date",
           required: false,
-          description: 'تاریخ واقعی پایان پروژه',
+          description: "تاریخ واقعی پایان پروژه",
         },
         {
-          name: 'paymentStatus',
-          label: 'وضعیت پرداخت',
-          type: 'select',
+          name: "paymentStatus",
+          label: "وضعیت پرداخت",
+          type: "select",
           required: true,
-          defaultValue: 'pending',
+          defaultValue: "pending",
           options: [
-            { value: 'pending', label: 'در انتظار پرداخت' },
-            { value: 'partial', label: 'پرداخت جزئی' },
-            { value: 'paid', label: 'پرداخت شده' },
-            { value: 'overdue', label: 'معوقه' },
+            { value: "pending", label: "در انتظار پرداخت" },
+            { value: "partial", label: "پرداخت جزئی" },
+            { value: "paid", label: "پرداخت شده" },
+            { value: "overdue", label: "معوقه" },
           ],
         },
         {
-          name: 'totalPrice',
-          label: 'قیمت کل (تومان)',
-          type: 'number',
-          placeholder: 'قیمت کل پروژه را وارد کنید',
+          name: "totalPrice",
+          label: "قیمت کل (تومان)",
+          type: "number",
+          placeholder: "قیمت کل پروژه را وارد کنید",
           required: true,
           validation: {
             min: 0,
           },
         },
         {
-          name: 'finalPrice',
-          label: 'قیمت نهایی (تومان)',
-          type: 'number',
-          placeholder: 'قیمت نهایی پروژه را وارد کنید',
+          name: "finalPrice",
+          label: "قیمت نهایی (تومان)",
+          type: "number",
+          placeholder: "قیمت نهایی پروژه را وارد کنید",
           required: true,
           validation: {
             min: 0,
           },
-          description: 'قیمت نهایی پس از اعمال تخفیف',
+          description: "قیمت نهایی پس از اعمال تخفیف",
         },
         {
-          name: 'discount',
-          label: 'تخفیف (تومان)',
-          type: 'number',
-          placeholder: 'مقدار تخفیف را وارد کنید',
+          name: "discount",
+          label: "تخفیف (تومان)",
+          type: "number",
+          placeholder: "مقدار تخفیف را وارد کنید",
           required: false,
           defaultValue: 0,
           validation: {
@@ -237,10 +278,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           },
         },
         {
-          name: 'paidAmount',
-          label: 'مبلغ پرداخت شده (تومان)',
-          type: 'number',
-          placeholder: 'مبلغ پرداخت شده را وارد کنید',
+          name: "paidAmount",
+          label: "مبلغ پرداخت شده (تومان)",
+          type: "number",
+          placeholder: "مبلغ پرداخت شده را وارد کنید",
           required: false,
           defaultValue: 0,
           validation: {
@@ -248,25 +289,25 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           },
         },
         {
-          name: 'notes',
-          label: 'یادداشت‌های عمومی',
-          type: 'textarea',
-          placeholder: 'یادداشت‌های مربوط به پروژه (قابل مشاهده برای مشتری)',
+          name: "notes",
+          label: "یادداشت‌های عمومی",
+          type: "textarea",
+          placeholder: "یادداشت‌های مربوط به پروژه (قابل مشاهده برای مشتری)",
           required: false,
           validation: {
             maxLength: 1000,
           },
         },
         {
-          name: 'internalNotes',
-          label: 'یادداشت‌های داخلی',
-          type: 'textarea',
-          placeholder: 'یادداشت‌های داخلی (فقط برای تیم)',
+          name: "internalNotes",
+          label: "یادداشت‌های داخلی",
+          type: "textarea",
+          placeholder: "یادداشت‌های داخلی (فقط برای تیم)",
           required: false,
           validation: {
             maxLength: 1000,
           },
-          description: 'این یادداشت‌ها فقط برای تیم داخلی قابل مشاهده است',
+          description: "این یادداشت‌ها فقط برای تیم داخلی قابل مشاهده است",
         },
       ],
     };
@@ -275,7 +316,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   // Show loading state
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md" dir="rtl">
+      <div
+        className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md"
+        dir="rtl"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">در حال بارگذاری اطلاعات...</p>
@@ -287,7 +331,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   // Show error if no form config
   if (!formConfig) {
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md" dir="rtl">
+      <div
+        className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md"
+        dir="rtl"
+      >
         <div className="text-center">
           <p className="text-red-600">خطا در بارگذاری فرم</p>
         </div>
