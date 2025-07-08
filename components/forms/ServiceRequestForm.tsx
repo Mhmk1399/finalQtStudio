@@ -199,8 +199,8 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <p className="text-red-600">
-            {projects.length === 0 && "No projects available. "}
-            {services.length === 0 && "No services available. "}
+            {projects.length === 0 && "پروژه‌ ای وجود ندارد. "}
+            {services.length === 0 && "سرویسی وجود ندارد. "}
             لطفا ابتدا پروژه‌ها و سرویس‌ها را ایجاد کنید.
           </p>
         </div>
