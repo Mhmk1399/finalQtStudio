@@ -43,7 +43,7 @@ import TasksTable from "../tables/taskTable";
 type FormType =
   | "customer"
   | "customers-list"
-  | "contracts-list"
+  // | "contracts-list"
   | "project"
   | "projects-list"
   | "user-register"
@@ -92,14 +92,14 @@ const FormsSidebar: React.FC = () => {
       description: "مشاهده و مدیریت لیست مشتریان",
       color: "bg-blue-500",
     },
-    {
-      id: "contracts-list",
-      label: "لیست قراردادها",
-      icon: <HiOutlineDocumentText className="w-5 h-5" />,
-      category: "مدیریت مشتریان",
-      description: "مشاهده و مدیریت لیست قراردادها",
-      color: "bg-blue-500",
-    },
+    // {
+    //   id: "contracts-list",
+    //   label: "لیست قراردادها",
+    //   icon: <HiOutlineDocumentText className="w-5 h-5" />,
+    //   category: "مدیریت مشتریان",
+    //   description: "مشاهده و مدیریت لیست قراردادها",
+    //   color: "bg-blue-500",
+    // },
 
     // Project Management
     {
@@ -236,8 +236,8 @@ const FormsSidebar: React.FC = () => {
         return <CustomerForm onSuccess={handleSuccess} onError={handleError} />;
       case "customers-list":
         return <CustomersTable />;
-      case "contracts-list":
-        return <ContractsTable />;
+      // case "contracts-list":
+      //   return <ContractsTable />;
       case "project":
         return <ProjectForm onSuccess={handleSuccess} onError={handleError} />;
       case "projects-list":
@@ -508,7 +508,7 @@ const FormsSidebar: React.FC = () => {
               </div>
 
               {/* Breadcrumb */}
-              <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
+              <div className="hidden mt-20 md:flex items-center space-x-2 text-sm text-gray-500">
                 <span>داشبورد</span>
                 <FaChevronLeft className="w-3 h-3" />
                 <span>{currentForm?.category}</span>
@@ -518,32 +518,7 @@ const FormsSidebar: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Message Display */}
-          {/* <AnimatePresence>
-            {message && (
-              <motion.div
-                initial={{ opacity: 0, y: -50, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                className={`mb-6 p-4 rounded-xl border-l-4 ${
-                  message?.type === "success"
-                    ? "bg-green-50 border-green-400 text-green-700"
-                    : "bg-red-50 border-red-400 text-red-700"
-                }`}
-              >
-                <div className="flex items-center">
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 0.5 }}
-                    className="ml-3"
-                  >
-                    {message?.type === "success" ? "✅" : "❌"}
-                  </motion.div>
-                  <p className="font-medium">{message?.text}</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence> */}
+          
 
           {/* Form Content */}
           <motion.div

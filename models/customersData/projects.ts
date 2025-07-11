@@ -21,7 +21,6 @@ const projectSchema = new mongoose.Schema<IProject>(
     contractId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Contract",
-      required: true,
     },
     projectManagerId: {
       type: mongoose.Schema.Types.ObjectId,

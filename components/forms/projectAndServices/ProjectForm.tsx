@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DynamicForm from "../DynamicForm";
 import { FormConfig } from "@/types/form";
 
@@ -18,8 +18,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
+  const hasInitialized = useRef(false);
+
   // Fetch initial data
   useEffect(() => {
+    if (hasInitialized.current) return;
     const fetchInitialData = async () => {
       try {
         setLoading(true);
@@ -59,6 +62,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
         console.error("Error fetching initial data:", error);
       } finally {
         setLoading(false);
+        hasInitialized.current = true;
       }
     };
 
@@ -77,22 +81,15 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     }
   }, [selectedCustomerId, allContracts]);
 
-  // Update form config when data is loaded
+  // Update form config when data is loaded - optimized dependencies
   useEffect(() => {
-    if (!loading) {
+    if (!loading && customers.length > 0 && managers.length > 0 && services.length > 0) {
       setFormConfig(createFormConfig());
     }
-  }, [
-    loading,
-    customers,
-    filteredContracts,
-    managers,
-    selectedCustomerId,
-    services,
-  ]); // Add services dependency
+  }, [loading, customers.length, managers.length, services.length]);
 
-  const handleCustomerChange = (customerId: string) => {
-    setSelectedCustomerId(customerId);
+  const handleCustomerChange = (fieldName: string, value: string | string[]) => {
+    setSelectedCustomerId(value as string);
   };
 
   const createFormConfig = (): FormConfig => {
@@ -144,27 +141,27 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           ],
           onChange: handleCustomerChange,
         },
-        {
-          name: "contractId",
-          label: "قرارداد",
-          type: "select",
-          required: true,
-          options: selectedCustomerId
-            ? [
-                { value: "", label: "قرارداد را انتخاب کنید" },
-                ...filteredContracts.map((contract) => ({
-                  value: contract._id,
-                  label:
-                    contract.title ||
-                    contract.contractNumber ||
-                    `قرارداد ${contract._id.slice(-6)}`,
-                })),
-              ]
-            : [{ value: "", label: "ابتدا مشتری را انتخاب کنید" }],
-          description: selectedCustomerId
-            ? "قراردادهای مربوط به مشتری انتخاب شده"
-            : "ابتدا مشتری را انتخاب کنید",
-        },
+        // {
+        //   name: "contractId",
+        //   label: "قرارداد",
+        //   type: "select",
+        //   required: true,
+        //   options: selectedCustomerId
+        //     ? [
+        //         { value: "", label: "قرارداد را انتخاب کنید" },
+        //         ...filteredContracts.map((contract) => ({
+        //           value: contract._id,
+        //           label:
+        //             contract.title ||
+        //             contract.contractNumber ||
+        //             `قرارداد ${contract._id.slice(-6)}`,
+        //         })),
+        //       ]
+        //     : [{ value: "", label: "ابتدا مشتری را انتخاب کنید" }],
+        //   description: selectedCustomerId
+        //     ? "قراردادهای مربوط به مشتری انتخاب شده"
+        //     : "ابتدا مشتری را انتخاب کنید",
+        // },
         {
           name: "projectManagerId",
           label: "مدیر پروژه",

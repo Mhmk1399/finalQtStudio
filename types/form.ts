@@ -16,6 +16,7 @@ export type FormFieldType =
 export interface FormFieldOption {
   value: string;
   label: string;
+  description?: string;
 }
 
 export interface FormField {
@@ -37,7 +38,7 @@ export interface FormField {
   className?: string;
   readonly?: boolean;
   hidden?: boolean;
-  onChange?: (fieldName: string, value: string) => void;
+  onChange?: (fieldName: string, value: string | string[]) => void;
 }
 
 export interface FormConfig {
@@ -57,12 +58,12 @@ export interface FormConfig {
 }
 
 export interface FormData {
-  [key: string]: string | number | boolean | File;
+  [key: string]: string | number | boolean | File | string[];
 }
 
 export interface FormState {
   data: FormData;
-  errors: { [key: string]: string };
+  errors: { [key: string]: string | null };
   loading: boolean;
   success: boolean;
 }
