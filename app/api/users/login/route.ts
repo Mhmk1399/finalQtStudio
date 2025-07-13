@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
+    const userToken = jwt.sign(
       {
         userId: user._id,
         phoneNumber: user.phoneNumber,
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         message: "Login successful",
         data: {
           user: userData,
-          token,
+          userToken,
         },
       },
       { status: 200 }
