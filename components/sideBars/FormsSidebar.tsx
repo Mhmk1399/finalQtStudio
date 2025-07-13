@@ -172,14 +172,14 @@ const FormsSidebar: React.FC = () => {
     },
 
     // Requests & Tasks Management
-    {
-      id: "service-request",
-      label: "درخواست سرویس جدید",
-      icon: <FaFileAlt className="w-5 h-5" />,
-      category: "درخواست‌ها و وظایف",
-      description: "ثبت درخواست سرویس جدید",
-      color: "bg-red-500",
-    },
+    // {
+    //   id: "service-request",
+    //   label: "درخواست سرویس جدید",
+    //   icon: <FaFileAlt className="w-5 h-5" />,
+    //   category: "درخواست‌ها و وظایف",
+    //   description: "ثبت درخواست سرویس جدید",
+    //   color: "bg-red-500",
+    // },
     {
       id: "service-requests-list",
       label: "لیست درخواست‌ها",
@@ -306,25 +306,7 @@ const FormsSidebar: React.FC = () => {
   return (
     <div className="flex h-screen bg-white">
       {/* Sidebar Toggle Button */}
-      <motion.button
-        onClick={toggleSidebar}
-        className={`fixed top-6 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
-          isSidebarOpen
-            ? "left-6 bg-blue-600 text-gray-100 hover:bg-gray-50"
-            : "left-6 bg-blue-600 text-white hover:bg-blue-700"
-        }`}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        {isSidebarOpen ? (
-          <FaTimes className="w-5 h-5" />
-        ) : (
-          <FaBars className="w-5 h-5" />
-        )}
-      </motion.button>
+     
 
       {/* Backdrop */}
       <AnimatePresence>
@@ -382,7 +364,7 @@ const FormsSidebar: React.FC = () => {
                   >
                     <div className="flex items-center mb-3">
                       <div
-                        className={`w-3 h-3 rounded-full mr-2 ${
+                        className={`w-3 h-3 rounded-full mx-2 ${
                           categoryIndex === 0
                             ? "bg-blue-500"
                             : categoryIndex === 1
@@ -488,6 +470,7 @@ const FormsSidebar: React.FC = () => {
             <div className="flex items-center justify-between gap-20">
               <div className="flex items-center ">
                 <motion.div
+                 onClick={toggleSidebar}
                   className={`p-3 rounded-xl ml-4 ${
                     currentForm?.color || "bg-blue-500"
                   } text-white shadow-lg`}
@@ -508,11 +491,11 @@ const FormsSidebar: React.FC = () => {
               </div>
 
               {/* Breadcrumb */}
-              <div className="hidden mt-20 md:flex items-center space-x-2 text-sm text-gray-500">
+              <div className="hidden  md:flex items-center space-x-2 text-sm text-gray-500">
                 <span>داشبورد</span>
                 <FaChevronLeft className="w-3 h-3" />
                 <span>{currentForm?.category}</span>
-                <FaChevronLeft className="w-3 h-3" />
+                <FaChevronLeft className="w-3 h-3 " />
                 <span className="text-gray-900">{currentForm?.label}</span>
               </div>
             </div>
