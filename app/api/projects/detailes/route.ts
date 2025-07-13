@@ -14,12 +14,12 @@ export async function GET(request: NextRequest) {
     const project = await Project.findById(id)
       .populate({
         path: 'customerId',
-        model: 'Customer',
+        model: Customer,
         select: 'name email phoneNumber'
       })
       .populate({
         path: 'projectManagerId',
-        model: 'User', 
+        model: User, 
         select: 'name email'
       });
     
