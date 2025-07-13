@@ -3,6 +3,7 @@
 import { TableConfig } from "@/types/tables";
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import DynamicModal, { ModalConfig } from "../../DynamicModal";
 import {
   HiOutlinePencilAlt,
   HiOutlineCheckCircle,
@@ -21,6 +22,12 @@ const CustomerProjectsList: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [customerId, setCustomerId] = useState<string | null>(null);
+  
+  // Dynamic Modal states
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+  const [refreshTable, setRefreshTable] = useState(0);
 
   // Get customer ID from token on component mount
   useEffect(() => {
@@ -42,6 +49,46 @@ const CustomerProjectsList: React.FC = () => {
     } catch (error) {
       console.error("Error decoding token:", error);
       return null;
+    }
+  };
+
+  // Function to fetch project managers for dropdown
+  const fetchProjectManagers = async () => {
+    try {
+      const response = await fetch("/api/users");
+      const result = await response.json();
+
+      if (result.success) {
+        return result.data
+          .filter((user: any) => user.role === "projectManager" || user.role === "admin")
+          .map((user: any) => ({
+            value: user._id,
+            label: `${user.name} (${user.email})`,
+          }));
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching project managers:", error);
+      return [];
+    }
+  };
+
+  // Function to fetch services for dropdown
+  const fetchServices = async () => {
+    try {
+      const response = await fetch("/api/services");
+      const result = await response.json();
+
+      if (result.success) {
+        return result.data.map((service: any) => ({
+          value: service._id,
+          label: service.name,
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      return [];
     }
   };
 
@@ -164,39 +211,208 @@ const CustomerProjectsList: React.FC = () => {
     setShowDetailsModal(true);
   };
 
-  // Handle edit project (redirect to edit form or show modal)
-  const handleEditProject = (project: any) => {
-    toast.error("ویرایش پروژه در حال توسعه است");
-    // You can implement edit functionality here
-    console.log("Edit project:", project);
+  // Handle edit project using DynamicModal
+  const handleEditProject = async (project: any) => {
+    // Show loading state
+    toast.loading("در حال بارگیری اطلاعات...", { id: "loading-project-data" });
+
+    try {
+      // Fetch project managers and services for dropdowns
+      const [projectManagers, services] = await Promise.all([
+        fetchProjectManagers(),
+        fetchServices(),
+      ]);
+
+      // Dismiss loading toast
+      toast.dismiss("loading-project-data");
+
+      if (projectManagers.length === 0) {
+        toast.error("مدیر پروژه‌ای برای انتخاب موجود نیست");
+        return;
+      }
+
+      const config: ModalConfig = {
+        title: "ویرایش اطلاعات پروژه",
+        type: "edit",
+        size: "xl",
+        endpoint: `/api/projects/detailes`,
+        method: "PATCH",
+        fields: [
+          {
+            key: "title",
+            label: "عنوان پروژه",
+            type: "text",
+            required: true,
+            placeholder: "عنوان پروژه را وارد کنید",
+          },
+          {
+            key: "description",
+            label: "توضیحات پروژه",
+            type: "textarea",
+            required: false,
+            placeholder: "توضیحات پروژه را وارد کنید",
+          },
+          {
+            key: "projectManagerId",
+            label: "مدیر پروژه",
+            type: "select",
+            required: true,
+            options: projectManagers,
+          },
+          {
+            key: "status",
+            label: "وضعیت پروژه",
+            type: "select",
+            required: true,
+            options: [
+              { value: "planning", label: "در حال برنامه‌ریزی" },
+              { value: "active", label: "فعال" },
+              { value: "paused", label: "متوقف شده" },
+              { value: "completed", label: "تکمیل شده" },
+              { value: "cancelled", label: "لغو شده" },
+            ],
+          },
+          {
+            key: "paymentStatus",
+            label: "وضعیت پرداخت",
+            type: "select",
+            required: true,
+            options: [
+              { value: "pending", label: "در انتظار پرداخت" },
+              { value: "partial", label: "پرداخت جزئی" },
+              { value: "paid", label: "پرداخت شده" },
+              { value: "overdue", label: "معوقه" },
+            ],
+          },
+          {
+            key: "startDate",
+            label: "تاریخ شروع",
+            type: "date",
+            required: true,
+          },
+          {
+            key: "expectedEndDate",
+            label: "تاریخ پایان پیش‌بینی شده",
+            type: "date",
+            required: true,
+          },
+          {
+            key: "actualEndDate",
+            label: "تاریخ پایان واقعی",
+            type: "date",
+            required: false,
+          },
+          {
+            key: "totalPrice",
+            label: "قیمت کل",
+            type: "number",
+            required: false,
+            placeholder: "قیمت کل به تومان",
+          },
+          {
+            key: "finalPrice",
+            label: "قیمت نهایی",
+            type: "number",
+            required: false,
+            placeholder: "قیمت نهایی به تومان",
+          },
+          {
+            key: "paidAmount",
+            label: "مبلغ پرداخت شده",
+            type: "number",
+            required: false,
+            placeholder: "مبلغ پرداخت شده به تومان",
+          },
+          {
+            key: "discount",
+            label: "تخفیف (درصد)",
+            type: "number",
+            required: false,
+            placeholder: "درصد تخفیف",
+          },
+          {
+            key: "notes",
+            label: "یادداشت‌ها",
+            type: "textarea",
+            required: false,
+            placeholder: "یادداشت‌های عمومی پروژه",
+          },
+          {
+            key: "internalNotes",
+            label: "یادداشت‌های داخلی",
+            type: "textarea",
+            required: false,
+            placeholder: "یادداشت‌های داخلی (فقط برای تیم)",
+          },
+        ],
+        onSuccess: (data) => {
+          console.log("Project updated successfully:", data);
+          toast.success("پروژه با موفقیت ویرایش شد");
+          setRefreshTable((prev) => prev + 1);
+          // Refresh the custom table
+          tableRef.current?.refreshData();
+        },
+        onError: (error) => {
+          toast.error("خطا در ویرایش پروژه: " + error);
+          console.error("Update error:", error);
+        },
+        onClose: () => setShowModal(false),
+        confirmText: "ذخیره تغییرات",
+      };
+
+      setModalConfig(config);
+      setSelectedProjectId(project._id);
+      setShowModal(true);
+    } catch (error) {
+      toast.dismiss("loading-project-data");
+      toast.error("خطا در بارگیری اطلاعات");
+      console.error("Error loading project data:", error);
+    }
   };
 
   // Handle delete project
   const handleDeleteProject = async (project: any) => {
-    if (!confirm(`آیا از حذف پروژه "${project.title}" اطمینان دارید؟`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/projects/${project._id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
+    const config: ModalConfig = {
+      title: "حذف پروژه",
+      type: "delete",
+      size: "md",
+      endpoint: `/api/projects/${project._id}`,
+      method: "DELETE",
+      customContent: (
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">
+            تأیید حذف پروژه
+          </h4>
+          <p className="text-gray-600 mb-4">
+            آیا از حذف پروژه "{project.title}" اطمینان دارید؟
+          </p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            <p className="text-red-700 text-sm">
+              ⚠️ توجه: حذف پروژه تمام اطلاعات مرتبط با آن را حذف خواهد کرد. این عمل قابل بازگشت نیست.
+            </p>
+          </div>
+        </div>
+      ),
+      onSuccess: (data) => {
+        console.log("Project deleted successfully:", data);
         toast.success("پروژه با موفقیت حذف شد");
+        setRefreshTable((prev) => prev + 1);
+        // Refresh the custom table
         tableRef.current?.refreshData();
-      } else {
-        toast.error(result.error || "خطا در حذف پروژه");
-      }
-    } catch (error) {
-      console.error("Error deleting project:", error);
-      toast.error("خطا در حذف پروژه");
-    }
+      },
+      onError: (error) => {
+        toast.error("خطا در حذف پروژه: " + error);
+        console.error("Delete error:", error);
+      },
+      onClose: () => setShowModal(false),
+      confirmText: "حذف پروژه",
+      cancelText: "لغو",
+    };
+
+    setModalConfig(config);
+    setSelectedProjectId(project._id);
+    setShowModal(true);
   };
 
   // Custom fetch function for DynamicTable
@@ -279,7 +495,7 @@ const CustomerProjectsList: React.FC = () => {
         render: (value: string) => renderPaymentStatus(value),
       },
       {
-        key: "totalAmount",
+        key: "totalPrice",
         label: "مبلغ کل",
         type: "number",
         sortable: true,
@@ -373,7 +589,17 @@ const CustomerProjectsList: React.FC = () => {
           config={tableConfig}
           customerId={customerId}
           fetchData={fetchProjectsData}
+          key={refreshTable}
         />
+
+        {/* Dynamic Modal for Edit/Delete */}
+        {showModal && modalConfig && (
+          <DynamicModal
+            isOpen={showModal}
+            config={modalConfig}
+            itemId={selectedProjectId}
+          />
+        )}
 
         {/* Project Details Modal */}
         {showDetailsModal && selectedProject && (
@@ -466,7 +692,16 @@ const CustomerProjectsList: React.FC = () => {
                           مبلغ کل
                         </label>
                         <p className="text-gray-900 font-medium">
-                          {formatAmount(selectedProject.totalAmount)}
+                          {formatAmount(selectedProject.totalPrice)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">
+                          قیمت نهایی
+                        </label>
+                        <p className="text-gray-900 font-medium">
+                          {formatAmount(selectedProject.finalPrice)}
                         </p>
                       </div>
 
@@ -479,13 +714,13 @@ const CustomerProjectsList: React.FC = () => {
                         </p>
                       </div>
 
-                      {selectedProject.remainingAmount && (
+                      {selectedProject.discount && (
                         <div>
                           <label className="text-sm font-medium text-gray-600">
-                            مبلغ باقی‌مانده
+                            تخفیف
                           </label>
-                          <p className="text-red-600 font-medium">
-                            {formatAmount(selectedProject.remainingAmount)}
+                          <p className="text-green-600 font-medium">
+                            {selectedProject.discount}%
                           </p>
                         </div>
                       )}
@@ -573,22 +808,22 @@ const CustomerProjectsList: React.FC = () => {
                         </div>
                       )}
 
-                      {selectedProject.teamMembers &&
-                        selectedProject.teamMembers.length > 0 && (
+                      {selectedProject.services &&
+                        selectedProject.services.length > 0 && (
                           <div>
                             <label className="text-sm font-medium text-gray-600">
-                              اعضای تیم
+                              سرویس‌ها
                             </label>
                             <div className="mt-2 space-y-1">
-                              {selectedProject.teamMembers.map(
-                                (member: any, index: number) => (
+                              {selectedProject.services.map(
+                                (service: any, index: number) => (
                                   <div
                                     key={index}
                                     className="flex items-center"
                                   >
-                                    <HiOutlineUser className="w-3 h-3 text-gray-400 ml-2" />
+                                    <HiOutlineDocumentText className="w-3 h-3 text-gray-400 ml-2" />
                                     <span className="text-sm text-gray-700">
-                                      {member.name || member}
+                                      {service.name || service}
                                     </span>
                                   </div>
                                 )
@@ -616,6 +851,7 @@ const CustomerProjectsList: React.FC = () => {
 
                 {/* Additional Info */}
                 {(selectedProject.notes ||
+                  selectedProject.internalNotes ||
                   selectedProject.requirements ||
                   selectedProject.deliverables) && (
                   <div className="mt-8 space-y-4">
@@ -657,6 +893,19 @@ const CustomerProjectsList: React.FC = () => {
                         <div className="mt-1 p-3 bg-gray-50 rounded-lg">
                           <p className="text-gray-900 text-sm">
                             {selectedProject.notes}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedProject.internalNotes && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">
+                          یادداشت‌های داخلی
+                        </label>
+                        <div className="mt-1 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                          <p className="text-gray-900 text-sm">
+                            {selectedProject.internalNotes}
                           </p>
                         </div>
                       </div>
