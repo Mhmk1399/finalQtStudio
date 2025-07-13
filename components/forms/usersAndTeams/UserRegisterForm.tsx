@@ -60,6 +60,13 @@ const UserRegisterForm: React.FC<UserRegisterFormProps> = ({
         },
       },
       {
+        name: "phoneNumber",
+        label: "شماره تلفن",
+        type: "tel",
+        placeholder: "شماره تلفن",
+        required: true,
+      },
+      {
         name: "password",
         label: "رمز عبور",
         type: "password",

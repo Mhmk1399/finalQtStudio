@@ -7,10 +7,6 @@ export async function GET() {
   try {
     await connect();
     const serviceRequests = await ServiceRequest.find({})
-      .populate("projectId", "title name") // Populate project with title/name
-      .populate("serviceId", "name basePrice") // Populate service with name and basePrice
-      .populate("requestedBy", "name") // If you want to show who requested it
-      .sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,

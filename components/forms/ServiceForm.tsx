@@ -94,10 +94,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onSuccess, onError }) => {
         label: "تیم انجام دهنده سرویس",
         type: "select",
         required: true,
-        options: teams.map((team) => ({
-          value: team._id,
-          label: `${team.name} (${team.specialization})`,
-        })),
+        options: [
+          { value: "", label: "انتخاب کنید" }, // Add this as the first option
+          ...teams.map((team) => ({
+            value: team._id,
+            label: `${team.name} (${team.specialization})`,
+          })),
+        ],
         description: "تیمی را که مسئول ارائه این سرویس است انتخاب کنید",
       },
     ],

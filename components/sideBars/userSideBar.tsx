@@ -2,35 +2,16 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  FaUser,
-  FaFileContract,
-  FaDollarSign,
-  FaProjectDiagram,
-  FaServicestack,
-  FaBlog,
-  FaVideo,
-  FaChevronLeft,
-  FaBars,
-  FaTimes,
-  FaCog,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaUser, FaChevronLeft, FaUserCircle } from "react-icons/fa";
 import {
   HiOutlineDocumentText,
   HiOutlineCurrencyDollar,
   HiOutlineUser,
-  HiOutlineCollection,
-  HiOutlineClipboardList,
-  HiOutlineBookOpen,
-  HiOutlineVideoCamera,
 } from "react-icons/hi";
-import CustomerForm from "../forms/customers/CustomerForm";
-import ContractFormHidden from "../forms/ContractForm";
-import UserRegisterForm from "../forms/usersAndTeams/UserRegisterForm";
-import toast from "react-hot-toast";
+
 import AttendanceForm from "../users/attendanceForm";
 import UserTasksPage from "../users/todoTable";
+import UserTransactionsPage from "../users/transactions";
 
 type FormType = "Todo" | "transaction" | "absentPresent";
 
@@ -94,7 +75,7 @@ const UsersSideBar: React.FC = () => {
         return <AttendanceForm />;
 
       case "transaction":
-        return <UserTasksPage />;
+        return <UserTransactionsPage />;
 
       case "Todo":
         return <UserTasksPage />;

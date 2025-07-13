@@ -13,13 +13,16 @@ import {
   DynamicTableProps,
 } from "@/types/tables";
 
-
 const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
-  type RowType = { [key: string]: any; _id?: string | number; id?: string | number };
+  type RowType = {
+    [key: string]: any;
+    _id?: string | number;
+    id?: string | number;
+  };
   const [data, setData] = useState<RowType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  type SortConfig = { key: string; direction: "asc" | "desc"|string } | null;
+  type SortConfig = { key: string; direction: "asc" | "desc" | string } | null;
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
   useEffect(() => {
@@ -29,7 +32,13 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(config.endpoint);
+
+      const options: RequestInit = {
+        method: "GET",
+        headers: config.headers ? { ...config.headers } : {},
+      };
+
+      const response = await fetch(config.endpoint, options);
       const result = await response.json();
 
       if (!response.ok) {
@@ -76,7 +85,10 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
     });
   }, [data, sortConfig]);
 
-  const formatCellValue = (value: string | number | Date, column: TableColumn): React.ReactNode => {
+  const formatCellValue = (
+    value: string | number | Date,
+    column: TableColumn
+  ): React.ReactNode => {
     if (column.render) {
       return column.render(value, data);
     }

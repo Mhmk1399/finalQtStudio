@@ -29,6 +29,7 @@ export interface TableConfig {
     custom?: CustomAction[];
   };
   onView?: (row: any) => void;
+  headers?: Record<string, string>; // ✅ Optional headers
   onEdit?: (row: any) => void;
   onDelete?: (row: any) => void;
   className?: string;

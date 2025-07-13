@@ -5,8 +5,9 @@ const transactionSchema = new mongoose.Schema({
   subject: { type: String, required: true },
   debtor: { type: Number, required: true },
   fastener: { type: Number, required: true },
-  users: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }
+  users: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
 });
 
-export default mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
+export default mongoose.models.Transaction ||
+  mongoose.model("Transaction", transactionSchema);

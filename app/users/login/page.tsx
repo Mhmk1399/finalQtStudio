@@ -1,78 +1,108 @@
 "use client";
 
-import React from "react";
-import { FormConfig } from "@/types/form";
-import { DynamicForm } from "@/components/forms";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BiPhone, BiLock } from "react-icons/bi";
+import toast from "react-hot-toast";
 
-const UsersLoginForm = () => {
+export default function LoginPage() {
   const router = useRouter();
-  const handleLoginSuccess = (response: any) => {
-    const token = response?.data?.token;
-    const user = response?.data?.user;
 
-    if (token && user) {
-      localStorage.setItem("userToken", token);
-      localStorage.setItem("customerUser", JSON.stringify(user));
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-      if (response.status === 200) response;
-      else router.push("/users/dashboard");
-    } else {
-      console.log("Token or user data missing in response:", response);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phoneNumber || !password) {
+      toast.error("شماره موبایل و رمز عبور الزامی است");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber, password }),
+      });
+
+      const result = await res.json();
+
+      if (!result.success) {
+        toast.error("ورود ناموفق بود");
+      } else {
+        toast.success("ورود با موفقیت انجام شد");
+        localStorage.setItem("userToken", result.data.userToken);
+        // Optional: store user info
+        router.push("/users/admin"); // change this to your dashboard or redirect page
+      }
+    } catch (err) {
+      toast.error("خطای سرور!");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLoginError = (error: string) => {
-    console.error("Login error:", error); // Debug log
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 space-y-6"
+      >
+        <h2 className="text-2xl font-bold text-center text-gray-800">
+          ورود به حساب کاربری
+        </h2>
 
-    // Call the parent error handler if provided
-    if (error && typeof onError === "function") {
-      onError(error);
-    } else {
-      // Default error behavior
-      console.error("Login failed:", error);
-    }
-  };
+        <div className="space-y-4">
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              شماره موبایل
+            </label>
+            <div className="relative">
+              <input
+                type="tel"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="مثلاً 09121234567"
+              />
+              <BiPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
 
-  const customerLoginFormConfig: FormConfig = {
-    title: "ورود به حساب کاربری",
-    description:
-      "برای ورود به حساب کاربری خود، شماره تلفن و رمز عبور را وارد کنید",
-    endpoint: "/api/customers/login",
-    method: "POST",
-    submitButtonText: "ورود",
-    onSuccess: handleLoginSuccess,
-    onError: handleLoginError,
-    className: "max-w-md", // Make it narrower for login form
-    fields: [
-      {
-        name: "phoneNumber",
-        label: "شماره تلفن",
-        type: "tel",
-        placeholder: "شماره تلفن خود را وارد کنید",
-        required: true,
-        validation: {
-          pattern: "^[+]?[0-9]{10,15}$",
-          minLength: 10,
-          maxLength: 15,
-        },
-        description: "شماره تلفن همراه با کد کشور (مثال: +989123456789)",
-      },
-      {
-        name: "password",
-        label: "رمز عبور",
-        type: "password",
-        placeholder: "رمز عبور خود را وارد کنید",
-        required: true,
-        validation: {
-          minLength: 8,
-        },
-        description: "رمز عبور باید حداقل 8 کاراکتر باشد",
-      },
-    ],
-  };
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              رمز عبور
+            </label>
+            <div className="relative">
+              <input
+                type="password"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="رمز عبور"
+              />
+              <BiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+        </div>
 
-  return <DynamicForm config={customerLoginFormConfig} />;
-};
-
-export default UsersLoginForm;
+        <button
+          type="submit"
+          className={`w-full py-2 px-4 rounded-lg text-white font-semibold ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          disabled={loading}
+        >
+          {loading ? "در حال ورود..." : "ورود"}
+        </button>
+      </form>
+    </div>
+  );
+}
