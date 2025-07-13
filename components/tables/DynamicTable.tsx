@@ -6,58 +6,19 @@ import {
   HiOutlinePencilAlt,
   HiOutlineTrash,
 } from "react-icons/hi";
-// Remove the DynamicModal import - we don't need it here
+import {
+  TableColumn,
+  CustomAction,
+  TableConfig,
+  DynamicTableProps,
+} from "@/types/tables";
 
-export interface TableColumn {
-  key: string;
-  label: string;
-  type?: "text" | "number" | "date" | "email" | "phone" | "status";
-  sortable?: boolean;
-  width?: string;
-  render?: (value: any, row: any) => React.ReactNode;
-}
-export interface CustomAction {
-  label: string;
-  icon: string;
-  className?: string;
-  onClick: (row: any) => void;
-  condition?: (row: any) => boolean;
-}
 
-export interface TableConfig {
-  title: string;
-  description?: string;
-  endpoint: string;
-  deleteEndpoint?: string;
-  columns: TableColumn[];
-  actions?: {
-    view?: boolean;
-    edit?: boolean;
-    delete?: boolean;
-    custom?: CustomAction[];
-  };
-  onView?: (row: any) => void;
-  onEdit?: (row: any) => void;
-  onDelete?: (row: any) => void; // Change this to accept the full row object instead of just id
-  className?: string;
-  
-}
-
-interface DynamicTableProps {
-  config: TableConfig;
-}
-
-const DynamicTable = React.forwardRef<
-  { refreshData: () => void },
-  DynamicTableProps
->(({ config }, ref) => {
-  const [data, setData] = useState<any[]>([]);
+const DynamicTable = React.forwardRef(({ config }, ref) => {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [sortConfig, setSortConfig] = useState<{
-    key: string;
-    direction: "asc" | "desc";
-  } | null>(null);
+  const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -84,8 +45,8 @@ const DynamicTable = React.forwardRef<
     }
   };
 
-  const handleSort = (key: string) => {
-    let direction: "asc" | "desc" = "asc";
+  const handleSort = (key) => {
+    let direction = "asc";
     if (
       sortConfig &&
       sortConfig.key === key &&
@@ -113,7 +74,7 @@ const DynamicTable = React.forwardRef<
     });
   }, [data, sortConfig]);
 
-  const formatCellValue = (value: any, column: TableColumn) => {
+  const formatCellValue = (value, column) => {
     if (column.render) {
       return column.render(value, data);
     }

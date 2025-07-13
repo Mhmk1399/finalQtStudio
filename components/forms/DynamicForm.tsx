@@ -35,7 +35,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const validateField = (
     field: FormField,
-    value: string | number | boolean | File
+    value: string | number | boolean | File | string[]
   ): string | null => {
     // Skip validation for File type fields
     if (value instanceof File) {
@@ -91,9 +91,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     if (field?.onChange) {
       // For array values, pass the array directly
       if (Array.isArray(value)) {
-        field.onChange(value);
+        field.onChange(fieldName, value);
       } else {
-        field.onChange(value as string);
+        field.onChange(fieldName, value as string);
       }
     }
   };
@@ -254,7 +254,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                 }
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor={fieldId} className="ml-2 text-sm text-gray-700">
+              <label htmlFor={fieldId} className="ml-4 text-sm text-gray-700">
                 {field.label}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
@@ -307,7 +307,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
       case "checkbox-group":
         return (
-          <div className="space-y-3">
+          <div key={field.name} className="mb-4 space-y-3" dir="rtl">
             <label className="block text-sm font-medium text-gray-700 mb-3">
               {field.label}
               {field.required && <span className="text-red-500 mr-1">*</span>}
@@ -318,7 +318,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
               {field.options?.map((option) => {
                 const isChecked = Array.isArray(formState.data[field.name])
-                  ? formState.data[field.name].includes(option.value)
+                  ? (formState.data[field.name] as string[]).includes(option.value)
                   : false;
 
                 return (
@@ -334,7 +334,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                         const currentValues = Array.isArray(
                           formState.data[field.name]
                         )
-                          ? formState.data[field.name]
+                          ? (formState.data[field.name] as string[])
                           : [];
 
                         let newValues;
@@ -348,7 +348,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
                         handleInputChange(field.name, newValues);
                       }}
-                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="mt-1 ml-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <div className="flex-1">
                       <label

@@ -43,7 +43,7 @@ import TasksTable from "../tables/taskTable";
 type FormType =
   | "customer"
   | "customers-list"
-  | "contracts-list"
+  // | "contracts-list"
   | "project"
   | "projects-list"
   | "user-register"
@@ -92,14 +92,14 @@ const FormsSidebar: React.FC = () => {
       description: "مشاهده و مدیریت لیست مشتریان",
       color: "bg-blue-500",
     },
-    {
-      id: "contracts-list",
-      label: "لیست قراردادها",
-      icon: <HiOutlineDocumentText className="w-5 h-5" />,
-      category: "مدیریت مشتریان",
-      description: "مشاهده و مدیریت لیست قراردادها",
-      color: "bg-blue-500",
-    },
+    // {
+    //   id: "contracts-list",
+    //   label: "لیست قراردادها",
+    //   icon: <HiOutlineDocumentText className="w-5 h-5" />,
+    //   category: "مدیریت مشتریان",
+    //   description: "مشاهده و مدیریت لیست قراردادها",
+    //   color: "bg-blue-500",
+    // },
 
     // Project Management
     {
@@ -172,14 +172,14 @@ const FormsSidebar: React.FC = () => {
     },
 
     // Requests & Tasks Management
-    {
-      id: "service-request",
-      label: "درخواست سرویس جدید",
-      icon: <FaFileAlt className="w-5 h-5" />,
-      category: "درخواست‌ها و وظایف",
-      description: "ثبت درخواست سرویس جدید",
-      color: "bg-red-500",
-    },
+    // {
+    //   id: "service-request",
+    //   label: "درخواست سرویس جدید",
+    //   icon: <FaFileAlt className="w-5 h-5" />,
+    //   category: "درخواست‌ها و وظایف",
+    //   description: "ثبت درخواست سرویس جدید",
+    //   color: "bg-red-500",
+    // },
     {
       id: "service-requests-list",
       label: "لیست درخواست‌ها",
@@ -236,8 +236,8 @@ const FormsSidebar: React.FC = () => {
         return <CustomerForm onSuccess={handleSuccess} onError={handleError} />;
       case "customers-list":
         return <CustomersTable />;
-      case "contracts-list":
-        return <ContractsTable />;
+      // case "contracts-list":
+      //   return <ContractsTable />;
       case "project":
         return <ProjectForm onSuccess={handleSuccess} onError={handleError} />;
       case "projects-list":
@@ -306,25 +306,7 @@ const FormsSidebar: React.FC = () => {
   return (
     <div className="flex h-screen bg-white">
       {/* Sidebar Toggle Button */}
-      <motion.button
-        onClick={toggleSidebar}
-        className={`fixed top-6 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
-          isSidebarOpen
-            ? "left-6 bg-blue-600 text-gray-100 hover:bg-gray-50"
-            : "left-6 bg-blue-600 text-white hover:bg-blue-700"
-        }`}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        {isSidebarOpen ? (
-          <FaTimes className="w-5 h-5" />
-        ) : (
-          <FaBars className="w-5 h-5" />
-        )}
-      </motion.button>
+     
 
       {/* Backdrop */}
       <AnimatePresence>
@@ -382,7 +364,7 @@ const FormsSidebar: React.FC = () => {
                   >
                     <div className="flex items-center mb-3">
                       <div
-                        className={`w-3 h-3 rounded-full mr-2 ${
+                        className={`w-3 h-3 rounded-full mx-2 ${
                           categoryIndex === 0
                             ? "bg-blue-500"
                             : categoryIndex === 1
@@ -488,6 +470,7 @@ const FormsSidebar: React.FC = () => {
             <div className="flex items-center justify-between gap-20">
               <div className="flex items-center ">
                 <motion.div
+                 onClick={toggleSidebar}
                   className={`p-3 rounded-xl ml-4 ${
                     currentForm?.color || "bg-blue-500"
                   } text-white shadow-lg`}
@@ -508,42 +491,17 @@ const FormsSidebar: React.FC = () => {
               </div>
 
               {/* Breadcrumb */}
-              <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
+              <div className="hidden  md:flex items-center space-x-2 text-sm text-gray-500">
                 <span>داشبورد</span>
                 <FaChevronLeft className="w-3 h-3" />
                 <span>{currentForm?.category}</span>
-                <FaChevronLeft className="w-3 h-3" />
+                <FaChevronLeft className="w-3 h-3 " />
                 <span className="text-gray-900">{currentForm?.label}</span>
               </div>
             </div>
           </motion.div>
 
-          {/* Message Display */}
-          {/* <AnimatePresence>
-            {message && (
-              <motion.div
-                initial={{ opacity: 0, y: -50, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                className={`mb-6 p-4 rounded-xl border-l-4 ${
-                  message?.type === "success"
-                    ? "bg-green-50 border-green-400 text-green-700"
-                    : "bg-red-50 border-red-400 text-red-700"
-                }`}
-              >
-                <div className="flex items-center">
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 0.5 }}
-                    className="ml-3"
-                  >
-                    {message?.type === "success" ? "✅" : "❌"}
-                  </motion.div>
-                  <p className="font-medium">{message?.text}</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence> */}
+          
 
           {/* Form Content */}
           <motion.div

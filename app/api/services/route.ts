@@ -6,15 +6,13 @@ import connect from "@/lib/data";
 export async function GET() {
   try {
     await connect();
-    const services = await Service.find({}).populate(
-      "teamId",
-      "name specialization"
-    );
+    const services = await Service.find({});
     return NextResponse.json({
       success: true,
       data: services,
     });
   } catch (error) {
+    console.log(error)
     return NextResponse.json(
       {
         success: false,

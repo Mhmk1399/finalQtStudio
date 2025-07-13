@@ -40,18 +40,12 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSuccess, onError }) => {
         type: "select",
         required: true,
         options: [
-          { value: "frontend", label: "برنامه نویس فرانت‌اند" },
-          { value: "backend", label: "برنامه نویس بک اند" },
-          { value: "fullstack", label: "برنامه نویس فول استک" },
-          { value: "mobile", label: "برنامه نویس موبایل" },
-          { value: "devops", label: "دوآپس و زیرساخت" },
-          { value: "design", label: "طراح" },
-          { value: "qa", label: "تست کننده" },
-          { value: "data", label: "داده‌کاو" },
-          { value: "security", label: "امنیت" },
-          { value: "support", label: "پشتیبانی" },
+          { value: "shooting", label: "فیلم برداری" },
+          { value: "edit", label: "تدوین" },
+          { value: "photographi", label: "عکاسی" },
           { value: "marketing", label: "تبلیغات" },
-          { value: "management", label: "مدیریت" },
+
+        
         ],
         description: "تخصص تیم را انتخاب کنید",
       },
