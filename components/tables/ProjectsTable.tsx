@@ -144,18 +144,7 @@ const ProjectsTable: React.FC = () => {
           type: "textarea",
           required: true,
         },
-        {
-          key: "customerId",
-          label: "شناسه مشتری",
-          type: "text",
-          required: true,
-        },
-        // {
-        //   key: "contractId",
-        //   label: "شناسه قرارداد",
-        //   type: "text",
-        //   required: true,
-        // },
+
         {
           key: "projectManagerId",
           label: "مدیر پروژه",
@@ -163,9 +152,9 @@ const ProjectsTable: React.FC = () => {
           required: true,
           options: [
             { value: "", label: "مدیر پروژه را انتخاب کنید" },
-            ...projectManagers.map((manager) => ({
+            ...projectManagers.map((manager:{_id:string,name:string,email:string}) => ({
               value: manager._id,
-              label: manager.name || manager.username || manager.email,
+              label: manager.name ,
             })),
           ],
         },

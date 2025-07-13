@@ -189,6 +189,19 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
     const value = data[field.key] || "";
     const isReadOnly = config.type === "view";
 
+    // Use custom render function if available and in view mode
+    if (isReadOnly && field.render && typeof field.render === 'function') {
+      const renderedValue = field.render(value, data);
+      return (
+        <div
+          key={field.key}
+          className="w-full px-4 py-3 border rounded-lg bg-gray-50 cursor-not-allowed text-gray-600 border-gray-200 min-h-[44px] flex items-center"
+        >
+          {renderedValue || "-"}
+        </div>
+      );
+    }
+
     const baseClassName = `w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
       isReadOnly
         ? "bg-gray-50 cursor-not-allowed text-gray-600 border-gray-200"
