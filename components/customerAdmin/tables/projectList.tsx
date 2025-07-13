@@ -1,7 +1,7 @@
 "use client";
 
+import { TableConfig } from "@/types/tables";
 import React, { useState, useRef, useEffect } from "react";
-import DynamicTable, { TableConfig } from "../../tables/DynamicTable";
 import { toast } from "react-hot-toast";
 import {
   HiOutlinePencilAlt,

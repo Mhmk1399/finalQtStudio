@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
+import { TableConfig } from "@/types/tables";
+import DynamicTable from "./DynamicTable";
 
 const ProjectsTable: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
@@ -45,7 +47,7 @@ const ProjectsTable: React.FC = () => {
           sortable: true,
           width: "150px",
           render: (value: unknown, row: unknown) => {
-            console.log("Customer value:", value); // Debug log
+            // console.log("Customer value:", value); // Debug log
             // Check if customerId is populated with customer object
             if (value && typeof value === "object" && "name" in value) {
               return value.name;
@@ -207,12 +209,10 @@ const ProjectsTable: React.FC = () => {
         { key: "internalNotes", label: "یادداشت‌های داخلی", type: "textarea" },
       ],
       onSuccess: (data) => {
-        console.log("Project updated successfully:", data);
         toast.success("پروژه با موفقیت به‌روزرسانی شد.");
         setRefreshTable((prev) => prev + 1);
       },
       onError: (error) => {
-        console.error("Update error:", error);
         toast.error("خطا در به‌روزرسانی پروژه: ");
       },
       onClose: () => setShowModal(false),
@@ -232,7 +232,6 @@ const ProjectsTable: React.FC = () => {
       endpoint: "/api/projects/detailes",
       method: "DELETE",
       onSuccess: (data) => {
-        console.log("Project deleted successfully:", data);
         setRefreshTable((prev) => prev + 1);
         toast.success("پروژه با موفقیت حذف شد.");
       },
@@ -277,7 +276,6 @@ const ProjectsTable: React.FC = () => {
         sortable: true,
         width: "150px",
         render: (value, row) => {
-          console.log("Customer value:", value); // Debug log
           // Check if customerId is populated with customer object
           if (value && typeof value === "object" && value.name) {
             return value.name;
@@ -295,10 +293,11 @@ const ProjectsTable: React.FC = () => {
         type: "text",
         sortable: true,
         width: "150px",
-        render: (value, row) => {
-          console.log("Project Manager value:", value); // Debug log
+        render: 
+        (value, row) => {
           // Check if projectManagerId is populated with user object
           if (value && typeof value === "object" && value.name) {
+
             return value.name;
           }
           // If it's still just an ID string
