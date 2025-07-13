@@ -25,9 +25,32 @@ export default function AttendanceForm() {
     const formattedDate = workDate.toDate(); // Converts to JS Date (Gregorian)
     const formattedInTime = inTime.format("HH:mm");
     const formattedOutTime = outTime.format("HH:mm");
-    const userId = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
+
+    const getCustomerIdFromToken = (): string | null => {
+      try {
+        const token = localStorage.getItem("userToken");
+        if (!token) {
+          console.error("No customer token found in localStorage");
+          return null;
+        }
+
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        console.log("Decoded token:", decodedToken);
+
+        if (decodedToken.userId) {
+          return decodedToken.userId;
+        } else {
+          console.error("customerId not found in token payload");
+          return null;
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        return null;
+      }
+    };
 
     try {
+      const userId = getCustomerIdFromToken();
       const res = await fetch("/api/presence", {
         method: "POST",
         headers: {
