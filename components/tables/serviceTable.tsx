@@ -38,7 +38,7 @@ const ServicesTable: React.FC = () => {
       title: "مشاهده جزئیات سرویس",
       type: "view",
       size: "lg",
-      endpoint: `/api/services/${service._id || service.id}`,
+      endpoint: `/api/services/detailes`,
       fields: [
         { key: "name", label: "نام سرویس", type: "text" },
         { key: "description", label: "توضیحات سرویس", type: "textarea" },
@@ -94,7 +94,7 @@ const ServicesTable: React.FC = () => {
         title: "ویرایش اطلاعات سرویس",
         type: "edit",
         size: "lg",
-        endpoint: `/api/services/${service._id || service.id}`,
+        endpoint: `/api/services/detailes`,
         method: "PATCH",
         fields: [
           {

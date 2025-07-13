@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Task from "@/models/tasks";
 import connect from "@/lib/data";
+import { model } from "mongoose";
+import ServiceRequest from "@/models/customersData/serviceRequests";
+import User from "@/models/users";
+import Team from "@/models/teams";
 
 // GET - Get task by ID
 export async function GET(
@@ -10,6 +14,20 @@ export async function GET(
     await connect();
     const id = request.headers.get("id");
     const task = await Task.findById(id)
+    .populate(
+      {path:"serviceRequestId",
+      model: ServiceRequest,
+       select:"title"})
+       .populate({
+        path:"assignedUserId",
+        model: User,
+        select:"name"
+       })
+       .populate({
+        path:"assignedTeamId",
+        model: Team,
+        select:"name"
+       })
      
 
     if (!task) {
