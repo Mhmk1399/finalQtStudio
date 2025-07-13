@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
+import DynamicTable from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
+import { TableConfig } from "@/types/tables";
 
 const ServicesTable: React.FC = () => {
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(

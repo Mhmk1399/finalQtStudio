@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import Service from "@/models/customersData/services";
 import connect from "@/lib/data";
+import Team from "@/models/teams";
 
 // GET - Get all services
 export async function GET() {
   try {
     await connect();
-    const services = await Service.find({});
+    const services = await Service.find({}).populate({
+      path: "teamId",
+      model: Team,
+      select: "name ",
+    });
     return NextResponse.json({
       success: true,
       data: services,

@@ -152,9 +152,9 @@ const ProjectsTable: React.FC = () => {
           required: true,
           options: [
             { value: "", label: "مدیر پروژه را انتخاب کنید" },
-            ...projectManagers.map((manager:{_id:string,name:string,email:string}) => ({
+            ...projectManagers.map((manager: ProjectManager) => ({
               value: manager._id,
-              label: manager.name ,
+              label: manager.name || '',
             })),
           ],
         },

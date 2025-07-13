@@ -1,15 +1,32 @@
 "use client";
 
 import React, { useState } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
+import DynamicTable from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
+import { TableConfig } from "@/types/tables";
 
 const UsersTable: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
+  const [teams, setTeams] = useState<{[key: string]: string}>({});
+
+  React.useEffect(() => {
+    fetch('/api/teams')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const teamMap = data.data.reduce((acc: any, team: any) => {
+            acc[team._id] = team.name;
+            return acc;
+          }, {});
+          setTeams(teamMap);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleView = (user: any) => {
     const config: ModalConfig = {
@@ -32,7 +49,13 @@ const UsersTable: React.FC = () => {
             { value: "viewer", label: "بازدیدکننده" },
           ],
         },
-        { key: "teamId", label: "شناسه تیم", type: "text" },
+        { 
+          key: "teamId", 
+          label: "تیم", 
+          type: "select",
+          optionsEndpoint: "/api/teams",
+          optionLabelKey: "name"
+        },
         {
           key: "permissions",
           label: "مجوزها",
@@ -88,8 +111,13 @@ const UsersTable: React.FC = () => {
             { value: "viewer", label: "بازدیدکننده" },
           ],
         },
-        { key: "teamId", label: "شناسه تیم", type: "text" },
-        {
+ { 
+          key: "teamId", 
+          label: "تیم", 
+          type: "select",
+          optionsEndpoint: "/api/teams",
+          optionLabelKey: "name"
+        },        {
           key: "permissions",
           label: "مجوزها",
           type: "textarea",
@@ -364,7 +392,7 @@ const UsersTable: React.FC = () => {
         sortable: true,
         width: "120px",
         render: (value) => {
-          return value ? `تیم: ${value.substring(0, 8)}...` : "-";
+          return value ? teams[value] || `تیم: ${value.substring(0, 8)}...` : "-";
         },
       },
       {
