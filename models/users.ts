@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema<IUser>(
       required: true,
       trim: true,
     },
+    phoneNumber: {
+      type: Number,
+    },
     email: {
       type: String,
       required: true,

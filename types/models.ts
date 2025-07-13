@@ -126,6 +126,7 @@ export interface IUser {
   teamId?: mongoose.Types.ObjectId;
   permissions: string;
   isActive: boolean;
+  phoneNumber?: string;
 }
 
 // Union Types for Status Fields

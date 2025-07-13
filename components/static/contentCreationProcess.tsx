@@ -8,9 +8,7 @@ import {
   AnimatePresence,
   useMotionValue,
 } from "framer-motion";
-import {
-  HiOutlineCheck,
-} from "react-icons/hi";
+import { HiOutlineCheck } from "react-icons/hi";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import {
   contentTypes,
@@ -401,7 +399,11 @@ const ContentCreationProcess = () => {
                 {/* Background image */}
                 <div className="relative aspect-square">
                   <video
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${
+                      activeContentType === type.id
+                        ? "blur-xs brightness-50"
+                        : ""
+                    }`}
                     autoPlay
                     muted
                     loop
