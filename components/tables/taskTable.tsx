@@ -377,9 +377,6 @@ const TasksTable: React.FC = () => {
             return (
               <div className="flex flex-col">
                 <span className="font-medium text-gray-900">{value.name}</span>
-                <span className="text-xs text-gray-500">
-                  ({value.specialization})
-                </span>
               </div>
             );
           }
