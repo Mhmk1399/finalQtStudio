@@ -1,10 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import DynamicTable from "@/components/tables/DynamicTable";
+import DynamicModal, { ModalConfig } from "@/components/DynamicModal";
 import { TableConfig } from "@/types/tables";
 
 const UserTransactionsPage = () => {
+  const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<
+    string | null
+  >(null);
+
   const getUserIdFromToken = (): string | null => {
     try {
       const token = localStorage.getItem("userToken");
@@ -107,6 +114,90 @@ const UserTransactionsPage = () => {
     );
   };
 
+  // Handle view transaction using DynamicModal
+  const handleViewTransaction = (row: any) => {
+    const viewConfig: ModalConfig = {
+      title: "جزئیات تراکنش",
+      type: "view",
+      size: "md",
+      endpoint: "/api/transactions/detailes", // You'll need to create this endpoint
+      method: "GET",
+      onClose: () => setIsModalOpen(false),
+      fields: [
+        {
+          key: "date",
+          label: "تاریخ تراکنش",
+          type: "date",
+          render: (value: string) => formatDate(value),
+        },
+        {
+          key: "subject",
+          label: "موضوع تراکنش",
+          type: "text",
+        },
+        {
+          key: "debtor",
+          label: "مبلغ بدهکار",
+          type: "text",
+          render: (value: number) => formatCurrency(value),
+        },
+        {
+          key: "fastener",
+          label: "مبلغ بستانکار",
+          type: "text",
+          render: (value: number) => formatCurrency(value),
+        },
+        {
+          key: "transactionType",
+          label: "نوع تراکنش",
+          type: "text",
+          render: (value: any, data: any) => {
+            const transactionType = getTransactionType(
+              data.debtor,
+              data.fastener
+            );
+            return (
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium border ${transactionType.color}`}
+              >
+                {transactionType.label}
+              </span>
+            );
+          },
+        },
+        {
+          key: "netAmount",
+          label: "مبلغ خالص",
+          type: "text",
+          render: (value: any, data: any) => {
+            const netAmount = calculateNetAmount(data.debtor, data.fastener);
+            const isPositive = netAmount > 0;
+            const isNegative = netAmount < 0;
+
+            return (
+              <span
+                className={`font-medium text-lg ${
+                  isPositive
+                    ? "text-green-600"
+                    : isNegative
+                    ? "text-red-600"
+                    : "text-gray-600"
+                }`}
+              >
+                {isPositive ? "+" : ""}
+                {formatCurrency(Math.abs(netAmount))}
+              </span>
+            );
+          },
+        },
+      ],
+    };
+
+    setModalConfig(viewConfig);
+    setSelectedTransactionId(row._id);
+    setIsModalOpen(true);
+  };
+
   const id = getUserIdFromToken();
 
   const tableConfig: TableConfig = {
@@ -143,32 +234,19 @@ const UserTransactionsPage = () => {
         render: (value: any, rowData: any) =>
           renderTransactionType(rowData.debtor, rowData.fastener),
       },
-      {
-        key: "netAmount",
-        label: "مبلغ خالص",
-        render: (value: any, rowData: any) =>
-          renderNetAmount(rowData.debtor, rowData.fastener),
-      },
+    //   {
+    //     key: "netAmount",
+    //     label: "مبلغ خالص",
+    //     render: (value: any, rowData: any) =>
+    //       renderNetAmount(rowData.debtor, rowData.fastener),
+    //   },
     ],
     actions: {
       view: true,
       edit: false, // Users typically shouldn't edit transactions
       delete: false, // Users typically shouldn't delete transactions
     },
-    onView: (row) => {
-      const transactionType = getTransactionType(row.debtor, row.fastener);
-      const netAmount = calculateNetAmount(row.debtor, row.fastener);
-
-      alert(
-        `جزئیات تراکنش:\n` +
-          `تاریخ: ${formatDate(row.date)}\n` +
-          `موضوع: ${row.subject}\n` +
-          `بدهکار: ${formatCurrency(row.debtor)}\n` +
-          `بستانکار: ${formatCurrency(row.fastener)}\n` +
-          `نوع: ${transactionType.label}\n` +
-          `مبلغ خالص: ${formatCurrency(Math.abs(netAmount))}`
-      );
-    },
+    onView: handleViewTransaction,
   };
 
   // نمایش حالت بارگذاری یا خطا در صورت عدم وجود شناسه کاربر
@@ -187,6 +265,14 @@ const UserTransactionsPage = () => {
   return (
     <div className="p-4">
       <DynamicTable config={tableConfig} />
+
+      {isModalOpen && modalConfig && (
+        <DynamicModal
+          isOpen={isModalOpen}
+          config={modalConfig}
+          itemId={selectedTransactionId}
+        />
+      )}
     </div>
   );
 };
