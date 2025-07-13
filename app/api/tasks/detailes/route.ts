@@ -1,24 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import Service from "@/models/customersData/services";
+import Task from "@/models/tasks";
 import connect from "@/lib/data";
 
-// GET - Get service by ID
+// GET - Get task by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
 ) {
   try {
     await connect();
-    const service = await Service.findById(params.id).populate(
-      "teamId",
-      "name specialization"
-    );
+    const id = request.headers.get("id");
+    const task = await Task.findById(id)
+     
 
-    if (!service) {
+    if (!task) {
       return NextResponse.json(
         {
           success: false,
-          error: "Service not found",
+          error: "Task not found",
         },
         { status: 404 }
       );
@@ -26,72 +24,85 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: service,
+      data: task,
     });
   } catch (error) {
+    console.error("GET Task Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch service",
+        error: "Failed to fetch task",
       },
       { status: 500 }
     );
   }
 }
 
-// PATCH - Update service by ID
+
+
+// PATCH - Partial update task by ID
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
 ) {
   try {
     await connect();
+    const id =request.headers.get('id');
     const body = await request.json();
-    const service = await Service.findByIdAndUpdate(params.id, body, {
+
+
+    // If status is being changed to completed, set completedDate
+    if (body.status === "completed" && !body.completedDate) {
+      body.completedDate = new Date();
+    }
+
+    const task = await Task.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
-    }).populate("teamId", "name specialization");
+    })
 
-    if (!service) {
+    if (!task) {
       return NextResponse.json(
         {
           success: false,
-          error: "Service not found",
+          error: "Task not found",
         },
         { status: 404 }
       );
     }
 
+    console.log("PATCH Response - Updated Task:", task);
+
     return NextResponse.json({
       success: true,
-      data: service,
-      message: "Service updated successfully",
+      data: task,
+      message: "Task updated successfully",
     });
   } catch (error: any) {
+    console.error("PATCH Task Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update service",
+        error: error.message || "Failed to update task",
       },
       { status: 400 }
     );
   }
 }
 
-// DELETE - Delete service by ID
+// DELETE - Delete task by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
 ) {
   try {
+    const id=request.headers.get('id');
     await connect();
-    const service = await Service.findByIdAndDelete(params.id);
+    const task = await Task.findByIdAndDelete(id);
 
-    if (!service) {
+    if (!task) {
       return NextResponse.json(
         {
           success: false,
-          error: "Service not found",
+          error: "Task not found",
         },
         { status: 404 }
       );
@@ -99,13 +110,14 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: "Service deleted successfully",
+      message: "Task deleted successfully",
     });
   } catch (error) {
+    console.error("DELETE Task Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to delete service",
+        error: "Failed to delete task",
       },
       { status: 500 }
     );

@@ -14,11 +14,13 @@ import {
 } from "@/types/tables";
 
 
-const DynamicTable = React.forwardRef(({ config }, ref) => {
-  const [data, setData] = useState([]);
+const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
+  type RowType = { [key: string]: any; _id?: string | number; id?: string | number };
+  const [data, setData] = useState<RowType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [sortConfig, setSortConfig] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  type SortConfig = { key: string; direction: "asc" | "desc"|string } | null;
+  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
   useEffect(() => {
     fetchData();
@@ -45,7 +47,7 @@ const DynamicTable = React.forwardRef(({ config }, ref) => {
     }
   };
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     let direction = "asc";
     if (
       sortConfig &&
@@ -74,18 +76,25 @@ const DynamicTable = React.forwardRef(({ config }, ref) => {
     });
   }, [data, sortConfig]);
 
-  const formatCellValue = (value, column) => {
+  const formatCellValue = (value: string | number | Date, column: TableColumn): React.ReactNode => {
     if (column.render) {
       return column.render(value, data);
     }
 
     switch (column.type) {
       case "date":
-        return value ? new Date(value).toLocaleDateString("fa-IR") : "-";
+        if (value instanceof Date) {
+          return value.toLocaleDateString("fa-IR");
+        }
+        if (typeof value === "string" || typeof value === "number") {
+          const date = new Date(value);
+          return isNaN(date.getTime()) ? "-" : date.toLocaleDateString("fa-IR");
+        }
+        return "-";
       case "phone":
-        return value || "-";
+        return value ? String(value) : "-";
       case "email":
-        return value || "-";
+        return value ? String(value) : "-";
       case "status":
         return (
           <span
@@ -99,7 +108,7 @@ const DynamicTable = React.forwardRef(({ config }, ref) => {
           </span>
         );
       default:
-        return value || "-";
+        return value !== undefined && value !== null ? String(value) : "-";
     }
   };
 
