@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
