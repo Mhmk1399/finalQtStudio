@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DynamicTable, { TableConfig } from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
@@ -9,10 +9,26 @@ const ProjectsTable: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
+  const [projectManagers, setProjectManagers] = useState([]);
+
   const [showModal, setShowModal] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
 
+  useEffect(() => {
+    const fetchProjectManagers = async () => {
+      try {
+        const response = await fetch("/api/users");
+        const data = await response.json();
+        setProjectManagers(data.data || []);
+      } catch (error) {
+        console.error("Error fetching project managers:", error);
+      }
+    };
+
+    fetchProjectManagers();
+  }, []);
+  console.log(projectManagers)
   const handleView = (project: any) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات پروژه",
@@ -47,7 +63,12 @@ const ProjectsTable: React.FC = () => {
           label: "مدیر پروژه",
           type: "text",
           render: (value: unknown) => {
-            if (value && typeof value === "object" && "name" in value && "email" in value) {
+            if (
+              value &&
+              typeof value === "object" &&
+              "name" in value &&
+              "email" in value
+            ) {
               return `${value.name} (${value.email || ""})`;
             }
             return value || "-";
@@ -121,18 +142,26 @@ const ProjectsTable: React.FC = () => {
           type: "text",
           required: true,
         },
-        {
-          key: "contractId",
-          label: "شناسه قرارداد",
-          type: "text",
-          required: true,
-        },
+        // {
+        //   key: "contractId",
+        //   label: "شناسه قرارداد",
+        //   type: "text",
+        //   required: true,
+        // },
         {
           key: "projectManagerId",
-          label: "شناسه مدیر پروژه",
-          type: "text",
+          label: "مدیر پروژه",
+          type: "select",
           required: true,
+          options: [
+            { value: "", label: "مدیر پروژه را انتخاب کنید" },
+            ...projectManagers.map((manager) => ({
+              value: manager._id,
+              label: manager.name || manager.username || manager.email,
+            })),
+          ],
         },
+
         {
           key: "status",
           label: "وضعیت پروژه",
