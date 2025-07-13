@@ -35,10 +35,14 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
   const [data, setData] = useState<any>(initialData || {});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldOptions, setFieldOptions] = useState<{[key: string]: any[]}>({});
 
   useEffect(() => {
     if (isOpen && itemId && config.endpoint && config.type !== "delete") {
       fetchData();
+    }
+    if (isOpen) {
+      fetchFieldOptions();
     }
   }, [isOpen, itemId, config.endpoint]);
 
@@ -92,6 +96,31 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFieldOptions = async () => {
+    const fieldsWithEndpoints = config.fields?.filter(field => field.optionsEndpoint) || [];
+    
+    for (const field of fieldsWithEndpoints) {
+      try {
+        const response = await fetch(field.optionsEndpoint);
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          const options = result.data.map((item: any) => ({
+            value: item._id,
+            label: field.optionLabelKey ? item[field.optionLabelKey] : item.name
+          }));
+          
+          setFieldOptions(prev => ({
+            ...prev,
+            [field.key]: options
+          }));
+        }
+      } catch (err) {
+        console.error(`Failed to fetch options for ${field.key}:`, err);
+      }
     }
   };
 
@@ -225,6 +254,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
         );
 
       case "select":
+        const options = field.optionsEndpoint ? fieldOptions[field.key] || [] : field.options || [];
         return (
           <select
             key={field.key}
@@ -236,7 +266,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
             disabled={isReadOnly}
           >
             <option value="">انتخاب کنید...</option>
-            {field.options?.map((option: any) => (
+            {options.map((option: any) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
