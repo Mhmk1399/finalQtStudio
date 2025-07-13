@@ -39,6 +39,7 @@ import TeamsTable from "../tables/TeamsTable";
 import ServicesTable from "../tables/serviceTable";
 import ServiceRequestsTable from "../tables/serviceRequestTable";
 import TasksTable from "../tables/taskTable";
+import TransactionForm from "../forms/transactionForm";
 
 type FormType =
   | "customer"
@@ -55,7 +56,8 @@ type FormType =
   | "service-request"
   | "service-requests-list"
   | "task"
-  | "tasks-list";
+  | "tasks-list"
+  | "transactions";
 
 interface FormOption {
   id: FormType;
@@ -92,14 +94,14 @@ const FormsSidebar: React.FC = () => {
       description: "مشاهده و مدیریت لیست مشتریان",
       color: "bg-blue-500",
     },
-    // {
-    //   id: "contracts-list",
-    //   label: "لیست قراردادها",
-    //   icon: <HiOutlineDocumentText className="w-5 h-5" />,
-    //   category: "مدیریت مشتریان",
-    //   description: "مشاهده و مدیریت لیست قراردادها",
-    //   color: "bg-blue-500",
-    // },
+    {
+      id: "transactions",
+      label: "ثبت تراکنش جدید",
+      icon: <HiOutlineDocumentText className="w-5 h-5" />,
+      category: "مدیریت تراکنش‌ها",
+      description: "   ثبت تراکنش جدید",
+      color: "bg-blue-500",
+    },
 
     // Project Management
     {
@@ -266,6 +268,8 @@ const FormsSidebar: React.FC = () => {
         return <TaskForm onSuccess={handleSuccess} onError={handleError} />;
       case "tasks-list":
         return <TasksTable />;
+      case "transactions":
+        return <TransactionForm />;
       default:
         return (
           <div className="text-center p-8">
@@ -306,7 +310,6 @@ const FormsSidebar: React.FC = () => {
   return (
     <div className="flex h-screen bg-white">
       {/* Sidebar Toggle Button */}
-     
 
       {/* Backdrop */}
       <AnimatePresence>
@@ -470,7 +473,7 @@ const FormsSidebar: React.FC = () => {
             <div className="flex items-center justify-between gap-20">
               <div className="flex items-center ">
                 <motion.div
-                 onClick={toggleSidebar}
+                  onClick={toggleSidebar}
                   className={`p-3 rounded-xl ml-4 ${
                     currentForm?.color || "bg-blue-500"
                   } text-white shadow-lg`}
@@ -500,8 +503,6 @@ const FormsSidebar: React.FC = () => {
               </div>
             </div>
           </motion.div>
-
-          
 
           {/* Form Content */}
           <motion.div
