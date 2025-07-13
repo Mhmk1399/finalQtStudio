@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
+import DynamicTable from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
+import { TableConfig } from "@/types/tables";
 
 const ServiceRequestsTable: React.FC = () => {
   const [selectedServiceRequestId, setSelectedServiceRequestId] = useState<
@@ -60,9 +61,7 @@ const ServiceRequestsTable: React.FC = () => {
       title: "مشاهده جزئیات درخواست سرویس",
       type: "view",
       size: "xl",
-      endpoint: `/api/service-requests/${
-        serviceRequest._id || serviceRequest.id
-      }`,
+      endpoint: `/api/service-requests/detailes`,
       fields: [
         { key: "title", label: "عنوان", type: "text" },
         {
@@ -148,9 +147,7 @@ const ServiceRequestsTable: React.FC = () => {
         title: "ویرایش درخواست سرویس",
         type: "edit",
         size: "xl",
-        endpoint: `/api/service-requests/${
-          serviceRequest._id || serviceRequest.id
-        }`,
+        endpoint: `/api/service-requests/detailes`,
         method: "PATCH",
         fields: [
           {

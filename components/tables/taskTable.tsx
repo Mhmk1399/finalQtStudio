@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
+import DynamicTable from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
+import { TableConfig } from "@/types/tables";
+import { BiSearch } from "react-icons/bi";
+import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 
 const TasksTable: React.FC = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -82,7 +85,7 @@ const TasksTable: React.FC = () => {
       title: "مشاهده جزئیات وظیفه",
       type: "view",
       size: "xl",
-      endpoint: `/api/tasks/${task._id || task.id}`,
+      endpoint: `/api/tasks/detailes`,
       fields: [
         { key: "title", label: "نام وظیفه", type: "text" },
         { key: "description", label: "توضیحات وظیفه", type: "textarea" },
@@ -92,10 +95,7 @@ const TasksTable: React.FC = () => {
           type: "text",
           render: (value: any) => {
             if (value && typeof value === "object") {
-              return `${value.title} (${value.requirements?.substring(
-                0,
-                50
-              )}...)`;
+              return `${value.title} `;
             }
             return value || "-";
           },
@@ -106,7 +106,7 @@ const TasksTable: React.FC = () => {
           type: "text",
           render: (value: any) => {
             if (value && typeof value === "object") {
-              return `${value.name} (${value.specialization})`;
+              return `${value.name} )`;
             }
             return value || "تعیین نشده";
           },
@@ -117,7 +117,7 @@ const TasksTable: React.FC = () => {
           type: "text",
           render: (value: any) => {
             if (value && typeof value === "object") {
-              return `${value.name} (${value.role})`;
+              return `${value.name} `;
             }
             return value || "تعیین نشده";
           },
@@ -180,8 +180,8 @@ const TasksTable: React.FC = () => {
         title: "ویرایش وظیفه",
         type: "edit",
         size: "xl",
-        endpoint: `/api/tasks/${task._id || task.id}`,
-        method: "PUT",
+        endpoint: `/api/tasks/detailes`,
+        method: "PATCH",
         fields: [
           {
             key: "serviceRequestId",
@@ -296,7 +296,7 @@ const TasksTable: React.FC = () => {
       title: "حذف وظیفه",
       type: "delete",
       size: "md",
-      endpoint: `/api/tasks/${task._id || task.id}`,
+      endpoint: `/api/tasks/detailes`,
       method: "DELETE",
       customContent: (
         <div className="text-center">
@@ -396,7 +396,7 @@ const TasksTable: React.FC = () => {
           if (value && typeof value === "object") {
             return (
               <div className="flex flex-col">
-                <span className="text-xs text-gray-500">({value.role})</span>
+                <span className="text-xs text-gray-500">{value.name}</span>
               </div>
             );
           }

@@ -201,7 +201,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               value={String(value)}
               onChange={(e) => handleInputChange(field.name, e.target.value)}
               className={baseClassName}
-              required={field.required}
+              required={field.required}             
             >
               {field.options?.map((option) => (
                 <option key={option.value} value={option.value}>
