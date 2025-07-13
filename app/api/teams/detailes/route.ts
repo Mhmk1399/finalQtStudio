@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Team from '@/models/teams';
+import connect from '@/lib/data';
 
 // GET - Get team by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
 ) {
-  try {
-    const team = await Team.findById(params.id);
+  try 
+  {
+    await connect();
+    const id=request.headers.get('id');
+    const team = await Team.findById(id);
+
     
     if (!team) {
       return NextResponse.json({
@@ -29,14 +33,15 @@ export async function GET(
 }
 
 // PUT - Update team by ID
-export async function PUT(
+export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
 ) {
   try {
+    await connect();
+    const id =request.headers.get('id');
     const body = await request.json();
     const team = await Team.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true, runValidators: true }
     );
@@ -63,10 +68,11 @@ export async function PUT(
 // DELETE - Delete team by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
 ) {
   try {
-    const team = await Team.findByIdAndDelete(params.id);
+    await connect();
+    const id = request.headers.get('id');
+    const team = await Team.findByIdAndDelete(id);
 
     if (!team) {
       return NextResponse.json({
