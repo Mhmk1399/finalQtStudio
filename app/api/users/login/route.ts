@@ -10,21 +10,21 @@ export async function POST(request: NextRequest) {
     await connect();
     const body = await request.json();
 
-    const { email, password } = body;
+    const { phoneNumber, password } = body;
 
     // Validate required fields
-    if (!email || !password) {
+    if (!phoneNumber || !password) {
       return NextResponse.json(
         {
           success: false,
-          error: "Email and password are required",
+          error: "phoneNumber and password are required",
         },
         { status: 400 }
       );
     }
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    // Find user by phoneNumber
+    const user = await User.findOne({ phoneNumber });
 
     if (!user) {
       return NextResponse.json(
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign(
       {
         userId: user._id,
-        email: user.email,
+        phoneNumber: user.phoneNumber,
         name: user.name,
         role: user.role,
         permissions: user.permissions,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const userData = {
       _id: user._id,
       name: user.name,
-      email: user.email,
+      phoneNumber: user.phoneNumber,
       role: user.role,
       teamId: user.teamId,
       permissions: user.permissions,
