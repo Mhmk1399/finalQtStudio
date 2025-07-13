@@ -121,7 +121,11 @@ const Navbar = () => {
     }
   };
 
-  if(pathname === '/admin' || pathname === '/customers/admin') {
+  if (
+    pathname === "/admin" ||
+    pathname === "/customers/admin" ||
+    pathname === "/users/admin"
+  ) {
     return null;
   }
 
