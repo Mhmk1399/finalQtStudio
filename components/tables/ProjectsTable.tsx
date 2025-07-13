@@ -4,12 +4,20 @@ import React, { useState, useEffect } from "react";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
+import DynamicTable from "./DynamicTable";
 
 const ProjectsTable: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
-  const [projectManagers, setProjectManagers] = useState([]);
+  type ProjectManager = {
+    _id: string;
+    name?: string;
+    username?: string;
+    email?: string;
+  };
+
+  const [projectManagers, setProjectManagers] = useState<ProjectManager[]>([]);
 
   const [showModal, setShowModal] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
