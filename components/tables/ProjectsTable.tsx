@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
-import DynamicTable from "./DynamicTable";
 
 const ProjectsTable: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
