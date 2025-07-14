@@ -12,14 +12,10 @@ import {
   FaUserCog,
   FaCog,
   FaServicestack,
-  FaFileAlt,
   FaCheckSquare,
-  FaBars,
-  FaTimes,
 } from "react-icons/fa";
 import {
   HiOutlineUserGroup,
-  HiOutlineDocumentText,
   HiOutlineClipboardList,
   HiOutlineCog,
   HiOutlineCollection,
@@ -34,7 +30,6 @@ import TaskForm from "../forms/TaskForm";
 import ProjectForm from "../forms/projectAndServices/ProjectForm";
 import CustomersTable from "../tables/CustomersTable";
 import ProjectsTable from "../tables/ProjectsTable";
-import ContractsTable from "../tables/ContractsTable";
 import UsersTable from "../tables/UserTable";
 import TeamsTable from "../tables/TeamsTable";
 import ServicesTable from "../tables/serviceTable";
