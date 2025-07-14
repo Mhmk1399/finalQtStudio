@@ -23,6 +23,7 @@ import {
   HiOutlineClipboardList,
   HiOutlineCog,
   HiOutlineCollection,
+  HiOutlineCash,
 } from "react-icons/hi";
 import CustomerForm from "../forms/customers/CustomerForm";
 import UserRegisterForm from "../forms/usersAndTeams/UserRegisterForm";
@@ -97,7 +98,7 @@ const FormsSidebar: React.FC = () => {
     {
       id: "transactions",
       label: "ثبت تراکنش جدید",
-      icon: <HiOutlineDocumentText className="w-5 h-5" />,
+      icon: <HiOutlineCash className="w-5 h-5" />,
       category: "مدیریت تراکنش‌ها",
       description: "   ثبت تراکنش جدید",
       color: "bg-blue-500",
