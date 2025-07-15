@@ -13,7 +13,7 @@ import {
 
 const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
   type RowType = {
-    [key: string]: any;
+    [key: string]: string | number | boolean | Date | null | undefined;
     _id?: string | number;
     id?: string | number;
   };
@@ -72,6 +72,11 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
     return [...data].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return sortConfig.direction === "asc" ? 1 : -1;
+      if (bValue == null) return sortConfig.direction === "asc" ? -1 : 1;
 
       if (aValue < bValue) {
         return sortConfig.direction === "asc" ? -1 : 1;
@@ -220,7 +225,7 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
                       key={column.key}
                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {formatCellValue(row[column.key], column)}
+                      {formatCellValue(row[column.key]?.toString() ?? '', column)}
                     </td>
                   ))}
                   {(config.actions?.view ||

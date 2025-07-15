@@ -5,7 +5,7 @@ import DynamicForm from "../DynamicForm";
 import { FormConfig } from "@/types/form";
 
 interface UserRegisterFormProps {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: string) => void;
   onError?: (error: string) => void;
 }
 
@@ -13,7 +13,7 @@ const UserRegisterForm: React.FC<UserRegisterFormProps> = ({
   onSuccess,
   onError,
 }) => {
-  const handleRegisterSuccess = (data: any) => {
+  const handleRegisterSuccess = (data: string) => {
     console.log("User registration successful:", data);
     if (onSuccess) {
       onSuccess(data);

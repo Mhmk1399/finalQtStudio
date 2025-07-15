@@ -13,7 +13,6 @@ import {
   FaCog,
   FaServicestack,
   FaCheckSquare,
-  FaFileAlt,
   FaChartBar,
 } from "react-icons/fa";
 import {
@@ -75,7 +74,7 @@ interface FormOption {
 const FormsSidebar: React.FC = () => {
   const [activeForm, setActiveForm] = useState<FormType>("customer");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [message, setMessage] = useState<{
+  const [, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
@@ -239,7 +238,7 @@ const FormsSidebar: React.FC = () => {
     return acc;
   }, {} as Record<string, FormOption[]>);
 
-  const handleSuccess = (data: any) => {
+  const handleSuccess = (data: string) => {
     console.log("Success:", data);
     setTimeout(() => setMessage(null), 5000);
   };

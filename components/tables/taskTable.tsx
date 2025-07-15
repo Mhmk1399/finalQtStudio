@@ -5,8 +5,6 @@ import DynamicTable from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
-import { BiSearch } from "react-icons/bi";
-import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 
 const TasksTable: React.FC = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -22,7 +20,7 @@ const TasksTable: React.FC = () => {
 
       if (result.success) {
         return [
-          ...result.data.map((request: any) => ({
+          ...result.data.map((request: { _id: string; title: string , requirements: string }) => ({
             value: request._id,
             label: `${request.title} (${request.requirements?.substring(
               0,
@@ -46,7 +44,7 @@ const TasksTable: React.FC = () => {
 
       if (result.success) {
         return [
-          ...result.data.map((team: any) => ({
+          ...result.data.map((team: { _id: string; name: string ,specialization: string }) => ({
             value: team._id,
             label: `${team.name} (${team.specialization})`,
           })),
@@ -67,7 +65,7 @@ const TasksTable: React.FC = () => {
 
       if (result.success) {
         return [
-          ...result.data.map((user: any) => ({
+          ...result.data.map((user: { _id: string; name: string ,role: string }) => ({
             value: user._id,
             label: `${user.name} (${user.role})`,
           })),
@@ -80,7 +78,7 @@ const TasksTable: React.FC = () => {
     }
   };
 
-  const handleView = (task: any) => {
+  const handleView = (task: { _id: string ;id:string, title: string, description: string, status: string, serviceRequestId: string, assignedTeamId: string, assignedUserId: string, createdAt: string, updatedAt: string }) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات وظیفه",
       type: "view",
@@ -93,22 +91,22 @@ const TasksTable: React.FC = () => {
           key: "serviceRequestId",
           label: "درخواست سرویس",
           type: "text",
-          render: (value: any) => {
-            if (value && typeof value === "object") {
-              return `${value.title} `;
+          render: (value: unknown, data: Record<string, unknown>) => {
+            if (value && typeof value === "object" && "title" in value) {
+              return `${(value as { title: string }).title} `;
             }
-            return value || "-";
+            return value ? String(value) : "-";
           },
         },
         {
           key: "assignedTeamId",
           label: "تیم تعیین‌شده",
           type: "text",
-          render: (value: any) => {
-            if (value && typeof value === "object") {
-              return `${value.name} )`;
+          render: (value: unknown, data: Record<string, unknown>) => {
+            if (value && typeof value === "object" && "name" in value) {
+              return `${(value as { name: string }).name} )`;
             }
-            return value || "تعیین نشده";
+            return value ? String(value) : "تعیین نشده";
           },
         },
         {
@@ -161,7 +159,7 @@ const TasksTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = async (task: any) => {
+  const handleEdit = async (task: { _id: string ;id:string, title: string, description: string, status: string, serviceRequestId: string, assignedTeamId: string, assignedUserId: string, createdAt: string, updatedAt: string }) => {
     // Show loading state
     toast.loading("در حال بارگیری اطلاعات...", { id: "loading-data" });
 
@@ -291,7 +289,7 @@ const TasksTable: React.FC = () => {
     }
   };
 
-  const handleDelete = (task: any) => {
+  const handleDelete = (task: { _id: string ;id:string, title: string, description: string, status: string, serviceRequestId: string, assignedTeamId: string, assignedUserId: string, createdAt: string, updatedAt: string }) => {
     const config: ModalConfig = {
       title: "حذف وظیفه",
       type: "delete",

@@ -51,7 +51,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   const [startDate, setStartDate] = useState<DateObject | null>(null);
   const [expectedEndDate, setExpectedEndDate] = useState<DateObject | null>(null);
   const [actualEndDate, setActualEndDate] = useState<DateObject | null>(null);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<{
+    title?: string;
+    name?: string;
+    description?: string;
+    customerId?: string;
+    projectManagerId?: string;
+    totalPrice?: number;
+    finalPrice?: number;
+    startDate?: DateObject;
+    expectedEndDate?: DateObject;
+    actualEndDate?: DateObject;
+    services?: string[];
+    [key: string]: any;
+  }>({});
 
   // Fetch initial data
   useEffect(() => {
@@ -431,7 +444,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
         
         {/* Form Fields */}
         <div className="space-y-4">
-          {formConfig.fields.map((field) => (
+          {formConfig.fields.map((field:{
+            [x: string]: any;name: string; label: string; type: string; placeholder?: string; required?: boolean; options?: {value: string; label: string,}[]; description?: string; onChange?: (name: string, value: string) => void; validation?: {minLength?: number; maxLength?: number; min?: number;}
+}) => (
             <div key={field.name} className="mb-4">
               <label className="text-sm mb-2 block font-medium text-gray-700">
                 {field.label} {field.required && <span className="text-red-500">*</span>}
@@ -440,7 +455,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
               {field.type === "select" ? (
                 <select
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  value={formData[field.name] || field.defaultValue || ""}
+                  value={formData[field?.name] || field.defaultValue || ""}
                   onChange={(e) => {
                     const newFormData = {...formData, [field.name]: e.target.value};
                     setFormData(newFormData);
@@ -481,12 +496,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                         }}
                         className="mt-1"
                       />
-                      <div>
-                        <span className="text-sm font-medium">{option.label}</span>
-                        {option.description && (
-                          <p className="text-xs text-gray-500">{option.description}</p>
-                        )}
-                      </div>
+                     
                     </label>
                   ))}
                 </div>

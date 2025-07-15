@@ -29,7 +29,9 @@ export interface ModalConfig {
   endpoint?: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   fields?: FormField[];
-  onSuccess?: (data: unknown) => void;
+  onSuccess?: (data: {
+    [key: string]: unknown;
+  }) => void;
   onError?: (error: string) => void;
   onClose?: () => void;
   customContent?: React.ReactNode;

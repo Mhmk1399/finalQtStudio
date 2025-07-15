@@ -14,7 +14,10 @@ const CustomersTable: React.FC = () => {
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
 
-  const handleView = (customer: any) => {
+  const handleView = (customer: {
+    _id: string | undefined;
+    id: string 
+  }) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات مشتری",
       type: "view",
@@ -69,7 +72,10 @@ const CustomersTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = (customer: any) => {
+  const handleEdit = (customer: {
+    _id: string | undefined;
+    id: string
+  }) => {
     const config: ModalConfig = {
       title: "ویرایش اطلاعات مشتری",
       type: "edit",
@@ -149,7 +155,10 @@ const CustomersTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (customer: any) => {
+  const handleDelete = (customer: { _id: string 
+    | undefined ;
+    id: string 
+  }) => {
     const config: ModalConfig = {
       title: "حذف مشتری",
       type: "delete",
@@ -171,7 +180,7 @@ const CustomersTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedCustomerId(customer._id || customer.id);
+    setSelectedCustomerId(customer?._id || customer?.id);
     setShowModal(true);
   };
 

@@ -12,7 +12,17 @@ const TeamsTable: React.FC = () => {
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
 
-  const handleView = (team: any) => {
+  const handleView = (team: {
+    _id: string | undefined;
+    id: string;
+    name: string;
+    description: string;
+    leaderId: string;
+    members: string[];
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات تیم",
       type: "view",
@@ -26,12 +36,17 @@ const TeamsTable: React.FC = () => {
           key: "members", 
           label: "اعضای تیم", 
           type: "textarea",
-          render: (value:string[]) => {
-            if (Array.isArray(value)) {
-              return `${value.length} عضو`;
-            }
-            return value || "-";
+          render: (value) => {
+          // Check if customerId is populated with customer object
+          if (value && typeof value === "object" && "name" in value) {
+            return (value as { name: string }).name;
           }
+          // If it's still just an ID string
+          if (typeof value === "string") {
+            return `مشتری: ${value.substring(0, 8)}...`;
+          }
+          return "-";
+        },
         },
         { 
           key: "isActive", 
@@ -53,7 +68,10 @@ const TeamsTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = (team: any) => {
+  const handleEdit = (team: {
+    _id: string | undefined;
+    id: string;
+  }) => {
     const config: ModalConfig = {
       title: "ویرایش تیم",
       type: "edit",
@@ -93,7 +111,7 @@ const TeamsTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (team: any) => {
+  const handleDelete = (team: {name:string, _id: string | undefined; id: string }) => {
     const config: ModalConfig = {
       title: "حذف تیم",
       type: "delete",
@@ -107,7 +125,7 @@ const TeamsTable: React.FC = () => {
             تأیید حذف تیم
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف تیم "{team.name}" اطمینان دارید؟
+            آیا از حذف تیم "{team?.name}" اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">

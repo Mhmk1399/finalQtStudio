@@ -22,7 +22,7 @@ const ServiceRequestsTable: React.FC = () => {
 
       if (result.success) {
         return [
-          ...result.data.map((project: any) => ({
+          ...result.data.map((project: { _id: string; title: string }) => ({
             value: project._id,
             label: project.title,
           })),
@@ -43,7 +43,7 @@ const ServiceRequestsTable: React.FC = () => {
 
       if (result.success) {
         return [
-          ...result.data.map((service: any) => ({
+          ...result.data.map((service: { _id: string; name: string , basePrice: number }) => ({
             value: service._id,
             label: `${service.name} (${service.basePrice})`,
           })),
@@ -56,7 +56,7 @@ const ServiceRequestsTable: React.FC = () => {
     }
   };
 
-  const handleView = (serviceRequest: any) => {
+  const handleView = (serviceRequest: { _id: string ;id:string, projectId: string, serviceId: string, title: string, description: string, status: string, price: number, createdAt: string, updatedAt: string }) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات درخواست سرویس",
       type: "view",
@@ -68,22 +68,24 @@ const ServiceRequestsTable: React.FC = () => {
           key: "projectId",
           label: "پروژه",
           type: "text",
-          render: (value: any) => {
+          render: (value: unknown, data: Record<string, unknown>) => {
             if (value && typeof value === "object") {
-              return value.title || value.name;
+              const v = value as { title?: string; name?: string };
+              return v.title || v.name || "-";
             }
-            return value || "-";
+            return (value as string) || "-";
           },
         },
         {
           key: "serviceId",
           label: "سرویس",
           type: "text",
-          render: (value: any) => {
+          render: (value: unknown, data: Record<string, unknown>) => {
             if (value && typeof value === "object") {
-              return `${value.name} (${value.basePrice} تومان)`;
+              const v = value as { name?: string; basePrice?: number };
+              return `${v.name ?? "-"} (${v.basePrice ?? "-"} تومان)`;
             }
-            return value || "-";
+            return (value as string) || "-";
           },
         },
         { key: "quantity", label: "تعداد", type: "number" },
@@ -129,7 +131,7 @@ const ServiceRequestsTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = async (serviceRequest: any) => {
+  const handleEdit = async (serviceRequest: { _id: string; id: string }) => {
     // Show loading state
     toast.loading("در حال بارگیری اطلاعات...", { id: "loading-data" });
 
@@ -250,7 +252,11 @@ const ServiceRequestsTable: React.FC = () => {
     }
   };
 
-  const handleDelete = (serviceRequest: any) => {
+  const handleDelete = (serviceRequest: {
+    _id: string;
+    id: string;
+    title: string;
+ }) => {
     const config: ModalConfig = {
       title: "حذف درخواست سرویس",
       type: "delete",

@@ -21,7 +21,7 @@ const ServicesTable: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        return result.data.map((team: any) => ({
+        return result.data.map((team: { _id: string; name: string ,specialization: string }) => ({
           value: team._id,
           label: `${team.name} (${team.specialization})`,
         }));
@@ -33,7 +33,17 @@ const ServicesTable: React.FC = () => {
     }
   };
 
-  const handleView = (service: any) => {
+  const handleView = (service: {
+    _id: string;
+    id: string;
+    name: string;
+    description: string;
+    basePrice: number;
+    teamId: {
+      name: string;
+      specialization: string;
+    };
+  }) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات سرویس",
       type: "view",
@@ -47,11 +57,11 @@ const ServicesTable: React.FC = () => {
           key: "teamId",
           label: "تیم انجام دهنده",
           type: "text",
-          render: (value: any) => {
+          render: (value: unknown) => {
             if (value && typeof value === "object") {
-              return `${value.name} (${value.specialization})`;
+              return `${(value as { name?: string; specialization?: string }).name ?? ""} (${(value as { specialization?: string }).specialization ?? ""})`;
             }
-            return value || "-";
+            return value ? String(value) : "-";
           },
         },
         {
@@ -74,7 +84,17 @@ const ServicesTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = async (service: any) => {
+  const handleEdit = async (service: {
+    _id: string;
+    id: string;
+    name: string;
+    description: string;
+    basePrice: number;
+    teamId: {
+      name: string;
+      specialization: string;
+    };
+  }) => {
     // Show loading state
     toast.loading("در حال بارگیری اطلاعات...", { id: "loading-teams" });
 
@@ -155,7 +175,11 @@ const ServicesTable: React.FC = () => {
     }
   };
 
-  const handleDelete = (service: any) => {
+  const handleDelete = (service: {
+    _id: string;
+    id: string;
+    name: string;
+  }) => {
     const config: ModalConfig = {
       title: "حذف سرویس",
       type: "delete",

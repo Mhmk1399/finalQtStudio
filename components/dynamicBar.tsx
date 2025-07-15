@@ -254,7 +254,9 @@ const DynamicBar: React.FC<DynamicBarProps> = ({
     if (!data.length) return [];
 
     // Group data by the specified key
-    const grouped = data.reduce<Record<string, ProcessedDataItem>>((acc, item: any) => {
+    const grouped = data.reduce<Record<string, ProcessedDataItem>>((acc, item:{
+      [key: string]: unknown;
+    }) => {
       let key = item[config.dataKey];
       
       // Handle nested objects (like populated references)

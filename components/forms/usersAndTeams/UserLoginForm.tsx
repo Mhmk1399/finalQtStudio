@@ -5,12 +5,22 @@ import DynamicForm from '../DynamicForm';
 import { FormConfig } from '@/types/form';
 
 interface UserLoginFormProps {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: string) => void;
   onError?: (error: string) => void;
 }
 
 const UserLoginForm: React.FC<UserLoginFormProps> = ({ onSuccess, onError }) => {
-  const handleLoginSuccess = (data: any) => {
+  const handleLoginSuccess = (data: {
+    data: {
+      success: boolean;
+      token: string;
+      user: {
+        _id: string;
+        name: string;
+        email: string;
+      };
+    };
+  }) => {
     console.log('Login successful:', data);
     
     // Store the token in localStorage
@@ -20,7 +30,7 @@ const UserLoginForm: React.FC<UserLoginFormProps> = ({ onSuccess, onError }) => 
     }
     
     if (onSuccess) {
-      onSuccess(data);
+      onSuccess(data.data.user.name);
     }
   };
 

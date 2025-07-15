@@ -35,6 +35,7 @@ interface TransactionStats {
 }
 
 interface UserGroup {
+  [key: string]: string | number;
   name: string;
   count: number;
   value: number;
@@ -43,6 +44,7 @@ interface UserGroup {
 }
 
 interface DateGroup {
+  [key: string]: string | number;
   name: string;
   count: number;
   value: number;
@@ -51,12 +53,14 @@ interface DateGroup {
 }
 
 interface DebtorFastenerData {
+  [key: string]: string | number;
   name: string;
   value: number;
   count: number;
 }
 
 interface SubjectGroup {
+  [key: string]: string | number;
   name: string;
   count: number;
   value: number;

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import DynamicForm from "./DynamicForm";
 import { FormConfig } from "@/types/form";
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
@@ -19,7 +18,20 @@ const TransactionForm: React.FC = () => {
   const [transactionDate, setTransactionDate] = useState<DateObject | null>(
     new DateObject()
   );
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<{
+    debtor: string;
+    subject: string;
+    fastener: string;
+    amount: string;
+    description: string;
+    [key: string]: string;
+  }>({
+    debtor: "",
+    subject: "",
+    fastener: "",
+    amount: "",
+    description: "",
+  });
 
   useEffect(() => {
     // Fetch users
@@ -28,7 +40,7 @@ const TransactionForm: React.FC = () => {
       .then((data) => {
         if (data.success) {
           setUsers(
-            data.data.map((user: any) => ({
+            data.data.map((user: { _id: string; name: string }) => ({
               value: user._id,
               label: user.name,
             }))
@@ -42,7 +54,7 @@ const TransactionForm: React.FC = () => {
       .then((data) => {
         if (data.success) {
           setCustomers(
-            data.data.map((customer: any) => ({
+            data.data.map((customer: { _id: string; name: string }) => ({
               value: customer._id,
               label: customer.name,
             }))
@@ -89,7 +101,13 @@ const TransactionForm: React.FC = () => {
         toast.success("تراکنش با موفقیت ثبت شد");
         // Reset form on success
         setTransactionDate(new DateObject());
-        setFormData({});
+        setFormData({
+           debtor: "",
+    subject: "",
+    fastener: "",
+    amount: "",
+    description: "",
+        });
         // You might want to trigger a form reset here
       } else {
         toast.error(result.message || "خطا در ثبت تراکنش");
@@ -101,9 +119,9 @@ const TransactionForm: React.FC = () => {
   };
 
   // Handle form data changes
-  const handleFormDataChange = (data: any) => {
-    setFormData(data);
-  };
+  // const handleFormDataChange = (data: any) => {
+  //   setFormData(data);
+  // };
 
   const formConfig: FormConfig = {
     title: "ثبت تراکنش",
@@ -114,7 +132,6 @@ const TransactionForm: React.FC = () => {
     successMessage: "تراکنش با موفقیت ثبت شد",
     errorMessage: "خطا در ثبت تراکنش",
     validationErrorMessage: "لطفاً اطلاعات فرم را به درستی تکمیل کنید.",
-
     fields: [
       {
         name: "subject",

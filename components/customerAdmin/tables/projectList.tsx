@@ -136,23 +136,23 @@ const CustomerProjectsList: React.FC = () => {
   };
 
   // Function to fetch services for dropdown
-  const fetchServices = async (): Promise<DropdownOption[]> => {
-    try {
-      const response = await fetch("/api/services");
-      const result = await response.json() as ApiResponse<Service[]>;
+  // const fetchServices = async (): Promise<DropdownOption[]> => {
+  //   try {
+  //     const response = await fetch("/api/services");
+  //     const result = await response.json() as ApiResponse<Service[]>;
 
-      if (result.success) {
-        return result.data.map((service: Service) => ({
-          value: service._id,
-          label: service.name,
-        }));
-      }
-      return [];
-    } catch (error) {
-      console.error("Error fetching services:", error);
-      return [];
-    }
-  };
+  //     if (result.success) {
+  //       return result.data.map((service: Service) => ({
+  //         value: service._id,
+  //         label: service.name,
+  //       }));
+  //     }
+  //     return [];
+  //   } catch (error) {
+  //     console.error("Error fetching services:", error);
+  //     return [];
+  //   }
+  // };
 
   // Status renderer with Persian labels and colors
   const renderStatus = (status: string) => {

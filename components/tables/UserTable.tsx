@@ -6,6 +6,25 @@ import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
 
+interface User {
+  _id: string;
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'manager' | 'employee' | 'client' | 'viewer';
+  teamId?: string;
+  permissions?: string[];
+  isActive: boolean;
+  lastLogin?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Team {
+  _id: string;
+  name: string;
+}
+
 const UsersTable: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -18,7 +37,7 @@ const UsersTable: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          const teamMap = data.data.reduce((acc: any, team: any) => {
+          const teamMap = data.data.reduce((acc: Record<string, string>, team: Team) => {
             acc[team._id] = team.name;
             return acc;
           }, {});
@@ -28,7 +47,7 @@ const UsersTable: React.FC = () => {
       .catch(console.error);
   }, []);
 
-  const handleView = (user: any) => {
+  const handleView = (user: User) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات کاربر",
       type: "view",
@@ -60,11 +79,11 @@ const UsersTable: React.FC = () => {
           key: "permissions",
           label: "مجوزها",
           type: "textarea",
-          render: (value: string[]) => {
+          render: (value: unknown) => {
             if (Array.isArray(value)) {
-              return value.join(", ");
+              return value.join(', ');
             }
-            return value || "-";
+            return (value as string) || '-';
           },
         },
         {
@@ -88,7 +107,7 @@ const UsersTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: User) => {
     const config: ModalConfig = {
       title: "ویرایش کاربر",
       type: "edit",
@@ -161,7 +180,7 @@ const UsersTable: React.FC = () => {
 
 
 
-  const handleResetPassword = (user: any) => {
+  const handleResetPassword = (user: User) => {
     const config: ModalConfig = {
       title: "بازنشانی رمز عبور",
       type: "edit",
@@ -169,8 +188,8 @@ const UsersTable: React.FC = () => {
       endpoint: "/api/users/detailes",
       method: "PATCH",
       fields: [
-        { key: "name", label: "نام کاربر", type: "text", readonly: true },
-        { key: "email", label: "ایمیل", type: "email", readonly: true },
+        { key: "name", label: "نام کاربر", type: "text" },
+        { key: "email", label: "ایمیل", type: "email" },
         {
           key: "password",
           label: "رمز عبور جدید",
@@ -186,17 +205,7 @@ const UsersTable: React.FC = () => {
           description: "رمز عبور را مجدداً وارد کنید",
         },
       ],
-      customContent: (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h4 className="font-semibold text-yellow-900 mb-2">
-            🔐 بازنشانی رمز عبور
-          </h4>
-          <p className="text-yellow-800 text-sm">
-            رمز عبور جدید برای کاربر "{user.name}" تنظیم خواهد شد. حتماً رمز
-            عبور جدید را به کاربر اطلاع دهید.
-          </p>
-        </div>
-      ),
+     
       onSuccess: (data) => {
         console.log("Password reset successfully:", data);
         toast.success("رمز عبور با موفقیت بازنشانی شد");
@@ -215,7 +224,7 @@ const UsersTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (user: any) => {
+  const handleDelete = (user: User) => {
     const config: ModalConfig = {
       title: "حذف کاربر",
       type: "delete",
@@ -229,7 +238,7 @@ const UsersTable: React.FC = () => {
             تأیید حذف کاربر
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف کاربر "{user.name}" اطمینان دارید؟
+            آیا از حذف کاربر  اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">
@@ -385,7 +394,13 @@ const UsersTable: React.FC = () => {
       view: true,
       edit: true,
       delete: true,
-     
+      custom: [
+        {
+          label: "بازنشانی رمز عبور",
+          icon: "key",
+          onClick: handleResetPassword,
+        },
+      ],
     },
     onView: handleView,
     onEdit: handleEdit,

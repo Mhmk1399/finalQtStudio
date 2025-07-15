@@ -6,6 +6,18 @@ import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
 
+interface Contract {
+  _id?: string;
+  id?: string;
+  title: string;
+  contractNumber: string;
+  customerId: string;
+  status: string;
+  totalAmount?: number;
+  finalAmount?: number;
+  paidAmount?: number;
+}
+
 const ContractsTable: React.FC = () => {
   const [selectedContractId, setSelectedContractId] = useState<string | null>(
     null
@@ -14,7 +26,7 @@ const ContractsTable: React.FC = () => {
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
 
-  const handleView = (contract: any) => {
+  const handleView = (contract: Contract) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات قرارداد",
       type: "view",
@@ -68,11 +80,11 @@ const ContractsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedContractId(contract._id || contract.id);
+    setSelectedContractId(contract?._id || contract?.id ||"");
     setShowModal(true);
   };
 
-  const handleEdit = (contract: any) => {
+  const handleEdit = (contract: Contract) => {
     const config: ModalConfig = {
       title: "ویرایش قرارداد",
       type: "edit",
@@ -160,11 +172,11 @@ const ContractsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedContractId(contract._id || contract.id);
+    setSelectedContractId(contract._id || contract.id||"");
     setShowModal(true);
   };
 
-  const handleApprove = (contract: any) => {
+  const handleApprove = (contract: Contract) => {
     const config: ModalConfig = {
       title: "تأیید قرارداد",
       type: "edit",
@@ -172,24 +184,21 @@ const ContractsTable: React.FC = () => {
       endpoint: "/api/contracts/approve",
       method: "PATCH",
       fields: [
-        { key: "title", label: "عنوان قرارداد", type: "text", readonly: true },
+        { key: "title", label: "عنوان قرارداد", type: "text" },
         {
           key: "contractNumber",
           label: "شماره قرارداد",
           type: "text",
-          readonly: true,
         },
         {
           key: "totalAmount",
           label: "مبلغ کل",
           type: "number",
-          readonly: true,
         },
         {
           key: "finalAmount",
           label: "مبلغ نهایی",
           type: "number",
-          readonly: true,
         },
         {
           key: "status",
@@ -219,10 +228,11 @@ const ContractsTable: React.FC = () => {
           </p>
         </div>
       ),
-      onSuccess: (data) => {
+      onSuccess: (data: { [key: string]: unknown }) => {
         console.log("Contract approval updated:", data);
         setRefreshTable((prev) => prev + 1);
-        const status = data.status === "approved" ? "تأیید" : "رد";
+        const status =
+          data?.status === "approved" ? "تأیید" : "رد";
         toast.success(`قرارداد با موفقیت ${status} شد`);
       },
       onError: (error) => {
@@ -235,11 +245,11 @@ const ContractsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedContractId(contract._id || contract.id);
+    setSelectedContractId(contract._id || contract.id||"");
     setShowModal(true);
   };
 
-  const handleDelete = (contract: any) => {
+  const handleDelete = (contract: Contract) => {
     const config: ModalConfig = {
       title: "حذف قرارداد",
       type: "delete",
@@ -278,7 +288,7 @@ const ContractsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedContractId(contract._id || contract.id);
+    setSelectedContractId(contract._id || contract.id||"");
     setShowModal(true);
   };
 
@@ -466,7 +476,7 @@ const ContractsTable: React.FC = () => {
           icon: "✅",
           className: "bg-green-500 hover:bg-green-600 text-white",
           onClick: handleApprove,
-          condition: (row: any) =>
+          condition: (row: Contract) =>
             row.status === "pending" || row.status === "draft",
         },
       ],

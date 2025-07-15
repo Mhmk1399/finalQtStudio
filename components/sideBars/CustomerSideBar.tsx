@@ -4,23 +4,15 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaUser,
-  FaFileContract,
-  FaDollarSign,
-  FaProjectDiagram,
-  FaServicestack,
-  FaBlog,
-  FaVideo,
   FaChevronLeft,
   FaBars,
   FaTimes,
-  FaCog,
   FaUserCircle,
 } from "react-icons/fa";
 import {
   HiOutlineDocumentText,
   HiOutlineCurrencyDollar,
   HiOutlineUser,
-  HiOutlineCollection,
   HiOutlineClipboardList,
   HiOutlineBookOpen,
   HiOutlineVideoCamera,
@@ -69,7 +61,7 @@ interface FormOption {
 const CustomerSideBar: React.FC = () => {
   const [activeForm, setActiveForm] = useState<FormType>("contracts-list");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [message, setMessage] = useState<{
+  const [, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
@@ -147,7 +139,7 @@ const CustomerSideBar: React.FC = () => {
     return acc;
   }, {} as Record<string, FormOption[]>);
 
-  const handleSuccess = (data: any) => {
+  const handleSuccess = (data: unknown) => {
     setMessage({ type: "success", text: "عملیات با موفقیت انجام شد!" });
     console.log("Success:", data);
     setTimeout(() => setMessage(null), 5000);

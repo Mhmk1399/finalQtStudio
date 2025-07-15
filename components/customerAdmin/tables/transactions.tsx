@@ -120,7 +120,7 @@ const CustomerTransactionsPage = () => {
           key: "date",
           label: "تاریخ تراکنش",
           type: "date",
-          render: (value: unknown, _data: Record<string, unknown>) => formatDate(value as string),
+          render: (value: unknown) => formatDate(value as string),
         },
         {
           key: "subject",
@@ -131,13 +131,13 @@ const CustomerTransactionsPage = () => {
           key: "debtor",
           label: "مبلغ بدهکار",
           type: "text",
-          render: (value: unknown, _data: Record<string, unknown>) => formatCurrency(value as number),
+          render: (value: unknown) => formatCurrency(value as number),
         },
         {
           key: "fastener",
           label: "مبلغ بستانکار",
           type: "text",
-          render: (value: unknown, _data: Record<string, unknown>) => formatCurrency(value as number),
+          render: (value: unknown) => formatCurrency(value as number),
         },
         {
           key: "transactionType",

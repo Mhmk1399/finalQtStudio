@@ -6,9 +6,28 @@ import toast from "react-hot-toast";
 import { TableConfig } from "@/types/tables";
 import DynamicTable from "./DynamicTable";
 
+interface Project {
+  _id?: string;
+  id?: string;
+  title: string;
+  description: string;
+  customerId: string;
+  projectManagerId: string;
+  status: string;
+  totalPrice: number;
+  finalPrice: number;
+  [key: string]: unknown;
+}
+
 const ProjectsTable: React.FC = () => {
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
+  const [selectedProjectId, setSelectedProjectId] = useState<{
+    _id?: string;
+    id?: string;
+  }|undefined>(
+    {
+      _id: "",
+      id: "",
+    }
   );
   type ProjectManager = {
     _id: string;
@@ -37,7 +56,7 @@ const ProjectsTable: React.FC = () => {
     fetchProjectManagers();
   }, []);
   console.log(projectManagers)
-  const handleView = (project: any) => {
+  const handleView = (project: Project) => {
     const config: ModalConfig = {
       title: "مشاهده جزئیات پروژه",
       type: "view",
@@ -50,13 +69,10 @@ const ProjectsTable: React.FC = () => {
           key: "customerId",
           label: "مشتری",
           type: "text",
-          sortable: true,
-          width: "150px",
-          render: (value: unknown, row: unknown) => {
-            // console.log("Customer value:", value); // Debug log
+          render: (value: unknown): React.ReactNode => {
             // Check if customerId is populated with customer object
             if (value && typeof value === "object" && "name" in value) {
-              return value.name;
+              return String((value as { name: string }).name);
             }
             // If it's still just an ID string
             if (typeof value === "string") {
@@ -77,9 +93,13 @@ const ProjectsTable: React.FC = () => {
               "name" in value &&
               "email" in value
             ) {
-              return `${value.name} (${value.email || ""})`;
+              const v = value as { name: string; email?: string };
+              return `${v.name} (${v.email || ""})`;
             }
-            return value || "-";
+            if (typeof value === "string") {
+              return value;
+            }
+            return "-";
           },
         },
         {
@@ -125,11 +145,11 @@ const ProjectsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedProjectId(project._id || project.id);
+    setSelectedProjectId({ _id: project?._id, id: project?.id });
     setShowModal(true);
   };
 
-  const handleEdit = (project: any) => {
+  const handleEdit = (project: Project) => {
     const config: ModalConfig = {
       title: "ویرایش پروژه",
       type: "edit",
@@ -203,11 +223,11 @@ const ProjectsTable: React.FC = () => {
         { key: "notes", label: "یادداشت‌ها", type: "textarea" },
         { key: "internalNotes", label: "یادداشت‌های داخلی", type: "textarea" },
       ],
-      onSuccess: (data) => {
+      onSuccess: () => {
         toast.success("پروژه با موفقیت به‌روزرسانی شد.");
         setRefreshTable((prev) => prev + 1);
       },
-      onError: (error) => {
+      onError: () => {
         toast.error("خطا در به‌روزرسانی پروژه: ");
       },
       onClose: () => setShowModal(false),
@@ -215,18 +235,18 @@ const ProjectsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedProjectId(project._id || project.id);
+    setSelectedProjectId({ _id: project._id, id: project.id });
     setShowModal(true);
   };
 
-  const handleDelete = (project: any) => {
+  const handleDelete = (project: Project) => {
     const config: ModalConfig = {
       title: "حذف پروژه",
       type: "delete",
       size: "md",
       endpoint: "/api/projects/detailes",
       method: "DELETE",
-      onSuccess: (data) => {
+      onSuccess: () => {
         setRefreshTable((prev) => prev + 1);
         toast.success("پروژه با موفقیت حذف شد.");
       },
@@ -240,7 +260,7 @@ const ProjectsTable: React.FC = () => {
     };
 
     setModalConfig(config);
-    setSelectedProjectId(project._id || project.id);
+    setSelectedProjectId({ _id: project._id, id: project.id });
     setShowModal(true);
   };
 
@@ -270,10 +290,10 @@ const ProjectsTable: React.FC = () => {
         type: "text",
         sortable: true,
         width: "150px",
-        render: (value, row) => {
+        render: (value) => {
           // Check if customerId is populated with customer object
-          if (value && typeof value === "object" && value.name) {
-            return value.name;
+          if (value && typeof value === "object" && "name" in value) {
+            return (value as { name: string }).name;
           }
           // If it's still just an ID string
           if (typeof value === "string") {
@@ -288,12 +308,10 @@ const ProjectsTable: React.FC = () => {
         type: "text",
         sortable: true,
         width: "150px",
-        render: 
-        (value, row) => {
+        render: (value) => {
           // Check if projectManagerId is populated with user object
-          if (value && typeof value === "object" && value.name) {
-
-            return value.name;
+          if (value && typeof value === "object" && "name" in value) {
+            return (value as { name: string }).name;
           }
           // If it's still just an ID string
           if (typeof value === "string") {
@@ -451,7 +469,7 @@ const ProjectsTable: React.FC = () => {
         <DynamicModal
           isOpen={showModal}
           config={modalConfig}
-          itemId={selectedProjectId}
+          itemId={selectedProjectId?._id}
         />
       )}
     </div>
