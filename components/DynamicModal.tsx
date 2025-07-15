@@ -1,8 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { HiX, HiExclamationCircle } from "react-icons/hi";
 import { HiOutlineSparkles } from "react-icons/hi2";
+
+export interface FieldOption {
+  value: string | number | boolean;
+  label: string;
+}
+
+export interface FormField {
+  key: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+  description?: string;
+  options?: FieldOption[];
+  optionsEndpoint?: string;
+  optionLabelKey?: string;
+  render?: (value: unknown, data: Record<string, unknown>) => React.ReactNode;
+}
 
 export interface ModalConfig {
   title: string;
@@ -10,8 +28,8 @@ export interface ModalConfig {
   size?: "sm" | "md" | "lg" | "xl" | "full";
   endpoint?: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  fields?: any[];
-  onSuccess?: (data: any) => void;
+  fields?: FormField[];
+  onSuccess?: (data: unknown) => void;
   onError?: (error: string) => void;
   onClose?: () => void;
   customContent?: React.ReactNode;
@@ -23,7 +41,7 @@ interface DynamicModalProps {
   isOpen: boolean;
   config: ModalConfig;
   itemId?: string | undefined | null;
-  initialData?: any;
+  initialData?: Record<string, unknown>;
 }
 
 const DynamicModal: React.FC<DynamicModalProps> = ({
@@ -32,40 +50,12 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
   itemId,
   initialData,
 }) => {
-  const [data, setData] = useState<any>(initialData || {});
+  const [data, setData] = useState<Record<string, unknown>>(initialData || {});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fieldOptions, setFieldOptions] = useState<{[key: string]: any[]}>({});
+  const [fieldOptions, setFieldOptions] = useState<{[key: string]: FieldOption[]}>({});
 
-  useEffect(() => {
-    if (isOpen && itemId && config.endpoint && config.type !== "delete") {
-      fetchData();
-    }
-    if (isOpen) {
-      fetchFieldOptions();
-    }
-  }, [isOpen, itemId, config.endpoint]);
-
-  // Close modal on Escape key press
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen && !loading) {
-        handleClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden"; // Prevent background scroll
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen, loading]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!itemId || !config.endpoint) return;
 
     try {
@@ -97,20 +87,20 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [itemId, config.endpoint, config.onError]);
 
-  const fetchFieldOptions = async () => {
+  const fetchFieldOptions = useCallback(async () => {
     const fieldsWithEndpoints = config.fields?.filter(field => field.optionsEndpoint) || [];
     
     for (const field of fieldsWithEndpoints) {
       try {
-        const response = await fetch(field.optionsEndpoint);
+        const response = await fetch(field.optionsEndpoint!);
         const result = await response.json();
         
         if (response.ok && result.success) {
-          const options = result.data.map((item: any) => ({
-            value: item._id,
-            label: field.optionLabelKey ? item[field.optionLabelKey] : item.name
+          const options = result.data.map((item: Record<string, unknown>) => ({
+            value: item._id as string,
+            label: field.optionLabelKey ? (item[field.optionLabelKey] as string) : (item.name as string)
           }));
           
           setFieldOptions(prev => ({
@@ -122,7 +112,44 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
         console.error(`Failed to fetch options for ${field.key}:`, err);
       }
     }
-  };
+  }, [config.fields]);
+
+  const handleClose = useCallback(() => {
+    if (loading) return; // Prevent closing while loading
+    setData({});
+    setError(null);
+    if (config.onClose) {
+      config.onClose();
+    }
+  }, [loading, config.onClose]);
+
+  useEffect(() => {
+    if (isOpen && itemId && config.endpoint && config.type !== "delete") {
+      fetchData();
+    }
+    if (isOpen) {
+      fetchFieldOptions();
+    }
+  }, [isOpen, itemId, config.endpoint, config.type, fetchData, fetchFieldOptions]);
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !loading) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden"; // Prevent background scroll
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, loading, handleClose]);
 
   const handleSubmit = async () => {
     if (!itemId || !config.endpoint) return;
@@ -166,17 +193,8 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
     }
   };
 
-  const handleClose = () => {
-    if (loading) return; // Prevent closing while loading
-    setData({});
-    setError(null);
-    if (config.onClose) {
-      config.onClose();
-    }
-  };
-
-  const handleInputChange = (fieldName: string, value: any) => {
-    setData((prev: any) => ({
+  const handleInputChange = (fieldName: string, value: unknown) => {
+    setData((prev: Record<string, unknown>) => ({
       ...prev,
       [fieldName]: value,
     }));
@@ -212,9 +230,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
     }
   };
 
-  
-
-  const renderField = (field: any) => {
+  const renderField = (field: FormField) => {
     const value = data[field.key] || "";
     const isReadOnly = config.type === "view";
 
@@ -242,7 +258,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
         return (
           <textarea
             key={field.key}
-            value={value}
+            value={value as string}
             onChange={(e) =>
               !isReadOnly && handleInputChange(field.key, e.target.value)
             }
@@ -258,7 +274,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
         return (
           <select
             key={field.key}
-            value={value}
+            value={value as string}
             onChange={(e) =>
               !isReadOnly && handleInputChange(field.key, e.target.value)
             }
@@ -266,8 +282,8 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
             disabled={isReadOnly}
           >
             <option value="">انتخاب کنید...</option>
-            {options.map((option: any) => (
-              <option key={option.value} value={option.value}>
+            {options.map((option: FieldOption) => (
+              <option key={String(option.value)} value={String(option.value)}>
                 {option.label}
               </option>
             ))}
@@ -279,7 +295,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
           <input
             key={field.key}
             type="text"
-            value={value ? new Date(value).toLocaleDateString("fa-IR") : ""}
+            value={value ? new Date(value as string).toLocaleDateString("fa-IR") : ""}
             className={`${baseClassName} bg-gray-50`}
             readOnly
           />
@@ -290,7 +306,7 @@ const DynamicModal: React.FC<DynamicModalProps> = ({
           <input
             key={field.key}
             type={field.type || "text"}
-            value={value}
+            value={value as string}
             onChange={(e) =>
               !isReadOnly && handleInputChange(field.key, e.target.value)
             }

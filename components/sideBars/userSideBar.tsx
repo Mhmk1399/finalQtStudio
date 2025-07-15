@@ -12,8 +12,9 @@ import {
 import AttendanceForm from "../users/attendanceForm";
 import UserTasksPage from "../users/todoTable";
 import UserTransactionsPage from "../users/transactions";
+import TransBar from "../users/transBar";
 
-type FormType = "Todo" | "transaction" | "absentPresent";
+type FormType = "Todo" | "transaction" | "absentPresent"|"transaction-bar";
 
 interface FormOption {
   id: FormType;
@@ -54,6 +55,14 @@ const UsersSideBar: React.FC = () => {
       description: "مدیریت اطلاعات  وظایف",
       color: "bg-purple-500",
     },
+        {
+      id: "transaction-bar",
+      label: "تراکنش‌ها",
+      icon: <HiOutlineCurrencyDollar className="w-5 h-5" />,
+      category: "مالی و حسابداری",
+      description: "نمودار پرداخت‌ها و تراکنش‌های مالی",
+      color: "bg-green-500",
+    },
   ];
 
   // Group forms by category
@@ -79,6 +88,8 @@ const UsersSideBar: React.FC = () => {
 
       case "Todo":
         return <UserTasksPage />;
+      case "transaction-bar":
+        return <TransBar />;
 
       default:
         return (

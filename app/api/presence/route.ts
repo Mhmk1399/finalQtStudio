@@ -15,14 +15,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to create presence",
+        error: "Failed to create presence"+error,
       },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connect();
     const presence = await Presence.find();
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch presence",
+        error: "Failed to fetch presence"+error,
       },
       { status: 500 }
     );

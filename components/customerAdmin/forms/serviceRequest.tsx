@@ -258,7 +258,7 @@ const ProjectOrderingComponent: React.FC = () => {
   const updateServiceRequest = (
     serviceId: string,
     field: keyof ServiceRequestForm,
-    value: any
+    value: string | number
   ) => {
     setServiceRequests((prev) =>
       prev.map((req) =>

@@ -159,73 +159,7 @@ const UsersTable: React.FC = () => {
     setShowModal(true);
   };
 
-  const handleActivateDeactivate = (user: any) => {
-    const isActive = user.isActive;
-    const action = isActive ? "غیرفعال" : "فعال";
 
-    const config: ModalConfig = {
-      title: `${action} کردن کاربر`,
-      type: "edit",
-      size: "md",
-      endpoint: "/api/users/detailes",
-      method: "PATCH",
-      fields: [
-        { key: "name", label: "نام کاربر", type: "text", readonly: true },
-        { key: "email", label: "ایمیل", type: "email", readonly: true },
-        { key: "role", label: "نقش", type: "text", readonly: true },
-        {
-          key: "isActive",
-          label: "وضعیت جدید",
-          type: "select",
-          required: true,
-          options: [{ value: !isActive, label: action }],
-          defaultValue: !isActive,
-        },
-      ],
-      customContent: (
-        <div
-          className={`mb-6 p-4 ${
-            isActive
-              ? "bg-red-50 border-red-200"
-              : "bg-green-50 border-green-200"
-          } border rounded-lg`}
-        >
-          <h4
-            className={`font-semibold ${
-              isActive ? "text-red-900" : "text-green-900"
-            } mb-2`}
-          >
-            {isActive ? "⚠️ توجه" : "✅ تأیید"}
-          </h4>
-          <p
-            className={`${
-              isActive ? "text-red-800" : "text-green-800"
-            } text-sm`}
-          >
-            {isActive
-              ? `با غیرفعال کردن این کاربر، وی دیگر نمی‌تواند وارد سیستم شود.`
-              : `با فعال کردن این کاربر، وی می‌تواند مجدداً وارد سیستم شود.`}
-          </p>
-        </div>
-      ),
-      onSuccess: (data) => {
-        console.log("User status updated:", data);
-        setRefreshTable((prev) => prev + 1);
-        toast.success(`کاربر با موفقیت ${action} شد`);
-      },
-      onError: (error) => {
-        console.error("Status update error:", error);
-        toast.error(`خطا در ${action} کردن کاربر: `);
-      },
-      onClose: () => setShowModal(false),
-      confirmText: `${action} کردن`,
-      cancelText: "لغو",
-    };
-
-    setModalConfig(config);
-    setSelectedUserId(user._id || user.id);
-    setShowModal(true);
-  };
 
   const handleResetPassword = (user: any) => {
     const config: ModalConfig = {
@@ -451,20 +385,7 @@ const UsersTable: React.FC = () => {
       view: true,
       edit: true,
       delete: true,
-      custom: [
-        {
-          label: "فعال/غیرفعال",
-          icon: "🔄",
-          className: "bg-blue-500 hover:bg-blue-600 text-white",
-          onClick: handleActivateDeactivate,
-        },
-        {
-          label: "بازنشانی رمز",
-          icon: "🔐",
-          className: "bg-yellow-500 hover:bg-yellow-600 text-white",
-          onClick: handleResetPassword,
-        },
-      ],
+     
     },
     onView: handleView,
     onEdit: handleEdit,

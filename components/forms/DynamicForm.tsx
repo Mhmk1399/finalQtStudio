@@ -342,7 +342,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                           newValues = [...currentValues, option.value];
                         } else {
                           newValues = currentValues.filter(
-                            (val: any) => val !== option.value
+                            (val: string) => val !== option.value
                           );
                         }
 

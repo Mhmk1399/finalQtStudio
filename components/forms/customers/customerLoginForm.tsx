@@ -5,7 +5,7 @@ import DynamicForm from "../DynamicForm";
 import { FormConfig } from "@/types/form";
 
 interface CustomerLoginFormProps {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: string) => void;
   onError?: (error: string) => void;
 }
 
@@ -13,7 +13,19 @@ const CustomerLoginForm: React.FC<CustomerLoginFormProps> = ({
   onSuccess,
   onError,
 }) => {
-  const handleLoginSuccess = (response: any) => {
+  const handleLoginSuccess = (response: {
+    success: boolean;
+    message: string;
+    data: {
+      customer: {
+        _id: string;
+        name: string;
+        email: string;
+        phoneNumber: string;
+      };
+      token: string;
+    };
+  }) => {
     console.log("Full API response:", response); // Debug log
 
     // The API returns: { success: true, message: "Login successful", data: { customer: {...}, token: "..." } }
@@ -28,7 +40,7 @@ const CustomerLoginForm: React.FC<CustomerLoginFormProps> = ({
 
     // Call the parent success handler if provided
     if (onSuccess) {
-      onSuccess(response);
+      onSuccess(response.message);
     } else {
       // Default success behavior - redirect to dashboard or home
       window.location.href = "/customers/admin";

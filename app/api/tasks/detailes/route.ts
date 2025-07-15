@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Task from "@/models/tasks";
 import connect from "@/lib/data";
-import { model } from "mongoose";
 import ServiceRequest from "@/models/customersData/serviceRequests";
 import User from "@/models/users";
 import Team from "@/models/teams";
@@ -95,12 +94,12 @@ export async function PATCH(
       data: task,
       message: "Task updated successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("PATCH Task Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update task",
+        error:  "Failed to update task",
       },
       { status: 400 }
     );

@@ -87,12 +87,12 @@ export async function PATCH(request: NextRequest) {
       success: true,
       data: project,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error updating project:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update project",
+        error:  "Failed to update project",
       },
       { status: 400 }
     );

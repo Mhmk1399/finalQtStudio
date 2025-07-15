@@ -12,6 +12,8 @@ export async function GET(request: NextRequest) {
       data: transaction,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json({
       success: false,
       error: "Failed to fetch transaction data",
@@ -33,6 +35,8 @@ export async function PATCH(request: NextRequest) {
       data: transaction,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json({
       success: false,
       error: "Failed to update transaction data",
@@ -50,6 +54,8 @@ export async function DELETE(request: NextRequest) {
       data: transaction,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json({
       success: false,
       error: "Failed to delete transaction",

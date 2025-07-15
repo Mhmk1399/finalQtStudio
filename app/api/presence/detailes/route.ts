@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: "Failed to fetch presence data",
+      error: "Failed to fetch presence data"+error,
     });
   }
 }
@@ -35,7 +35,7 @@ export async function PATCH(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: "Failed to update presence data",
+      error: "Failed to update presence data"+error,
     });
   }
 }
@@ -45,7 +45,7 @@ export async function DELETE(request: NextRequest) {
   try {
     await connect();
     const id =request.headers.get('id');
-    const presence = await Presence.findByIdAndDelete(id);
+     await Presence.findByIdAndDelete(id);
     return NextResponse.json({
       success: true,
       message: "Presence data deleted successfully",
@@ -53,7 +53,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: "Failed to delete presence data",
+      error: "Failed to delete presence data"+error,
     });
   }
 }

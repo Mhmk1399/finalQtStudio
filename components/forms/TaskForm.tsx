@@ -5,7 +5,7 @@ import DynamicForm from "./DynamicForm";
 import { FormConfig } from "@/types/form";
 
 interface TaskFormProps {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: string) => void;
   onError?: (error: string) => void;
 }
 

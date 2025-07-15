@@ -5,7 +5,7 @@ import DynamicForm from "./DynamicForm";
 import { FormConfig } from "@/types/form";
 
 interface ContractFormHiddenProps {
-  onSuccess?: (data: any) => void;
+  onSuccess?: (data: string) => void;
   onError?: (error: string) => void;
   customerId?: string; // Optional prop to pass customer ID
 }
@@ -17,7 +17,7 @@ const ContractFormHidden: React.FC<ContractFormHiddenProps> = ({
 }) => {
   const [currentCustomerId, setCurrentCustomerId] = useState<string>("");
 
-  const handleFormSuccess = (data: any) => {
+  const handleFormSuccess = (data: string) => {
     console.log('Form submitted successfully:', data);
     if (onSuccess) {
       onSuccess(data);

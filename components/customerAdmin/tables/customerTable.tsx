@@ -175,18 +175,6 @@ const CustomersTable: React.FC = () => {
     setShowModal(true);
   };
 
-  // Handle refresh customer data
-  const handleRefreshData = async () => {
-    setLoading(true);
-    const info = await fetchCustomerData();
-    if (info) {
-      setCustomerInfo(info);
-      toast.success("اطلاعات به‌روزرسانی شد");
-    } else {
-      toast.error("خطا در به‌روزرسانی اطلاعات");
-    }
-    setLoading(false);
-  };
 
   useEffect(() => {
     const loadCustomerData = async () => {

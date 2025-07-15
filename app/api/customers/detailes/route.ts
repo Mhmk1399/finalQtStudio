@@ -94,7 +94,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to delete customer",
+        error: "Failed to delete customer"+error,
       },
       { status: 500 }
     );

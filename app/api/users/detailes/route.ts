@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     await connect();
     const id = request.headers.get("id");
+    console.log(id,'id user');
     const user = await User.findById(id);
 
     if (!user) {
@@ -24,6 +25,8 @@ export async function GET(request: NextRequest) {
       data: user,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,
@@ -59,11 +62,13 @@ export async function PATCH(request: NextRequest) {
       success: true,
       data: user,
     });
-  } catch (error: any) {
+  } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update user",
+        error:  "Failed to update user",
       },
       { status: 400 }
     );
@@ -92,6 +97,8 @@ export async function DELETE(request: NextRequest) {
       message: "User deleted successfully",
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,

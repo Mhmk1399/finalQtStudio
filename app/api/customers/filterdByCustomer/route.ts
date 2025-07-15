@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch contracts",
+        error: "Failed to fetch contracts"+error,
       },
       { status: 500 }
     );

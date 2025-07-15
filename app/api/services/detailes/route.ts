@@ -30,6 +30,8 @@ export async function GET(
       data: service,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,
@@ -68,11 +70,13 @@ export async function PATCH(
       data: service,
       message: "Service updated successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update service",
+        error:  "Failed to update service",
       },
       { status: 400 }
     );
@@ -103,6 +107,8 @@ export async function DELETE(
       message: "Service deleted successfully",
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,

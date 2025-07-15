@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import DynamicTable, { TableConfig } from "./DynamicTable";
+import DynamicTablefrom from "./DynamicTable";
 import DynamicModal, { ModalConfig } from "../DynamicModal";
 import toast from "react-hot-toast";
+import { TableConfig } from "@/types/tables";
 
 const TeamsTable: React.FC = () => {
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
@@ -221,7 +222,7 @@ const TeamsTable: React.FC = () => {
 
   return (
     <div>
-      <DynamicTable 
+      <DynamicTablefrom 
         config={teamsTableConfig} 
         key={refreshTable}
       />

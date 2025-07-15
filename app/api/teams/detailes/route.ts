@@ -25,6 +25,8 @@ export async function GET(
       data: team
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json({
       success: false,
       error: 'Failed to fetch team'
@@ -57,10 +59,12 @@ export async function PATCH(
       success: true,
       data: team
     });
-  } catch (error: any) {
+  } catch (error) {
+        console.log(error);
+
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to update team'
+      error:  'Failed to update team'
     }, { status: 400 });
   }
 }
@@ -86,6 +90,8 @@ export async function DELETE(
       message: 'Team deleted successfully'
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json({
       success: false,
       error: 'Failed to delete team'

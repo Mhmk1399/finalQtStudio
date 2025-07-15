@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
 
     const filteredData = projects.filter((project) => {
       // Convert ObjectId to string for comparison
+      console.log("Project Customer ID:", project.customerId.toString());
       return project.customerId.toString() === customerId;
     });
 

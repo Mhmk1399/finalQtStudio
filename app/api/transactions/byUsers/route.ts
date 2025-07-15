@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
       data: filteredData,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,

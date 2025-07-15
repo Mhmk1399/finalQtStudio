@@ -36,7 +36,8 @@ import ProjectForm from "../forms/projectAndServices/ProjectForm";
 import CustomerInfoTable from "../customerAdmin/tables/customerTable";
 import ProjectOrderingComponent from "../customerAdmin/forms/serviceRequest";
 import CustomerProjectsList from "../customerAdmin/tables/projectList";
-
+import {Transactions} from "../customerAdmin/tables/transactions";
+import TransBar from "../customerAdmin/tables/transBar";
 type FormType =
   | "customer"
   | "contract"
@@ -52,6 +53,8 @@ type FormType =
   | "projects-list"
   | "service-requests-list"
   | "latest-blogs"
+  |"transactions"
+  |"transactions-bar"
   | "latest-videos";
 
 interface FormOption {
@@ -89,6 +92,14 @@ const CustomerSideBar: React.FC = () => {
       description: "تاریخچه پرداخت‌ها و تراکنش‌های مالی",
       color: "bg-blue-500",
     },
+     {
+      id: "transactions-bar",
+      label: "نمودار تراکنش‌ها ",
+      icon: <HiOutlineCurrencyDollar className="w-5 h-5" />,
+      category: "مالی و حسابداری",
+      description: " پرداخت‌ها و تراکنش‌های مالی",
+      color: "bg-blue-500",
+    },
     {
       id: "personal-info",
       label: "اطلاعات شخصی",
@@ -98,15 +109,7 @@ const CustomerSideBar: React.FC = () => {
       color: "bg-blue-500",
     },
 
-    // پروژه‌ها و خدمات
-    {
-      id: "projects-list",
-      label: "لیست پروژه‌ها",
-      icon: <FaProjectDiagram className="w-5 h-5" />,
-      category: "پروژه‌ها و خدمات",
-      description: "مشاهده پروژه‌های در حال اجرا و تکمیل شده",
-      color: "bg-green-500",
-    },
+ 
     {
       id: "service-requests-list",
       label: "لیست درخواست خدمات",
@@ -188,6 +191,8 @@ const CustomerSideBar: React.FC = () => {
         return <TaskForm onSuccess={handleSuccess} onError={handleError} />;
       case "service-requests-list":
         return <ProjectOrderingComponent />;
+      case "transactions-bar":
+      return < TransBar/>;
       case "contracts-list":
         return (
           <div className="text-center p-8">
@@ -209,22 +214,7 @@ const CustomerSideBar: React.FC = () => {
         );
       case "transactions":
         return (
-          <div className="text-center p-8">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="text-6xl mb-4"
-            >
-              💰
-            </motion.div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              تراکنش‌های مالی
-            </h3>
-            <p className="text-gray-500">
-              تاریخچه پرداخت‌ها و تراکنش‌های مالی شما
-            </p>
-          </div>
+         <Transactions />
         );
       case "personal-info":
         return <CustomerInfoTable />;

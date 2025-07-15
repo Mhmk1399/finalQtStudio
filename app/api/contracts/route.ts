@@ -14,7 +14,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch contracts'
+      error: 'Failed to fetch contracts'+error
     }, { status: 500 });
   }
 }

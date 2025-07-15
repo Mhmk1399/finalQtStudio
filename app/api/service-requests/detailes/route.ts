@@ -61,11 +61,12 @@ export async function PATCH(request: NextRequest) {
       success: true,
       data: serviceRequest,
     });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("PATCH Service Request Error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to update service request",
+        error:  "Failed to update service request",
       },
       { status: 400 }
     );
@@ -97,7 +98,10 @@ export async function DELETE(
       message: "Service request deleted successfully",
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
+
       {
         success: false,
         error: "Failed to delete service request",

@@ -1,7 +1,7 @@
 "use client";
 
 import { TableConfig } from "@/types/tables";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import DynamicModal, { ModalConfig } from "../../DynamicModal";
 import {
@@ -17,9 +17,71 @@ import {
   HiOutlineTrash,
 } from "react-icons/hi";
 
+// Type definitions
+interface Project {
+  _id: string;
+  id?: string;
+  title: string;
+  name?: string;
+  description?: string;
+  status: 'planning' | 'active' | 'paused' | 'completed' | 'cancelled';
+  paymentStatus: 'pending' | 'partial' | 'paid' | 'overdue';
+  progress?: number;
+  totalPrice?: number;
+  finalPrice?: number;
+  paidAmount?: number;
+  discount?: number;
+  startDate: string;
+  expectedEndDate: string;
+  actualEndDate?: string;
+  createdAt: string;
+  projectManagerId?: {
+    _id: string;
+    name: string;
+    email: string;
+  } | string;
+  services?: Array<{
+    _id: string;
+    name: string;
+  }> | string[];
+  contractId?: string;
+  notes?: string;
+  internalNotes?: string;
+  requirements?: string;
+  deliverables?: string;
+}
+
+interface ProjectManager {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface Service {
+  _id: string;
+  name: string;
+}
+
+interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
+interface DecodedToken {
+  customerId: string;
+  [key: string]: unknown;
+}
+
 const CustomerProjectsList: React.FC = () => {
   const tableRef = useRef<{ refreshData: () => void }>(null);
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [customerId, setCustomerId] = useState<string | null>(null);
   
@@ -44,7 +106,7 @@ const CustomerProjectsList: React.FC = () => {
         return null;
       }
 
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      const decodedToken = JSON.parse(atob(token.split(".")[1])) as DecodedToken;
       return decodedToken.customerId || null;
     } catch (error) {
       console.error("Error decoding token:", error);
@@ -53,15 +115,15 @@ const CustomerProjectsList: React.FC = () => {
   };
 
   // Function to fetch project managers for dropdown
-  const fetchProjectManagers = async () => {
+  const fetchProjectManagers = async (): Promise<DropdownOption[]> => {
     try {
       const response = await fetch("/api/users");
-      const result = await response.json();
+      const result = await response.json() as ApiResponse<ProjectManager[]>;
 
       if (result.success) {
         return result.data
-          .filter((user: any) => user.role === "projectManager" || user.role === "admin")
-          .map((user: any) => ({
+          .filter((user: ProjectManager) => user.role === "projectManager" || user.role === "admin")
+          .map((user: ProjectManager) => ({
             value: user._id,
             label: `${user.name} (${user.email})`,
           }));
@@ -74,13 +136,13 @@ const CustomerProjectsList: React.FC = () => {
   };
 
   // Function to fetch services for dropdown
-  const fetchServices = async () => {
+  const fetchServices = async (): Promise<DropdownOption[]> => {
     try {
       const response = await fetch("/api/services");
-      const result = await response.json();
+      const result = await response.json() as ApiResponse<Service[]>;
 
       if (result.success) {
-        return result.data.map((service: any) => ({
+        return result.data.map((service: Service) => ({
           value: service._id,
           label: service.name,
         }));
@@ -206,21 +268,20 @@ const CustomerProjectsList: React.FC = () => {
   };
 
   // Handle view project details
-  const handleViewProject = (project: any) => {
+  const handleViewProject = (project: Project) => {
     setSelectedProject(project);
     setShowDetailsModal(true);
   };
 
   // Handle edit project using DynamicModal
-  const handleEditProject = async (project: any) => {
+  const handleEditProject = async (project: Project) => {
     // Show loading state
     toast.loading("در حال بارگیری اطلاعات...", { id: "loading-project-data" });
 
     try {
-      // Fetch project managers and services for dropdowns
-      const [projectManagers, services] = await Promise.all([
+      // Fetch project managers for dropdowns
+      const [projectManagers] = await Promise.all([
         fetchProjectManagers(),
-        fetchServices(),
       ]);
 
       // Dismiss loading toast
@@ -345,14 +406,14 @@ const CustomerProjectsList: React.FC = () => {
             placeholder: "یادداشت‌های داخلی (فقط برای تیم)",
           },
         ],
-        onSuccess: (data) => {
+        onSuccess: (data: unknown) => {
           console.log("Project updated successfully:", data);
           toast.success("پروژه با موفقیت ویرایش شد");
           setRefreshTable((prev) => prev + 1);
           // Refresh the custom table
           tableRef.current?.refreshData();
         },
-        onError: (error) => {
+        onError: (error: string) => {
           toast.error("خطا در ویرایش پروژه: " + error);
           console.error("Update error:", error);
         },
@@ -371,7 +432,7 @@ const CustomerProjectsList: React.FC = () => {
   };
 
   // Handle delete project
-  const handleDeleteProject = async (project: any) => {
+  const handleDeleteProject = async (project: Project) => {
     const config: ModalConfig = {
       title: "حذف پروژه",
       type: "delete",
@@ -380,12 +441,13 @@ const CustomerProjectsList: React.FC = () => {
       method: "DELETE",
       customContent: (
         <div className="text-center">
-          <div className="text-6xl mb-4">⚠️</div>
+          <div className="text-6xl mb-4">⚠️
+          </div>
           <h4 className="text-lg font-semibold text-gray-900 mb-2">
             تأیید حذف پروژه
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف پروژه "{project.title}" اطمینان دارید؟
+            آیا از حذف پروژه &quot;{project.title}&quot; اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">
@@ -394,14 +456,14 @@ const CustomerProjectsList: React.FC = () => {
           </div>
         </div>
       ),
-      onSuccess: (data) => {
+      onSuccess: (data: unknown) => {
         console.log("Project deleted successfully:", data);
         toast.success("پروژه با موفقیت حذف شد");
         setRefreshTable((prev) => prev + 1);
         // Refresh the custom table
         tableRef.current?.refreshData();
       },
-      onError: (error) => {
+      onError: (error: string) => {
         toast.error("خطا در حذف پروژه: " + error);
         console.error("Delete error:", error);
       },
@@ -416,7 +478,7 @@ const CustomerProjectsList: React.FC = () => {
   };
 
   // Custom fetch function for DynamicTable
-  const fetchProjectsData = async () => {
+  const fetchProjectsData = useCallback(async (): Promise<ApiResponse<Project[]>> => {
     if (!customerId) {
       throw new Error("Customer ID not found");
     }
@@ -430,8 +492,8 @@ const CustomerProjectsList: React.FC = () => {
         },
       });
 
-      const result = await response.json();
-
+      const result = await response.json() as ApiResponse<Project[]>;
+      console.log("Fetched projects:", result);
       if (!response.ok) {
         throw new Error(result.error || "Failed to fetch projects");
       }
@@ -441,7 +503,7 @@ const CustomerProjectsList: React.FC = () => {
       console.error("Error fetching projects:", error);
       throw error;
     }
-  };
+  }, [customerId]);
 
   // Table configuration
   const tableConfig: TableConfig = {
@@ -456,7 +518,7 @@ const CustomerProjectsList: React.FC = () => {
         type: "text",
         sortable: true,
         width: "20%",
-        render: (value: string, row: any) => (
+        render: (value: string, row: Project) => (
           <div className="flex items-center space-x-2 space-x-reverse">
             <div className="bg-blue-100 p-2 rounded-lg">
               <HiOutlineDocumentText className="w-4 h-4 text-blue-600" />
@@ -478,14 +540,7 @@ const CustomerProjectsList: React.FC = () => {
         width: "12%",
         render: (value: string) => renderStatus(value),
       },
-      {
-        key: "progress",
-        label: "پیشرفت",
-        type: "number",
-        sortable: true,
-        width: "15%",
-        render: (value: number) => renderProgress(value),
-      },
+
       {
         key: "paymentStatus",
         label: "وضعیت پرداخت",
@@ -665,7 +720,7 @@ const CustomerProjectsList: React.FC = () => {
                           پیشرفت
                         </label>
                         <div className="mt-2">
-                          {renderProgress(selectedProject.progress)}
+                          {renderProgress(selectedProject.progress || 0)}
                         </div>
                       </div>
                     </div>
@@ -692,7 +747,7 @@ const CustomerProjectsList: React.FC = () => {
                           مبلغ کل
                         </label>
                         <p className="text-gray-900 font-medium">
-                          {formatAmount(selectedProject.totalPrice)}
+                          {formatAmount(selectedProject.totalPrice || 0)}
                         </p>
                       </div>
 
@@ -701,7 +756,7 @@ const CustomerProjectsList: React.FC = () => {
                           قیمت نهایی
                         </label>
                         <p className="text-gray-900 font-medium">
-                          {formatAmount(selectedProject.finalPrice)}
+                          {formatAmount(selectedProject.finalPrice || 0)}
                         </p>
                       </div>
 
@@ -710,7 +765,7 @@ const CustomerProjectsList: React.FC = () => {
                           مبلغ پرداخت شده
                         </label>
                         <p className="text-gray-900 font-medium">
-                          {formatAmount(selectedProject.paidAmount)}
+                          {formatAmount(selectedProject.paidAmount || 0)}
                         </p>
                       </div>
 
@@ -801,8 +856,9 @@ const CustomerProjectsList: React.FC = () => {
                           <div className="flex items-center mt-1">
                             <HiOutlineUser className="w-4 h-4 text-gray-400 ml-2" />
                             <p className="text-gray-900">
-                              {selectedProject.projectManagerId.name ||
-                                selectedProject.projectManagerId}
+                              {typeof selectedProject.projectManagerId === 'object' 
+                                ? selectedProject.projectManagerId.name 
+                                : selectedProject.projectManagerId}
                             </p>
                           </div>
                         </div>
@@ -816,14 +872,14 @@ const CustomerProjectsList: React.FC = () => {
                             </label>
                             <div className="mt-2 space-y-1">
                               {selectedProject.services.map(
-                                (service: any, index: number) => (
+                                (service: Service | string, index: number) => (
                                   <div
                                     key={index}
                                     className="flex items-center"
                                   >
                                     <HiOutlineDocumentText className="w-3 h-3 text-gray-400 ml-2" />
                                     <span className="text-sm text-gray-700">
-                                      {service.name || service}
+                                      {typeof service === 'object' ? service.name : service}
                                     </span>
                                   </div>
                                 )
@@ -942,15 +998,21 @@ const CustomerProjectsList: React.FC = () => {
 };
 
 // Custom table component that handles the header injection
+interface CustomProjectTableProps {
+  config: TableConfig;
+  customerId: string;
+  fetchData: () => Promise<ApiResponse<Project[]>>;
+}
+
+interface CustomProjectTableRef {
+  refreshData: () => void;
+}
+
 const CustomProjectTable = React.forwardRef<
-  { refreshData: () => void },
-  {
-    config: TableConfig;
-    customerId: string;
-    fetchData: () => Promise<any>;
-  }
+  CustomProjectTableRef,
+  CustomProjectTableProps
 >(({ config, customerId, fetchData }, ref) => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
@@ -958,27 +1020,38 @@ const CustomProjectTable = React.forwardRef<
     direction: "asc" | "desc";
   } | null>(null);
 
+  const fetchProjectsData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log("Fetching projects data...");
+      
+      const result = await fetchData();
+      console.log("Fetched result:", result);
+      
+      if (result && result.success && Array.isArray(result.data)) {
+        setData(result.data);
+        console.log("Data set successfully:", result.data);
+      } else {
+        console.error("Invalid data structure:", result);
+        setError("Invalid data structure received");
+        setData([]);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      console.error("Error fetching projects:", err);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchData]);
+
   useEffect(() => {
     if (customerId) {
       fetchProjectsData();
     }
-  }, [customerId]);
-
-  const fetchProjectsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await fetchData();
-      setData(result.data || []);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred";
-      setError(errorMessage);
-      console.error("Error fetching projects:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [customerId, fetchProjectsData]);
 
   const handleSort = (key: string) => {
     let direction: "asc" | "desc" = "asc";
@@ -993,11 +1066,11 @@ const CustomProjectTable = React.forwardRef<
   };
 
   const sortedData = React.useMemo(() => {
-    if (!sortConfig) return data;
+    if (!sortConfig || !Array.isArray(data)) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
+      const aValue = a[sortConfig.key as keyof Project] ?? '';
+      const bValue = b[sortConfig.key as keyof Project] ?? '';
 
       if (aValue < bValue) {
         return sortConfig.direction === "asc" ? -1 : 1;
@@ -1009,24 +1082,24 @@ const CustomProjectTable = React.forwardRef<
     });
   }, [data, sortConfig]);
 
-  const formatCellValue = (value: any, column: any, row: any) => {
+  const formatCellValue = (value: unknown, column: TableConfig['columns'][0], row: Project) => {
     if (column.render) {
       return column.render(value, row);
     }
 
     switch (column.type) {
       case "date":
-        return value ? new Date(value).toLocaleDateString("fa-IR") : "-";
+        return value ? new Date(value as string).toLocaleDateString("fa-IR") : "-";
       case "number":
-        return value || 0;
+        return (value as number) || 0;
       default:
         return value || "-";
     }
   };
 
-  const refreshData = () => {
+  const refreshData = useCallback(() => {
     fetchProjectsData();
-  };
+  }, [fetchProjectsData]);
 
   React.useImperativeHandle(ref, () => ({
     refreshData,
@@ -1034,23 +1107,27 @@ const CustomProjectTable = React.forwardRef<
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <span className="mr-4 text-gray-600">در حال بارگذاری پروژه‌ها...</span>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="mr-4 text-gray-600">در حال بارگذاری پروژه‌ها...</span>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
-        <p className="text-red-700">خطا در بارگذاری پروژه‌ها: {error}</p>
-        <button
-          onClick={fetchProjectsData}
-          className="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          تلاش مجدد
-        </button>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <p className="text-red-700">خطا در بارگذاری پروژه‌ها: {error}</p>
+          <button
+            onClick={fetchProjectsData}
+            className="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            تلاش مجدد
+          </button>
+        </div>
       </div>
     );
   }
@@ -1103,7 +1180,7 @@ const CustomProjectTable = React.forwardRef<
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedData.length === 0 ? (
+            {!Array.isArray(sortedData) || sortedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={config.columns.length + 1}
@@ -1123,7 +1200,7 @@ const CustomProjectTable = React.forwardRef<
                       key={column.key}
                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {formatCellValue(row[column.key], column, row)}
+                      {formatCellValue(row[column.key as keyof Project], column, row) as React.ReactNode}
                     </td>
                   ))}
                   {(config.actions?.view ||
@@ -1184,7 +1261,7 @@ const CustomProjectTable = React.forwardRef<
       <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-700">
-            نمایش {sortedData.length} پروژه
+            نمایش {Array.isArray(sortedData) ? sortedData.length : 0} پروژه
           </div>
           <button
             onClick={fetchProjectsData}

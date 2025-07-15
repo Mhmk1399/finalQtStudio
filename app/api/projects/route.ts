@@ -7,7 +7,7 @@ import connect from "@/lib/data";
 
 // GET - Get all projects
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connect();
 
@@ -86,11 +86,13 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to create project",
+        error:  "Failed to create project",
       },
       { status: 400 }
     );

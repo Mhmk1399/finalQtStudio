@@ -8,8 +8,6 @@ import {
 } from "react-icons/hi";
 import {
   TableColumn,
-  CustomAction,
-  TableConfig,
   DynamicTableProps,
 } from "@/types/tables";
 

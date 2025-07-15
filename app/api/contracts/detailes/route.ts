@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch contract",
+        error: "Failed to fetch contract"+error,
       },
       { status: 500 }
     );
@@ -98,7 +98,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to delete contract",
+        error: "Failed to delete contract"+error,
       },
       { status: 500 }
     );

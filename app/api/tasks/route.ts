@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Task from '@/models/tasks';
 import connect from '@/lib/data';
+import ServiceRequest from '@/models/customersData/serviceRequests';
+import Team from '@/models/teams';
+import User from '@/models/users';
 
 // GET - Get all tasks
 export async function GET() {
@@ -35,9 +38,15 @@ export async function POST(request: NextRequest) {
     
     // Populate the related data in response
     await task.populate([
-      { path: 'serviceRequestId', select: 'title requirements' },
-      { path: 'assignedTeamId', select: 'name specialization' },
-      { path: 'assignedUserId', select: 'name role' }
+      { path: 'serviceRequestId',
+        model: ServiceRequest,
+         select: 'title requirements' },
+      { path: 'assignedTeamId',
+        model: Team,
+        select: 'name specialization' },
+      { path: 'assignedUserId',
+        model: User
+        , select: 'name role' }
     ]);
     
     return NextResponse.json({
@@ -45,11 +54,11 @@ export async function POST(request: NextRequest) {
       data: task,
       message: 'Task created successfully'
     }, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating task:', error);
     return NextResponse.json({
       success: false,
-      error: error.message || 'Failed to create task'
+      error:  'Failed to create task'
     }, { status: 400 });
   }
 }

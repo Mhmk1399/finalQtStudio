@@ -13,6 +13,8 @@ import {
   FaCog,
   FaServicestack,
   FaCheckSquare,
+  FaFileAlt,
+  FaChartBar,
 } from "react-icons/fa";
 import {
   HiOutlineUserGroup,
@@ -36,6 +38,9 @@ import ServicesTable from "../tables/serviceTable";
 import ServiceRequestsTable from "../tables/serviceRequestTable";
 import TasksTable from "../tables/taskTable";
 import TransactionForm from "../forms/transactionForm";
+import  TransactionsAdmin  from "../tables/transactionsadmin";
+import Transbar from "../forms/bar/transbar";
+import ProjBar from "../forms/bar/projBar";
 
 type FormType =
   | "customer"
@@ -53,6 +58,9 @@ type FormType =
   | "service-requests-list"
   | "task"
   | "tasks-list"
+  | "transactions-admin"
+  | "transactions-bar"
+  |"projects-bar"
   | "transactions";
 
 interface FormOption {
@@ -82,6 +90,7 @@ const FormsSidebar: React.FC = () => {
       description: "ثبت نام مشتری جدید در سیستم",
       color: "bg-blue-500",
     },
+
     {
       id: "customers-list",
       label: "لیست مشتریان",
@@ -169,15 +178,7 @@ const FormsSidebar: React.FC = () => {
       color: "bg-orange-500",
     },
 
-    // Requests & Tasks Management
-    // {
-    //   id: "service-request",
-    //   label: "درخواست سرویس جدید",
-    //   icon: <FaFileAlt className="w-5 h-5" />,
-    //   category: "درخواست‌ها و وظایف",
-    //   description: "ثبت درخواست سرویس جدید",
-    //   color: "bg-red-500",
-    // },
+  
     {
       id: "service-requests-list",
       label: "لیست درخواست‌ها",
@@ -202,6 +203,31 @@ const FormsSidebar: React.FC = () => {
       description: "مشاهده و مدیریت لیست وظایف",
       color: "bg-red-500",
     },
+    {
+      id: "transactions-admin",
+      label: " تراکنش‌ها  ",
+      icon: <HiOutlineCash className="w-5 h-5" />,
+      category: "مدیریت تراکنش‌ها",
+      description: "   ثبت تراکنش جدید",
+      color: "bg-blue-500",
+    }
+    ,
+     {
+      id: "transactions-bar",
+      label: " نمودار تراکنش‌ها ",
+      icon: <FaChartBar className="w-5 h-5" />,
+      category: "مدیریت تراکنش‌ها",
+      description: "     نمودار تراکنش‌ها",
+      color: "bg-blue-500",
+    },
+    {
+      id: "projects-bar",
+      label: " نمودار پروژه‌ها ",
+      icon: <HiOutlineCash className="w-5 h-5" />,
+      category: "مدیریت پروژه‌ها",
+      description: "   نمودار پروژه‌ها",
+      color: "bg-blue-500",
+    }
   ];
 
   // Group forms by category
@@ -258,6 +284,8 @@ const FormsSidebar: React.FC = () => {
         return (
           <ServiceRequestForm onSuccess={handleSuccess} onError={handleError} />
         );
+      case 'transactions-admin':
+        return <TransactionsAdmin />;
       case "service-requests-list":
         return <ServiceRequestsTable />;
       case "task":
@@ -266,6 +294,10 @@ const FormsSidebar: React.FC = () => {
         return <TasksTable />;
       case "transactions":
         return <TransactionForm />;
+        case "transactions-bar":
+          return <Transbar />;
+          case "projects-bar":
+          return <ProjBar />;
       default:
         return (
           <div className="text-center p-8">
@@ -363,17 +395,16 @@ const FormsSidebar: React.FC = () => {
                   >
                     <div className="flex items-center mb-3">
                       <div
-                        className={`w-3 h-3 rounded-full mx-2 ${
-                          categoryIndex === 0
+                        className={`w-3 h-3 rounded-full mx-2 ${categoryIndex === 0
                             ? "bg-blue-500"
                             : categoryIndex === 1
-                            ? "bg-green-500"
-                            : categoryIndex === 2
-                            ? "bg-purple-500"
-                            : categoryIndex === 3
-                            ? "bg-orange-500"
-                            : "bg-red-500"
-                        }`}
+                              ? "bg-green-500"
+                              : categoryIndex === 2
+                                ? "bg-purple-500"
+                                : categoryIndex === 3
+                                  ? "bg-orange-500"
+                                  : "bg-red-500"
+                          }`}
                       />
                       <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                         {category}
@@ -388,11 +419,10 @@ const FormsSidebar: React.FC = () => {
                             setActiveForm(form.id);
                             toggleSidebar();
                           }}
-                          className={`w-full text-right p-4 rounded-xl transition-all duration-300 group ${
-                            activeForm === form.id
+                          className={`w-full text-right p-4 rounded-xl transition-all duration-300 group ${activeForm === form.id
                               ? "bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 shadow-md"
                               : "hover:bg-gray-50 border-2 border-transparent hover:border-gray-200"
-                          }`}
+                            }`}
                           whileHover={{ scale: 1.02, x: 5 }}
                           whileTap={{ scale: 0.98 }}
                           initial={{ opacity: 0, x: -20 }}
@@ -403,22 +433,20 @@ const FormsSidebar: React.FC = () => {
                         >
                           <div className="flex items-center">
                             <motion.div
-                              className={`p-2 rounded-lg ml-3 ${
-                                activeForm === form.id
+                              className={`p-2 rounded-lg ml-3 ${activeForm === form.id
                                   ? form.color + " text-white shadow-lg"
                                   : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
-                              }`}
+                                }`}
                               whileHover={{ rotate: 5 }}
                             >
                               {form.icon}
                             </motion.div>
                             <div className="text-right flex-1">
                               <div
-                                className={`font-medium text-sm ${
-                                  activeForm === form.id
+                                className={`font-medium text-sm ${activeForm === form.id
                                     ? "text-blue-700"
                                     : "text-gray-700"
-                                }`}
+                                  }`}
                               >
                                 {form.label}
                               </div>
@@ -470,9 +498,8 @@ const FormsSidebar: React.FC = () => {
               <div className="flex items-center ">
                 <motion.div
                   onClick={toggleSidebar}
-                  className={`p-3 rounded-xl ml-4 ${
-                    currentForm?.color || "bg-blue-500"
-                  } text-white shadow-lg`}
+                  className={`p-3 rounded-xl ml-4 ${currentForm?.color || "bg-blue-500"
+                    } text-white shadow-lg`}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >

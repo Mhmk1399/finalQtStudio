@@ -41,6 +41,7 @@ export default function LoginPage() {
         router.push("/users/admin"); // change this to your dashboard or redirect page
       }
     } catch (err) {
+      console.error("خطا در ارتباط با سرور:", err);
       toast.error("خطای سرور!");
     } finally {
       setLoading(false);

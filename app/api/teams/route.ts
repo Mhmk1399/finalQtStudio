@@ -12,6 +12,8 @@ export async function GET() {
       data: teams,
     });
   } catch (error) {
+        console.log(error);
+
     return NextResponse.json(
       {
         success: false,
