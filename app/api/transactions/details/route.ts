@@ -55,8 +55,7 @@ export async function PATCH(request: NextRequest) {
       id,
       body,
       { new: true, runValidators: true }
-    ).populate('users', 'name email')
-     .populate('customer', 'name email businessName');
+    )
     
     if (!transaction) {
       return NextResponse.json({

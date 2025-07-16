@@ -261,9 +261,7 @@ const ServiceRequestsTable: React.FC = () => {
       title: "حذف درخواست سرویس",
       type: "delete",
       size: "md",
-      endpoint: `/api/service-requests/${
-        serviceRequest._id || serviceRequest.id
-      }`,
+      endpoint: `/api/service-requests/detailes`,
       method: "DELETE",
       customContent: (
         <div className="text-center">
