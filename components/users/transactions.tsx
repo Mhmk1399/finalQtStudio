@@ -52,40 +52,6 @@ const UserTransactionsPage = () => {
     return new Intl.NumberFormat("fa-IR").format(amount) + " تومان";
   };
 
-  // Get transaction type based on debtor and fastener values
-  const getTransactionType = (debtor: number, fastener: number) => {
-    if (debtor > 0 && fastener === 0) {
-      return {
-        type: "debt",
-        label: "بدهکار",
-        color: "bg-red-100 text-red-800 border-red-200",
-      };
-    } else if (fastener > 0 && debtor === 0) {
-      return {
-        type: "credit",
-        label: "بستانکار",
-        color: "bg-green-100 text-green-800 border-green-200",
-      };
-    } else {
-      return {
-        type: "unknown",
-        label: "نامشخص",
-        color: "bg-gray-100 text-gray-800 border-gray-200",
-      };
-    }
-  };
-
-  // Render transaction type badge
-  const renderTransactionType = (debtor: number, fastener: number) => {
-    const transactionType = getTransactionType(debtor, fastener);
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-medium border ${transactionType.color}`}
-      >
-        {transactionType.label}
-      </span>
-    );
-  };
 
   // Calculate net amount (positive for credit, negative for debt)
   const calculateNetAmount = (debtor: number, fastener: number) => {
@@ -158,23 +124,23 @@ const UserTransactionsPage = () => {
           type: "text",
           render: (value: unknown) => formatCurrency(value as number),
         },
-        {
-          key: "transactionType",
-          label: "نوع تراکنش",
-          type: "text",
-          render: (_value: unknown, data: Record<string, unknown>) => {
-            const debtor = typeof data.debtor === "number" ? data.debtor : 0;
-            const fastener = typeof data.fastener === "number" ? data.fastener : 0;
-            const transactionType = getTransactionType(debtor, fastener);
-            return (
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-medium border ${transactionType.color}`}
-              >
-                {transactionType.label}
-              </span>
-            );
-          },
-        },
+        // {
+        //   key: "transactionType",
+        //   label: "نوع تراکنش",
+        //   type: "text",
+        //   render: (_value: unknown, data: Record<string, unknown>) => {
+        //     const debtor = typeof data.debtor === "number" ? data.debtor : 0;
+        //     const fastener = typeof data.fastener === "number" ? data.fastener : 0;
+        //     const transactionType = getTransactionType(debtor, fastener);
+        //     return (
+        //       <span
+        //         className={`px-3 py-1 rounded-full text-xs font-medium border ${transactionType.color}`}
+        //       >
+        //         {transactionType.label}
+        //       </span>
+        //     );
+        //   },
+        // },
         {
           key: "netAmount",
           label: "مبلغ خالص",
@@ -240,12 +206,12 @@ const UserTransactionsPage = () => {
         label: "بستانکار",
         render: (value: number) => formatCurrency(value),
       },
-      {
-        key: "type",
-        label: "نوع تراکنش",
-        render: ( rowData: { debtor: number; fastener: number }) =>
-          renderTransactionType(rowData.debtor, rowData.fastener),
-      },
+      // {
+      //   key: "type",
+      //   label: "نوع تراکنش",
+      //   render: ( rowData: { debtor: number; fastener: number }) =>
+      //     renderTransactionType(rowData.debtor, rowData.fastener),
+      // },
     //   {
     //     key: "netAmount",
     //     label: "مبلغ خالص",

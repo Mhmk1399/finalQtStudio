@@ -4,14 +4,12 @@ import React, { useState } from "react";
 import DynamicTable from "@/components/tables/DynamicTable";
 import DynamicModal, { ModalConfig } from "@/components/DynamicModal";
 import { TableConfig } from "@/types/tables";
-import { HiOutlineCloudUpload } from "react-icons/hi";
 
 const UserTasksPage = () => {
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [showFileUpload, setShowFileUpload] = useState(false);
-  const [showGoogleDriveModal, setShowGoogleDriveModal] = useState(false);
+
 
   const getCustomerIdFromToken = (): string | null => {
     try {
@@ -144,41 +142,9 @@ const UserTasksPage = () => {
     });
   };
 
-  // Handle Google Drive upload button click
-  const handleGoogleDriveUpload = (row: {
-    _id: string;
-    title: string;
-    description: string;
-    status: string;
-    priority: string;
-    dueDate: string;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-  }) => {
-    console.log('Google Drive upload button clicked for task:', row._id);
-    setSelectedTaskId(row._id);
-    setShowGoogleDriveModal(true);
-  };
+
 
   // Handle upload file button click - FIXED
-  const handleUploadFile = (row: {
-    _id: string;
-    title: string;
-    description: string;
-    status: string;
-    priority: string;
-    dueDate: string;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-  }) => {
-    console.log('Upload button clicked for task:', row._id);
-    console.log('Current showFileUpload state:', showFileUpload);
-    setSelectedTaskId(row._id);
-    setShowFileUpload(true);
-    console.log('Modal should open now, showFileUpload set to true');
-  };
 
   // Handle view task
   const handleViewTask = (row: {
@@ -271,8 +237,6 @@ const UserTasksPage = () => {
       onSuccess: (data) => {
         console.log("Task updated successfully:", data);
         setIsModalOpen(false);
-        // Refresh the table
-        window.location.reload();
       },
       onError: (error) => {
         console.error("Error updating task:", error);
@@ -317,54 +281,6 @@ const UserTasksPage = () => {
     setIsModalOpen(true);
   };
 
-  // Custom action renderer for upload button
-  const renderUploadAction = (row: {
-    _id: string;
-    title: string;
-    description: string;
-    status: string;
-    priority: string;
-    dueDate: string;
-    createdAt: string;
-    updatedAt:string
-    __v: number;
-  }) => {
-    return (
-      <button
-        onClick={() => handleUploadFile(row )}
-        className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-        title="آپلود فایل"
-      >
-        <HiOutlineCloudUpload className="w-4 h-4 mr-1" />
-        آپلود
-      </button>
-    );
-  };
-
-  // Custom action renderer for Google Drive upload button
-  const renderGoogleDriveAction = (row: {
-    _id: string;
-    title: string;
-    description: string;
-    status: string;
-    priority: string;
-    dueDate: string;
-    createdAt: string;
-    updatedAt:string
-    __v: number;
-  }) => {
-    return (
-      <button
-        onClick={() => handleGoogleDriveUpload(row)}
-        className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors ml-2"
-        title="آپلود به گوگل درایو"
-      >
-        <HiOutlineCloudUpload className="w-4 h-4 mr-1" />
-        گوگل درایو
-      </button>
-    );
-  };
-
   const id = getCustomerIdFromToken();
 
   const tableConfig: TableConfig = {
@@ -401,30 +317,8 @@ const UserTasksPage = () => {
       },
       { key: "notes", label: "یادداشت‌ها" },
       { key: "deliverables", label: "تحویلی‌ها" },
-      {
-        key: "actions",
-        label: "عملیات",
-        type: "custom",
-        render: ( row:{
-          _id: string;
-          title: string;
-          description: string;
-          status: string;
-          priority: string;
-          startDate: string;
-          dueDate: string;
-          notes: string;
-          deliverables: string;
-          createdAt: string;
-          updatedAt: string;
-          __v: number;
-        }) => (
-          <div className="flex items-center space-x-2">
-            {renderUploadAction(row)}
-            {renderGoogleDriveAction(row)}
-          </div>
-        ),
-      },
+      
+      
     ],
     actions: {
       view: true,
@@ -464,70 +358,7 @@ const UserTasksPage = () => {
         />
       )}
 
-      {/* Google Drive Upload Modal */}
-      {showGoogleDriveModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-5/6 mx-4">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                آپلود فایل به گوگل درایو
-              </h3>
-              <button
-                               onClick={() => setShowGoogleDriveModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
 
-            {/* Modal Body */}
-            <div className="p-4 h-full">
-              <div className="mb-4">
-                <p className="text-sm text-gray-600">
-                  وظیفه: <span className="font-medium">{selectedTaskId}</span>
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  برای آپلود فایل‌های مربوط به این وظیفه، از گوگل درایو استفاده کنید.
-                </p>
-              </div>
-
-              {/* Google Drive Iframe */}
-              <div className="w-full h-5/6 border border-gray-300 rounded-lg overflow-hidden">
-                <iframe
-                  src="https://drive.google.com/drive/my-drive?lfhs=2"
-                  className="w-full h-full"
-                  title="Google Drive Upload"
-                  allow="camera; microphone; fullscreen"
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                />
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex items-center justify-end p-4 border-t border-gray-200 space-x-2 space-x-reverse">
-              <button
-                onClick={() => setShowGoogleDriveModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-              >
-                بستن
-              </button>
-              <button
-                onClick={() => {
-                  // You can add any additional logic here if needed
-                  console.log('Files uploaded for task:', selectedTaskId);
-                  setShowGoogleDriveModal(false);
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-              >
-                تایید
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
