@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FormConfig } from "@/types/form";
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
@@ -37,8 +37,6 @@ interface Service {
   basePrice?: number;
 }
 
-
-
 const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [allContracts, setAllContracts] = useState<Contract[]>([]);
@@ -46,13 +44,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const hasInitialized = useRef(false);
 
-  // Persian date states
+  // Persian date states - exactly like attendanceForm
   const [startDate, setStartDate] = useState<DateObject | null>(null);
   const [expectedEndDate, setExpectedEndDate] = useState<DateObject | null>(null);
   const [actualEndDate, setActualEndDate] = useState<DateObject | null>(null);
+  
   const [formData, setFormData] = useState<{
     title?: string;
     name?: string;
@@ -61,12 +59,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     projectManagerId?: string;
     totalPrice?: number;
     finalPrice?: number;
-    startDate?: DateObject;
-    expectedEndDate?: DateObject;
-    actualEndDate?: DateObject;
     services?: string[];
-    [key: string]: string | number | string[] | DateObject | undefined;
-  }>({});
+    status?: string;
+    paymentStatus?: string;
+    discount?: number;
+    paidAmount?: number;
+    notes?: string;
+    internalNotes?: string;
+    [key: string]: string | number | string[] | undefined;
+  }>({
+    status: "planning",
+    paymentStatus: "pending",
+    discount: 0,
+    paidAmount: 0,
+  });
 
   // Fetch initial data
   useEffect(() => {
@@ -129,9 +135,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
 
   const handleCustomerChange = (fieldName: string, value: string | string[]) => {
     setSelectedCustomerId(value as string);
+    setFormData(prev => ({ ...prev, [fieldName]: value }));
   };
 
-  // Handle form submission with Persian dates
+  // Handle form submission with Persian dates - exactly like attendanceForm
   const handleProjectSubmit = async () => {
     // Validate required fields
     if (!formData.title || !formData.description || !formData.customerId || !formData.projectManagerId || !formData.totalPrice || !formData.finalPrice) {
@@ -139,12 +146,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
       return;
     }
 
-    // Prepare submission data with converted dates
+    // Convert dates exactly like in attendanceForm
+    const formattedStartDate = startDate ? startDate.toDate() : null; // Converts to JS Date (Gregorian)
+    const formattedExpectedEndDate = expectedEndDate ? expectedEndDate.toDate() : null;
+    const formattedActualEndDate = actualEndDate ? actualEndDate.toDate() : null;
+
+    // Prepare submission data
     const submissionData = {
       ...formData,
-      startDate: startDate ? startDate.toDate() : null,
-      expectedEndDate: expectedEndDate ? expectedEndDate.toDate() : null,
-      actualEndDate: actualEndDate ? actualEndDate.toDate() : null,
+      startDate: formattedStartDate,
+      expectedEndDate: formattedExpectedEndDate,
+      actualEndDate: formattedActualEndDate,
     };
 
     console.log("Submitting project data:", submissionData);
@@ -162,11 +174,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
       
       if (result.success) {
         toast.success("پروژه با موفقیت ایجاد شد");
-        // Reset form on success
+        // Reset form on success - exactly like attendanceForm
         setStartDate(null);
         setExpectedEndDate(null);
         setActualEndDate(null);
-        setFormData({});
+        setFormData({
+          status: "planning",
+          paymentStatus: "pending",
+          discount: 0,
+          paidAmount: 0,
+        });
         if (onSuccess) {
           onSuccess(result);
         }
@@ -185,46 +202,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     }
   };
 
-  // Persian Date Picker Components
-  const PersianDatePicker = ({ 
-    label, 
-    value, 
-    onChange, 
-    placeholder, 
-    required = false,
-    description 
-  }: {
-    label: string;
-    value: DateObject | null;
-    onChange: (date: DateObject | null) => void;
-    placeholder: string;
-    required?: boolean;
-    description?: string;
-  }) => (
-    <div className="mb-4 w-full">
-      <label className="text-sm mb-2 block font-medium text-gray-700">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
-        <FaRegCalendarAlt className="text-gray-400" />
-        <DatePicker
-          value={value}
-          onChange={onChange}
-          calendar={persian}
-          locale={persian_fa}
-          format="YYYY/MM/DD"
-          inputClass="w-full bg-transparent p-2 text-black focus:outline-none"
-          calendarPosition="bottom-right"
-          placeholder={placeholder}
-        />
-      </div>
-      {description && (
-        <p className="text-sm text-gray-500 mt-1">{description}</p>
-      )}
-    </div>
-  );
-
-  const createFormConfig = useCallback((): FormConfig => {
+  // Fixed: Create static form config to prevent infinite loops
+  const getFormConfig = (): FormConfig => {
     return {
       title: "ایجاد پروژه جدید",
       description: "فرم زیر را برای ایجاد پروژه جدید تکمیل کنید",
@@ -397,14 +376,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
         },
       ],
     };
-  }, [customers, managers, services, onSuccess, onError, handleCustomerChange]);
-
-    // Update form config when data is loaded - optimized dependencies
-  useEffect(() => {
-    if (!loading && customers.length > 0 && managers.length > 0 && services.length > 0) {
-      setFormConfig(createFormConfig());
-    }
-  }, [loading, customers.length, managers.length, services.length, createFormConfig]);
+  };
 
   // Show loading state
   if (loading) {
@@ -421,19 +393,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     );
   }
 
-  // Show error if no form config
-  if (!formConfig) {
-    return (
-      <div
-        className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md"
-        dir="rtl"
-      >
-        <div className="text-center">
-          <p className="text-red-600">خطا در بارگذاری فرم</p>
-        </div>
-      </div>
-    );
-  }
+  // Get form config when needed
+  const formConfig = getFormConfig();
 
   return (
     <div className="w-full max-w-4xl mx-auto" dir="rtl">
@@ -445,16 +406,21 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           {formConfig.description}
         </p>
         
-        {/* Form Fields */}
+        {/* Form Fields - Fixed: Added id and name attributes */}
         <div className="space-y-4">
           {formConfig.fields.map((field: import("/Users/macbook/Desktop/repositories/finalQtStudio/types/form").FormField) => (
             <div key={field.name} className="mb-4">
-              <label className="text-sm mb-2 block font-medium text-gray-700">
+              <label 
+                htmlFor={field.name}
+                className="text-sm mb-2 block font-medium text-gray-700"
+              >
                 {field.label} {field.required && <span className="text-red-500">*</span>}
               </label>
               
               {field.type === "select" ? (
                 <select
+                  id={field.name}
+                  name={field.name}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   value={String(formData[field?.name] || field.defaultValue || "")}
                   onChange={(e) => {
@@ -473,6 +439,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                 </select>
               ) : field.type === "textarea" ? (
                 <textarea
+                  id={field.name}
+                  name={field.name}
                   placeholder={field.placeholder}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px]"
                   value={String(formData[field.name] || "")}
@@ -485,6 +453,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                   {field.options?.map((option) => (
                     <label key={option.value} className="flex items-start space-x-2 space-x-reverse">
                       <input
+                        id={`${field.name}-${option.value}`}
+                        name={`${field.name}[]`}
                         type="checkbox"
                         value={option.value}
                         checked={(formData[field.name] as string[] || []).includes(option.value)}
@@ -510,14 +480,26 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                     </label>
                   ))}
                 </div>
+              ) : field.type === "number" ? (
+                <input
+                  id={field.name}
+                  name={field.name}
+                  type="number"
+                  placeholder={field.placeholder}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  value={String(formData[field.name] || field.defaultValue || "")}
+                  onChange={(e) => setFormData({...formData, [field.name]: parseFloat(e.target.value) || 0})}
+                  min={field.validation?.min}
+                />
               ) : (
                 <input
+                  id={field.name}
+                  name={field.name}
                   type={field.type}
                   placeholder={field.placeholder}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   value={String(formData[field.name] || field.defaultValue || "")}
                   onChange={(e) => setFormData({...formData, [field.name]: e.target.value})}
-                  min={field.validation?.min}
                   minLength={field.validation?.minLength}
                   maxLength={field.validation?.maxLength}
                 />
@@ -530,37 +512,83 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
           ))}
         </div>
 
-        {/* Persian Date Pickers */}
-        <div className="mt-6 space-y-4">
-          <PersianDatePicker
-            label="تاریخ شروع"
-            value={startDate}
-            onChange={setStartDate}
-            placeholder="تاریخ شروع پروژه را انتخاب کنید"
-            description="تاریخ شروع پروژه (اختیاری)"
-          />
-          
-          <PersianDatePicker
-            label="تاریخ پایان مورد انتظار"
-            value={expectedEndDate}
-            onChange={setExpectedEndDate}
-            placeholder="تاریخ پایان مورد انتظار را انتخاب کنید"
-            description="تاریخ مورد انتظار برای پایان پروژه"
-          />
-          
-          <PersianDatePicker
-            label="تاریخ پایان واقعی"
-            value={actualEndDate}
-            onChange={setActualEndDate}
-            placeholder="تاریخ پایان واقعی را انتخاب کنید"
-            description="تاریخ واقعی پایان پروژه"
-          />
-        </div>
+        {/* Persian Date Pickers - Exactly like attendanceForm */}
+      {/* Persian Date Pickers */}
+<div className="mt-6 space-y-4">
+  {/* تاریخ شروع */}
+  <div className="mb-4 w-full">
+    <label className="text-sm mb-2 block">تاریخ شروع</label>
+    <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg">
+      <FaRegCalendarAlt className="text-gray-400" />
+      <DatePicker
+        value={startDate}
+        onChange={setStartDate}
+        calendar={persian}
+        locale={persian_fa}
+        format="YYYY/MM/DD"
+        containerClassName="w-full"
+        inputClass="w-full bg-transparent p-2 text-black focus:outline-none border rounded-lg"
+        calendarPosition="bottom-right"
+        zIndex={1000} // Ensure calendar appears above other elements
+        placeholder="تاریخ شروع پروژه را انتخاب کنید"
+        onOpen={() => console.log("Start DatePicker opened")}
+        onClose={() => console.log("Start DatePicker closed")}
+      />
+    </div>
+    <p className="text-sm text-gray-500 mt-1">تاریخ شروع پروژه (اختیاری)</p>
+  </div>
+
+  {/* تاریخ پایان مورد انتظار */}
+  <div className="mb-4 w-full">
+    <label className="text-sm mb-2 block">تاریخ پایان مورد انتظار</label>
+    <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg">
+      <FaRegCalendarAlt className="text-gray-400" />
+      <DatePicker
+        value={expectedEndDate}
+        onChange={setExpectedEndDate}
+        calendar={persian}
+        locale={persian_fa}
+        format="YYYY/MM/DD"
+        containerClassName="w-full"
+        inputClass="w-full bg-transparent p-2 text-black focus:outline-none border rounded-lg"
+        calendarPosition="bottom-right"
+        zIndex={1000}
+        placeholder="تاریخ پایان مورد انتظار را انتخاب کنید"
+        onOpen={() => console.log("Expected End DatePicker opened")}
+        onClose={() => console.log("Expected End DatePicker closed")}
+      />
+    </div>
+    <p className="text-sm text-gray-500 mt-1">تاریخ مورد انتظار برای پایان پروژه</p>
+  </div>
+
+  {/* تاریخ پایان واقعی */}
+  <div className="mb-4 w-full">
+    <label className="text-sm mb-2 block">تاریخ پایان واقعی</label>
+    <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg">
+      <FaRegCalendarAlt className="text-gray-400" />
+      <DatePicker
+        value={actualEndDate}
+        onChange={setActualEndDate}
+        calendar={persian}
+        locale={persian_fa}
+        format="YYYY/MM/DD"
+        containerClassName="w-full"
+        inputClass="w-full bg-transparent p-2 text-black focus:outline-none border rounded-lg"
+        calendarPosition="bottom-right"
+        zIndex={1000}
+        placeholder="تاریخ پایان واقعی را انتخاب کنید"
+        onOpen={() => console.log("Actual End DatePicker opened")}
+        onClose={() => console.log("Actual End DatePicker closed")}
+      />
+    </div>
+    <p className="text-sm text-gray-500 mt-1">تاریخ واقعی پایان پروژه</p>
+  </div>
+</div>
 
         {/* Submit Button */}
         <button
           onClick={handleProjectSubmit}
-          className="w-full py-3 px-12 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition font-bold mt-6"
+          className="w-full py-3 px-12 bg-blue-500 text-white rounded-xl hover:opacity-90 transition font-bold mt-6"
         >
           {formConfig.submitButtonText}
         </button>
@@ -570,3 +598,4 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
 };
 
 export default ProjectForm;
+

@@ -180,49 +180,7 @@ const UsersTable: React.FC = () => {
 
 
 
-  const handleResetPassword = (user: User) => {
-    const config: ModalConfig = {
-      title: "بازنشانی رمز عبور",
-      type: "edit",
-      size: "md",
-      endpoint: "/api/users/detailes",
-      method: "PATCH",
-      fields: [
-        { key: "name", label: "نام کاربر", type: "text" },
-        { key: "email", label: "ایمیل", type: "email" },
-        {
-          key: "password",
-          label: "رمز عبور جدید",
-          type: "password",
-          required: true,
-          description: "رمز عبور جدید باید حداقل 6 کاراکتر باشد",
-        },
-        {
-          key: "confirmPassword",
-          label: "تأیید رمز عبور",
-          type: "password",
-          required: true,
-          description: "رمز عبور را مجدداً وارد کنید",
-        },
-      ],
-     
-      onSuccess: (data) => {
-        console.log("Password reset successfully:", data);
-        toast.success("رمز عبور با موفقیت بازنشانی شد");
-      },
-      onError: (error) => {
-        console.error("Password reset error:", error);
-        toast.error("خطا در بازنشانی رمز عبور: ");
-      },
-      onClose: () => setShowModal(false),
-      confirmText: "بازنشانی رمز عبور",
-      cancelText: "لغو",
-    };
-
-    setModalConfig(config);
-    setSelectedUserId(user._id || user.id);
-    setShowModal(true);
-  };
+ 
 
   const handleDelete = (user: User) => {
     const config: ModalConfig = {
@@ -394,13 +352,7 @@ const UsersTable: React.FC = () => {
       view: true,
       edit: true,
       delete: true,
-      custom: [
-        {
-          label: "بازنشانی رمز عبور",
-          icon: "key",
-          onClick: handleResetPassword,
-        },
-      ],
+      
     },
     onView: handleView,
     onEdit: handleEdit,

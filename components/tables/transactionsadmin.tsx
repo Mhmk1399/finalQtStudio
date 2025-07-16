@@ -177,114 +177,128 @@ const TransactionsAdmin: React.FC = () => {
     setShowModal(true);
   };
 
-  const transactionsTableConfig: TableConfig = {
-    title: "لیست تراکنش‌ها",
-    description: "مدیریت و مشاهده تراکنش‌های سیستم",
-    endpoint: "/api/transactions",
-    columns: [
-      {
-        key: "subject",
-        label: "موضوع",
-        type: "text",
-        sortable: true,
-        width: "200px",
-        render: (value: string) => (
-          <span className="text-sm font-medium text-gray-900">
-            {value || "-"}
+ const transactionsTableConfig: TableConfig = {
+  title: "لیست تراکنش‌ها",
+  description: "مدیریت و مشاهده تراکنش‌های سیستم",
+  endpoint: "/api/transactions",
+  columns: [
+    {
+      key: "subject",
+      label: "موضوع",
+      type: "text",
+      sortable: true,
+      width: "200px",
+      render: (value: string) => (
+        <span className="text-sm font-medium text-gray-900">
+          {value || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "date",
+      label: "تاریخ",
+      type: "date",
+      sortable: true,
+      width: "120px",
+      render: (value: string) => {
+        if (!value) return <span className="text-sm text-gray-600">-</span>;
+        return (
+          <span className="text-sm text-gray-600">
+            {new Date(value).toLocaleDateString("fa-IR")}
           </span>
-        ),
+        );
       },
-      {
-        key: "date",
-        label: "تاریخ",
-        type: "date",
-        sortable: true,
-        width: "120px",
-        render: (value: string) => {
-          if (!value) return "-";
-          return (
-            <span className="text-sm text-gray-600">
-              {new Date(value).toLocaleDateString("fa-IR")}
-            </span>
-          );
-        },
-      },
-      {
-        key: "debtor",
-        label: "بدهکار",
-        type: "number",
-        sortable: true,
-        width: "120px",
-        render: (value: number) => (
-          <span className="font-semibold text-red-600">
-            {value?.toLocaleString()} ریال
-          </span>
-        ),
-      },
-      {
-        key: "fastener",
-        label: "بستانکار",
-        type: "number",
-        sortable: true,
-        width: "120px",
-        render: (value: number) => (
-          <span className="font-semibold text-green-600">
-            {value?.toLocaleString()} ریال
-          </span>
-        ),
-      },
-      {
-        key: "users",
-        label: "کاربر",
-        type: "text",
-        sortable: true,
-        width: "150px",
-        render: (value: User | string) => {
-          if (!value) return "-";
+    },
+    {
+      key: "debtor",
+      label: "بدهکار",
+      type: "number",
+      sortable: true,
+      width: "120px",
+      render: (value: number) => (
+        <span className="font-semibold text-red-600">
+          {value?.toLocaleString() || 0} ریال
+        </span>
+      ),
+    },
+    {
+      key: "fastener",
+      label: "بستانکار",
+      type: "number",
+      sortable: true,
+      width: "120px",
+      render: (value: number) => (
+        <span className="font-semibold text-green-600">
+          {value?.toLocaleString() || 0} ریال
+        </span>
+      ),
+    },
+    {
+      key: "users",
+      label: "کاربر",
+      type: "text",
+      sortable: true,
+      width: "150px",
+      render: (value: User | string | null | undefined) => {
+        if (!value) return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">-</span>;
+        if (typeof value === "string") {
+          return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{value}</span>;
+        }
+        if (typeof value === "object" && value !== null && "name" in value) {
+          const user = value as User;
           return (
             <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-              {typeof value === 'object' && value.name ? value.name : (typeof value === 'string' ? value.substring(0, 8) + "..." : "نامشخص")}
+              {user.name || "نامشخص"}
             </span>
           );
-        },
+        }
+        return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">نامشخص</span>;
       },
-      {
-        key: "customer",
-        label: "مشتری",
-        type: "text",
-        sortable: true,
-        width: "150px",
-        render: (value: Customer | string) => {
-          if (!value) return "-";
+    },
+    {
+      key: "customer",
+      label: "مشتری",
+      type: "text",
+      sortable: true,
+      width: "150px",
+      render: (value: Customer | string | null | undefined) => {
+        if (!value) return <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">-</span>;
+        if (typeof value === "string") {
+          return <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">{value}</span>;
+        }
+        if (typeof value === "object" && value !== null && "name" in value) {
+          const customer = value as Customer;
           return (
             <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
-              {typeof value === 'object' && value.name ? value.name : (typeof value === 'string' ? value.substring(0, 8) + "..." : "نامشخص")}
+              {customer.name || "نامشخص"} {customer.businessName ? `- ${customer.businessName}` : ""}
             </span>
           );
-        },
+        }
+        return <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">نامشخص</span>;
       },
-      {
-        key: "_id",
-        label: "شناسه",
-        type: "text",
-        sortable: false,
-        width: "100px",
-        render: (value: string) => (
-          <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-            {value ? value.substring(0, 8) + "..." : "-"}
-          </span>
-        ),
-      },
-    ],
-    actions: {
-      view: true,
-      edit: true,
-      delete: true,
     },
-    onView: handleView,
-    onEdit: handleEdit,
-    onDelete: handleDelete,
-  };
+    {
+      key: "_id",
+      label: "شناسه",
+      type: "text",
+      sortable: false,
+      width: "100px",
+      render: (value: string) => (
+        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+          {value ? value.substring(0, 8) + "..." : "-"}
+        </span>
+      ),
+    },
+  ],
+  actions: {
+    view: true,
+    edit: true,
+    delete: true,
+  },
+  onView: handleView,
+  onEdit: handleEdit,
+  onDelete: handleDelete,
+};
 
   return (
     <div>

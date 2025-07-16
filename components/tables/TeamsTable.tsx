@@ -27,7 +27,7 @@ const TeamsTable: React.FC = () => {
       title: "مشاهده جزئیات تیم",
       type: "view",
       size: "xl",
-      endpoint: `/api/teams/${team._id || team.id}`,
+      endpoint: `/api/teams/detailes`,
       fields: [
         { key: "name", label: "نام تیم", type: "text" },
         { key: "description", label: "توضیحات", type: "textarea" },
@@ -76,7 +76,7 @@ const TeamsTable: React.FC = () => {
       title: "ویرایش تیم",
       type: "edit",
       size: "xl",
-      endpoint: `/api/teams/${team._id}`,
+      endpoint: `/api/teams/detailes`,
       method: "PUT",
       fields: [
         { key: "name", label: "نام تیم", type: "text", required: true },

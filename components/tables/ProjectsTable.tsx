@@ -284,42 +284,7 @@ const ProjectsTable: React.FC = () => {
         sortable: true,
         width: "200px",
       },
-      {
-        key: "customerId",
-        label: "مشتری",
-        type: "text",
-        sortable: true,
-        width: "150px",
-        render: (value) => {
-          // Check if customerId is populated with customer object
-          if (value && typeof value === "object" && "name" in value) {
-            return (value as { name: string }).name;
-          }
-          // If it's still just an ID string
-          if (typeof value === "string") {
-            return `مشتری: ${value.substring(0, 8)}...`;
-          }
-          return "-";
-        },
-      },
-      {
-        key: "projectManagerId",
-        label: "مدیر پروژه",
-        type: "text",
-        sortable: true,
-        width: "150px",
-        render: (value) => {
-          // Check if projectManagerId is populated with user object
-          if (value && typeof value === "object" && "name" in value) {
-            return (value as { name: string }).name;
-          }
-          // If it's still just an ID string
-          if (typeof value === "string") {
-            return `مدیر: ${value.substring(0, 8)}...`;
-          }
-          return "-";
-        },
-      },
+  
       {
         key: "status",
         label: "وضعیت پروژه",

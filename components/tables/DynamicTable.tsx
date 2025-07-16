@@ -6,14 +6,11 @@ import {
   HiOutlinePencilAlt,
   HiOutlineTrash,
 } from "react-icons/hi";
-import {
-  TableColumn,
-  DynamicTableProps,
-} from "@/types/tables";
+import { TableColumn, DynamicTableProps } from "@/types/tables";
 
 const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
   type RowType = {
-    [key: string]: string | number | boolean | Date | null | undefined;
+    [key: string]: unknown; // Allow any type for flexibility
     _id?: string | number;
     id?: string | number;
   };
@@ -30,12 +27,10 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-
       const options: RequestInit = {
         method: "GET",
         headers: config.headers ? { ...config.headers } : {},
       };
-
       const response = await fetch(config.endpoint, options);
       const result = await response.json();
 
@@ -88,14 +83,13 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
     });
   }, [data, sortConfig]);
 
-  const formatCellValue = (
-    value: string | number | Date,
-    column: TableColumn
-  ): React.ReactNode => {
+  const formatCellValue = (value: unknown, column: TableColumn): React.ReactNode => {
+    // If a custom render function is provided, use it with the raw value
     if (column.render) {
       return column.render(value, data);
     }
 
+    // Handle different column types
     switch (column.type) {
       case "date":
         if (value instanceof Date) {
@@ -225,7 +219,7 @@ const DynamicTable = React.forwardRef(({ config }: DynamicTableProps, ref) => {
                       key={column.key}
                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {formatCellValue(row[column.key]?.toString() ?? '', column)}
+                      {formatCellValue(row[column.key], column)}
                     </td>
                   ))}
                   {(config.actions?.view ||
