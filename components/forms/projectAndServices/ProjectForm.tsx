@@ -408,7 +408,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
         
         {/* Form Fields - Fixed: Added id and name attributes */}
         <div className="space-y-4">
-          {formConfig.fields.map((field: import("/Users/macbook/Desktop/repositories/finalQtStudio/types/form").FormField) => (
+          {formConfig.fields.map((field: import("../../../types/form").FormField) => (
             <div key={field.name} className="mb-4">
               <label 
                 htmlFor={field.name}
