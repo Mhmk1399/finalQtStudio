@@ -255,7 +255,6 @@ const UserTasksPage = () => {
             { value: "todo", label: "انجام نشده" },
             { value: "in-progress", label: "در حال انجام" },
             { value: "completed", label: "تکمیل شده" },
-            { value: "pending", label: "در انتظار" },
             { value: "cancelled", label: "لغو شده" },
           ],
         },
@@ -329,7 +328,6 @@ const UserTasksPage = () => {
     onEdit: handleEditTask,
     onDelete: (row) => {
       console.log("حذف وظیفه:", row);
-      alert(`حذف وظیفه: ${row.title}`);
     },
   };
 

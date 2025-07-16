@@ -184,7 +184,7 @@ const ServicesTable: React.FC = () => {
       title: "حذف سرویس",
       type: "delete",
       size: "md",
-      endpoint: `/api/services/${service._id || service.id}`,
+      endpoint: `/api/services/detailes`,
       method: "DELETE",
       customContent: (
         <div className="text-center">

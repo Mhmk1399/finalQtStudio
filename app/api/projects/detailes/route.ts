@@ -62,16 +62,7 @@ export async function PATCH(request: NextRequest) {
       new: true,
       runValidators: true,
     })
-    .populate({
-      path: 'customerId',
-      model: 'Customer',
-      select: 'name email phoneNumber'
-    })
-    .populate({
-      path: 'projectManagerId',
-      model: 'User',
-      select: 'name email'
-    });
+    
 
     if (!project) {
       return NextResponse.json(

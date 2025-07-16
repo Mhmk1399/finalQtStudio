@@ -1,6 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import {
   HiOutlineShoppingCart,
   HiOutlineCheckCircle,
@@ -36,7 +40,7 @@ interface ServiceRequestForm {
   title: string;
   quantity: number;
   priority: "low" | "medium" | "high" | "urgent";
-  requestedDate: string;
+  requestedDate: DateObject | null; // Changed to DateObject for Persian date
   requirements: string;
   notes: string;
 }
@@ -117,7 +121,6 @@ const ProjectOrderingComponent: React.FC = () => {
   };
 
   // Fetch project services when project is selected
-  // Update the fetchProjectServices function to better handle service arrays
   const fetchProjectServices = async (projectId: string) => {
     if (!projectId) {
       setProjectServices([]);
@@ -238,14 +241,14 @@ const ProjectOrderingComponent: React.FC = () => {
       // Add service
       setSelectedServices((prev) => [...prev, serviceId]);
 
-      // Create default form for this service
+      // Create default form for this service with Persian date
       const service = projectServices.find((s) => s._id === serviceId);
       const defaultForm: ServiceRequestForm = {
         serviceId,
         title: `درخواست ${service?.name || "خدمت"}`,
         quantity: 1,
         priority: "medium",
-        requestedDate: new Date().toISOString().split("T")[0],
+        requestedDate: null, // Initialize as null for Persian date picker
         requirements: "",
         notes: "",
       };
@@ -254,11 +257,11 @@ const ProjectOrderingComponent: React.FC = () => {
     }
   };
 
-  // Update service request
+  // Update service request - Updated to handle DateObject
   const updateServiceRequest = (
     serviceId: string,
     field: keyof ServiceRequestForm,
-    value: string | number
+    value: string | number | DateObject | null
   ) => {
     setServiceRequests((prev) =>
       prev.map((req) =>
@@ -267,7 +270,7 @@ const ProjectOrderingComponent: React.FC = () => {
     );
   };
 
-  // Submit form
+  // Submit form - Updated to handle Persian dates
   const handleSubmitAll = async () => {
     if (!selectedProjectId) {
       toast.error("لطفاً پروژه را انتخاب کنید");
@@ -296,19 +299,25 @@ const ProjectOrderingComponent: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const promises = serviceRequests.map((request) =>
-        fetch("/api/service-requests", {
+      const promises = serviceRequests.map((request) => {
+        // Convert Persian date to Gregorian for API submission
+        const formattedRequestedDate = request.requestedDate 
+          ? request.requestedDate.toDate() 
+          : null;
+
+        return fetch("/api/service-requests", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             ...request,
+            requestedDate: formattedRequestedDate,
             projectId: selectedProjectId,
             requestedBy: customerId,
           }),
-        })
-      );
+        });
+      });
 
       const responses = await Promise.all(promises);
       const results = await Promise.all(responses.map((res) => res.json()));
@@ -764,7 +773,7 @@ const ProjectOrderingComponent: React.FC = () => {
                           updateServiceRequest(
                             serviceId,
                             "priority",
-                            e.target.value
+                            e.target.value as "low" | "medium" | "high" | "urgent"
                           )
                         }
                         className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
@@ -786,25 +795,38 @@ const ProjectOrderingComponent: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Requested Date */}
+                    {/* Persian Date Picker for Requested Date */}
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">
-                        تاریخ درخواست
+                        تاریخ تحویل مورد نظر
                       </label>
                       <div className="relative">
-                        <input
-                          type="date"
-                          value={request.requestedDate}
-                          onChange={(e) =>
-                            updateServiceRequest(
-                              serviceId,
-                              "requestedDate",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        />
-                        <HiOutlineCalendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        <div className="flex items-center gap-3 bg-white border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all duration-200">
+                          <FaRegCalendarAlt className="text-gray-400 w-5 h-5" />
+                          <DatePicker
+                            value={request.requestedDate}
+                            onChange={(date) =>
+                              updateServiceRequest(
+                                serviceId,
+                                "requestedDate",
+                                date
+                              )
+                            }
+                            calendar={persian}
+                            locale={persian_fa}
+                            format="YYYY/MM/DD"
+                            containerClassName="w-full"
+                            inputClass="w-full bg-transparent p-2 text-black focus:outline-none"
+                            calendarPosition="bottom-right"
+                            zIndex={1000}
+                            placeholder="تاریخ تحویل مورد نظر را انتخاب کنید"
+                            onOpen={() => console.log(`DatePicker opened for service ${serviceId}`)}
+                            onClose={() => console.log(`DatePicker closed for service ${serviceId}`)}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          تاریخی که انتظار دارید خدمت تحویل داده شود
+                        </p>
                       </div>
                     </div>
 
@@ -905,6 +927,18 @@ const ProjectOrderingComponent: React.FC = () => {
                         </div>
                       </div>
                     )}
+                    {/* Display selected date if available */}
+                    {request.requestedDate && (
+                      <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
+                        <div className="flex items-center text-sm text-blue-800">
+                          <HiOutlineCalendar className="w-4 h-4 ml-2" />
+                          <span className="font-medium">تاریخ تحویل مورد نظر:</span>
+                          <span className="mr-2 font-bold">
+                            {request.requestedDate.format("YYYY/MM/DD")}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -961,6 +995,15 @@ const ProjectOrderingComponent: React.FC = () => {
                           >
                             {getPriorityLabel(request.priority)}
                           </span>
+                          {request.requestedDate && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center">
+                                <HiOutlineCalendar className="w-3 h-3 ml-1" />
+                                {request.requestedDate.format("YYYY/MM/DD")}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1106,6 +1149,8 @@ const ProjectOrderingComponent: React.FC = () => {
             </div>
           </div>
         )}
+
+      {/* Project Info Display - Enhanced */}
       {selectedProjectId && (
         <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <div className="flex items-center justify-between">

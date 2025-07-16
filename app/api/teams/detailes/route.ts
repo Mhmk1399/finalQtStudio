@@ -41,6 +41,7 @@ export async function PATCH(
   try {
     await connect();
     const id =request.headers.get('id');
+    console.log(id);
     const body = await request.json();
     const team = await Team.findByIdAndUpdate(
       id,

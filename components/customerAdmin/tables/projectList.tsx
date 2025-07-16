@@ -437,7 +437,7 @@ const CustomerProjectsList: React.FC = () => {
       title: "حذف پروژه",
       type: "delete",
       size: "md",
-      endpoint: `/api/projects/${project._id}`,
+      endpoint: `/api/projects/detailes`,
       method: "DELETE",
       customContent: (
         <div className="text-center">

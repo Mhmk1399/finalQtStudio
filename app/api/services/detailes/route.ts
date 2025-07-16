@@ -52,8 +52,7 @@ export async function PATCH(
     const body = await request.json();
     const service = await Service.findByIdAndUpdate(id, body, {
       new: true,
-      runValidators: true,
-    }).populate("teamId", "name specialization");
+    })
 
     if (!service) {
       return NextResponse.json(

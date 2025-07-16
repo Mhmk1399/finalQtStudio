@@ -77,7 +77,7 @@ const TeamsTable: React.FC = () => {
       type: "edit",
       size: "xl",
       endpoint: `/api/teams/detailes`,
-      method: "PUT",
+      method: "PATCH",
       fields: [
         { key: "name", label: "نام تیم", type: "text", required: true },
         { key: "description", label: "توضیحات", type: "textarea", required: true },
@@ -116,7 +116,7 @@ const TeamsTable: React.FC = () => {
       title: "حذف تیم",
       type: "delete",
       size: "md",
-      endpoint: `/api/teams/${team._id || team.id}`,
+      endpoint: `/api/teams/detailes`,
       method: "DELETE",
       customContent: (
         <div className="text-center">
