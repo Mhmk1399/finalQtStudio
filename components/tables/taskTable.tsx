@@ -91,7 +91,7 @@ const TasksTable: React.FC = () => {
           key: "serviceRequestId",
           label: "درخواست سرویس",
           type: "text",
-          render: (value: unknown, data: Record<string, unknown>) => {
+          render: (value: unknown) => {
             if (value && typeof value === "object" && "title" in value) {
               return `${(value as { title: string }).title} `;
             }
@@ -102,7 +102,7 @@ const TasksTable: React.FC = () => {
           key: "assignedTeamId",
           label: "تیم تعیین‌شده",
           type: "text",
-          render: (value: unknown, data: Record<string, unknown>) => {
+          render: (value: unknown) => {
             if (value && typeof value === "object" && "name" in value) {
               return `${(value as { name: string }).name} )`;
             }
@@ -113,11 +113,11 @@ const TasksTable: React.FC = () => {
           key: "assignedUserId",
           label: "کاربر تعیین‌شده",
           type: "text",
-          render: (value: any) => {
-            if (value && typeof value === "object") {
-              return `${value.name} `;
+          render: (value: unknown) => {
+            if (value && typeof value === "object" && "name" in value) {
+              return `${(value as { name: string }).name} `;
             }
-            return value || "تعیین نشده";
+            return value ? String(value) : "تعیین نشده";
           },
         },
         {
@@ -303,7 +303,7 @@ const TasksTable: React.FC = () => {
             تأیید حذف وظیفه
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف وظیفه "{task.title}" اطمینان دارید؟
+            آیا از حذف وظیفه  اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">

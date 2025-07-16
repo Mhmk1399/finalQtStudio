@@ -148,7 +148,7 @@ export const TransBar: React.FC = () => {
       acc[customerName].fastener += transaction.fastener || 0;
       acc[customerName].value = acc[customerName].fastener - acc[customerName].debtor;
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, { name: string; count: number; value: number; debtor: number; fastener: number }>);
 
     return Object.values(customerGroups);
   };
@@ -175,7 +175,7 @@ export const TransBar: React.FC = () => {
       acc[dateKey].fastener += transaction.fastener || 0;
       acc[dateKey].value = acc[dateKey].fastener - acc[dateKey].debtor;
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, { name: string; count: number; value: number; debtor: number; fastener: number }>);
 
     return Object.values(dateGroups);
   };
@@ -213,7 +213,7 @@ export const TransBar: React.FC = () => {
       acc[subject].fastener += transaction.fastener || 0;
       acc[subject].value = acc[subject].fastener - acc[subject].debtor;
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, { name: string; count: number; value: number; debtor: number; fastener: number }>);
 
     return Object.values(subjectGroups);
   };
@@ -501,7 +501,13 @@ export const TransBar: React.FC = () => {
                 acc[customerName].netAmount = acc[customerName].totalFastener - acc[customerName].totalDebtor;
                 
                 return acc;
-              }, {} as Record<string, any>)
+              }, {} as Record<string, {
+                name: string;
+                businessName: string;
+                totalDebtor: number;
+                totalFastener: number;
+                transactionCount: number;
+                netAmount: number;}>)
             )
             .sort(([,a], [,b]) => Math.abs(b.netAmount) - Math.abs(a.netAmount))
             .slice(0, 6)
@@ -573,7 +579,12 @@ export const TransBar: React.FC = () => {
                 acc[subject].netAmount = acc[subject].totalFastener - acc[subject].totalDebtor;
                 
                 return acc;
-              }, {} as Record<string, any>)
+              }, {} as Record<string, {
+                subject: string;
+                totalDebtor: number;
+                totalFastener: number;
+                transactionCount: number;
+                netAmount: number;}>)
             )
             .sort(([,a], [,b]) => b.transactionCount - a.transactionCount)
             .map(([subject, data]) => (

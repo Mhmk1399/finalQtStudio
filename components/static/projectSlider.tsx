@@ -178,21 +178,21 @@ const ProjectSlider = () => {
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.85,
-      filter: "blur(8px)",
+      opacity: 0 as const,
+      scale: 0.85 as const,
+      filter: "blur(8px)" as const,
     }),
     center: {
       x: 0,
       opacity: 1,
       scale: 1,
-      filter: "blur(0px)",
+      filter: "blur(0px)" as const,
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.5 },
+        x: { type: "spring", stiffness: 300, damping: 30 } as const,
+        opacity: { duration: 0.5 } as const,
         scale: { duration: 0.5 },
         filter: { duration: 0.5 },
-      },
+      } as const,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? "100%" : "-100%",
@@ -200,7 +200,7 @@ const ProjectSlider = () => {
       scale: 0.85,
       filter: "blur(8px)",
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
+        x: { type: "spring", stiffness: 300, damping: 30 } as const,
         opacity: { duration: 0.5 },
         scale: { duration: 0.5 },
         filter: { duration: 0.5 },
@@ -216,7 +216,7 @@ const ProjectSlider = () => {
       transition: {
         delay: 0.2 + custom * 0.1,
         duration: 0.5,
-        ease: [0.19, 1.0, 0.22, 1.0],
+        ease: [0.19, 1.0, 0.22, 1.0] as const,
       },
     }),
     exit: { y: -20, opacity: 0, transition: { duration: 0.3 } },

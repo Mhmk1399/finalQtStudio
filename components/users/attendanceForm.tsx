@@ -118,7 +118,7 @@ export default function AttendanceForm() {
           <DatePicker
             value={inTime}
             onChange={setInTime}
-            plugins={[<TimePicker position="bottom" />]}
+            plugins={[<TimePicker key="intime-picker" position="bottom" />]}
             format="HH:mm"
             inputClass="w-full bg-transparent p-2 text-black focus:outline-none border rounded-lg"
             calendarPosition="bottom-right"
@@ -135,7 +135,7 @@ export default function AttendanceForm() {
           <DatePicker
             value={outTime}
             onChange={setOutTime}
-            plugins={[<TimePicker position="bottom" />]}
+            plugins={[<TimePicker key="outtime-picker" position="bottom" />]}
             format="HH:mm"
             inputClass="w-full bg-transparent p-2 text-black focus:outline-none border rounded-lg"
             calendarPosition="bottom-right"

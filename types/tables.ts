@@ -3,7 +3,7 @@ import React from "react";
 export interface TableColumn {
   key: string;
   label: string;
-  type?: "text" | "number" | "date" | "email" | "phone" | "status";
+  type?: "text" | "number" | "date" | "email" | "phone" | "status"| "custom";
   sortable?: boolean;
   width?: string;
   render?: (value: any, row: any) => React.ReactNode;

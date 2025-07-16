@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FormConfig } from "@/types/form";
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
@@ -37,6 +37,8 @@ interface Service {
   basePrice?: number;
 }
 
+
+
 const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [allContracts, setAllContracts] = useState<Contract[]>([]);
@@ -63,7 +65,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     expectedEndDate?: DateObject;
     actualEndDate?: DateObject;
     services?: string[];
-    [key: string]: any;
+    [key: string]: string | number | string[] | DateObject | undefined;
   }>({});
 
   // Fetch initial data
@@ -118,18 +120,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
   // Filter contracts when customer changes
   useEffect(() => {
     if (selectedCustomerId) {
-      const customerContracts = allContracts.filter(
+      // Filter contracts for the selected customer
+      allContracts.filter(
         (contract) => contract.customerId === selectedCustomerId
       );
     } 
   }, [selectedCustomerId, allContracts]);
-
-  // Update form config when data is loaded - optimized dependencies
-  useEffect(() => {
-    if (!loading && customers.length > 0 && managers.length > 0 && services.length > 0) {
-      setFormConfig(createFormConfig());
-    }
-  }, [loading, customers.length, managers.length, services.length]);
 
   const handleCustomerChange = (fieldName: string, value: string | string[]) => {
     setSelectedCustomerId(value as string);
@@ -228,7 +224,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
     </div>
   );
 
-  const createFormConfig = (): FormConfig => {
+  const createFormConfig = useCallback((): FormConfig => {
     return {
       title: "ایجاد پروژه جدید",
       description: "فرم زیر را برای ایجاد پروژه جدید تکمیل کنید",
@@ -401,7 +397,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
         },
       ],
     };
-  };
+  }, [customers, managers, services, onSuccess, onError, handleCustomerChange]);
+
+    // Update form config when data is loaded - optimized dependencies
+  useEffect(() => {
+    if (!loading && customers.length > 0 && managers.length > 0 && services.length > 0) {
+      setFormConfig(createFormConfig());
+    }
+  }, [loading, customers.length, managers.length, services.length, createFormConfig]);
 
   // Show loading state
   if (loading) {
@@ -444,9 +447,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
         
         {/* Form Fields */}
         <div className="space-y-4">
-          {formConfig.fields.map((field:{
-            [x: string]: any;name: string; label: string; type: string; placeholder?: string; required?: boolean; options?: {value: string; label: string,}[]; description?: string; onChange?: (name: string, value: string) => void; validation?: {minLength?: number; maxLength?: number; min?: number;}
-}) => (
+          {formConfig.fields.map((field: import("/Users/macbook/Desktop/repositories/finalQtStudio/types/form").FormField) => (
             <div key={field.name} className="mb-4">
               <label className="text-sm mb-2 block font-medium text-gray-700">
                 {field.label} {field.required && <span className="text-red-500">*</span>}
@@ -455,7 +456,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
               {field.type === "select" ? (
                 <select
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  value={formData[field?.name] || field.defaultValue || ""}
+                  value={String(formData[field?.name] || field.defaultValue || "")}
                   onChange={(e) => {
                     const newFormData = {...formData, [field.name]: e.target.value};
                     setFormData(newFormData);
@@ -474,7 +475,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                 <textarea
                   placeholder={field.placeholder}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 min-h-[100px]"
-                  value={formData[field.name] || ""}
+                  value={String(formData[field.name] || "")}
                   onChange={(e) => setFormData({...formData, [field.name]: e.target.value})}
                   minLength={field.validation?.minLength}
                   maxLength={field.validation?.maxLength}
@@ -486,9 +487,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                       <input
                         type="checkbox"
                         value={option.value}
-                        checked={(formData[field.name] || []).includes(option.value)}
+                        checked={(formData[field.name] as string[] || []).includes(option.value)}
                         onChange={(e) => {
-                          const currentValues = formData[field.name] || [];
+                          const currentValues = formData[field.name] as string[] || [];
                           const newValues = e.target.checked
                             ? [...currentValues, option.value]
                             : currentValues.filter((v: string) => v !== option.value);
@@ -496,7 +497,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                         }}
                         className="mt-1"
                       />
-                     
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-900">
+                          {option.label}
+                        </div>
+                        {option.description && (
+                          <div className="text-xs text-gray-500">
+                            {option.description}
+                          </div>
+                        )}
+                      </div>
                     </label>
                   ))}
                 </div>
@@ -505,7 +515,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSuccess, onError }) => {
                   type={field.type}
                   placeholder={field.placeholder}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  value={formData[field.name] || field.defaultValue || ""}
+                  value={String(formData[field.name] || field.defaultValue || "")}
                   onChange={(e) => setFormData({...formData, [field.name]: e.target.value})}
                   min={field.validation?.min}
                   minLength={field.validation?.minLength}

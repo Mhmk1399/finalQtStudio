@@ -193,7 +193,7 @@ const ServicesTable: React.FC = () => {
             تأیید حذف سرویس
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف سرویس "{service.name}" اطمینان دارید؟
+            آیا از حذف سرویس  اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">

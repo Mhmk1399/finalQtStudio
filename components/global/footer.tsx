@@ -45,7 +45,7 @@ const Footer = () => {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: "easeInOut" as const,
     },
   };
 
@@ -60,17 +60,7 @@ const Footer = () => {
     },
   };
 
-  const itemAnimation = {
-    hidden: { y: 20, opacity: 0 },
-    show: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        bounce: 0.4,
-      },
-    },
-  };
+
   useEffect(() => {
     const sequence = async () => {
       await controls.start({ scale: 1.1 });
@@ -178,7 +168,17 @@ const Footer = () => {
           {footerItems.map((item, index) => (
             <motion.a
               key={index}
-              variants={itemAnimation}
+              variants={{
+                hidden: { y: 20, opacity: 0 },
+                show: { 
+                  y: 0, 
+                  opacity: 1, 
+                  transition: { 
+                    type: "spring", 
+                    bounce: 0.4 
+                  } 
+                }
+              }}
               href={item.link}
               target="_blank"
               aria-label={`Visit our ${item.title} profile`}

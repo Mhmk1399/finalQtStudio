@@ -68,7 +68,7 @@ const ServiceRequestsTable: React.FC = () => {
           key: "projectId",
           label: "پروژه",
           type: "text",
-          render: (value: unknown, data: Record<string, unknown>) => {
+          render: (value: unknown) => {
             if (value && typeof value === "object") {
               const v = value as { title?: string; name?: string };
               return v.title || v.name || "-";
@@ -80,7 +80,7 @@ const ServiceRequestsTable: React.FC = () => {
           key: "serviceId",
           label: "سرویس",
           type: "text",
-          render: (value: unknown, data: Record<string, unknown>) => {
+          render: (value: unknown) => {
             if (value && typeof value === "object") {
               const v = value as { name?: string; basePrice?: number };
               return `${v.name ?? "-"} (${v.basePrice ?? "-"} تومان)`;
@@ -272,7 +272,7 @@ const ServiceRequestsTable: React.FC = () => {
             تأیید حذف درخواست سرویس
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف درخواست سرویس "{serviceRequest.title}" اطمینان دارید؟
+            آیا از حذف درخواست سرویس  اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">

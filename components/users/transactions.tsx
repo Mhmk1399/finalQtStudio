@@ -93,29 +93,40 @@ const UserTransactionsPage = () => {
   };
 
   // Render net amount with appropriate color
-  const renderNetAmount = (debtor: number, fastener: number) => {
-    const netAmount = calculateNetAmount(debtor, fastener);
-    const isPositive = netAmount > 0;
-    const isNegative = netAmount < 0;
+  // const renderNetAmount = (debtor: number, fastener: number) => {
+  //   const netAmount = calculateNetAmount(debtor, fastener);
+  //   const isPositive = netAmount > 0;
+  //   const isNegative = netAmount < 0;
 
-    return (
-      <span
-        className={`font-medium ${
-          isPositive
-            ? "text-green-600"
-            : isNegative
-            ? "text-red-600"
-            : "text-gray-600"
-        }`}
-      >
-        {isPositive ? "+" : ""}
-        {formatCurrency(Math.abs(netAmount))}
-      </span>
-    );
-  };
+  //   return (
+  //     <span
+  //       className={`font-medium ${
+  //         isPositive
+  //           ? "text-green-600"
+  //           : isNegative
+  //           ? "text-red-600"
+  //           : "text-gray-600"
+  //       }`}
+  //     >
+  //       {isPositive ? "+" : ""}
+  //       {formatCurrency(Math.abs(netAmount))}
+  //     </span>
+  //   );
+  // };
 
   // Handle view transaction using DynamicModal
-  const handleViewTransaction = (row: any) => {
+  const handleViewTransaction = (row: {
+    id: string;
+    userId: string;
+    _id: string;
+    debtor: number;
+    fastener: number;
+    subject: string;
+    date: string;
+    type: string;
+    netAmount: number;
+
+  }) => {
     const viewConfig: ModalConfig = {
       title: "جزئیات تراکنش",
       type: "view",
@@ -128,7 +139,7 @@ const UserTransactionsPage = () => {
           key: "date",
           label: "تاریخ تراکنش",
           type: "date",
-          render: (value: string) => formatDate(value),
+          render: (value: unknown) => formatDate(value as string),
         },
         {
           key: "subject",
@@ -139,23 +150,22 @@ const UserTransactionsPage = () => {
           key: "debtor",
           label: "مبلغ بدهکار",
           type: "text",
-          render: (value: number) => formatCurrency(value),
+          render: (value: unknown) => formatCurrency(value as number),
         },
         {
           key: "fastener",
           label: "مبلغ بستانکار",
           type: "text",
-          render: (value: number) => formatCurrency(value),
+          render: (value: unknown) => formatCurrency(value as number),
         },
         {
           key: "transactionType",
           label: "نوع تراکنش",
           type: "text",
-          render: (value: any, data: any) => {
-            const transactionType = getTransactionType(
-              data.debtor,
-              data.fastener
-            );
+          render: (_value: unknown, data: Record<string, unknown>) => {
+            const debtor = typeof data.debtor === "number" ? data.debtor : 0;
+            const fastener = typeof data.fastener === "number" ? data.fastener : 0;
+            const transactionType = getTransactionType(debtor, fastener);
             return (
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium border ${transactionType.color}`}
@@ -169,8 +179,10 @@ const UserTransactionsPage = () => {
           key: "netAmount",
           label: "مبلغ خالص",
           type: "text",
-          render: (value: any, data: any) => {
-            const netAmount = calculateNetAmount(data.debtor, data.fastener);
+          render: (_value: unknown, data: Record<string, unknown>) => {
+            const debtor = typeof data.debtor === "number" ? data.debtor : 0;
+            const fastener = typeof data.fastener === "number" ? data.fastener : 0;
+            const netAmount = calculateNetAmount(debtor, fastener);
             const isPositive = netAmount > 0;
             const isNegative = netAmount < 0;
 
@@ -231,7 +243,7 @@ const UserTransactionsPage = () => {
       {
         key: "type",
         label: "نوع تراکنش",
-        render: (value: any, rowData: any) =>
+        render: ( rowData: { debtor: number; fastener: number }) =>
           renderTransactionType(rowData.debtor, rowData.fastener),
       },
     //   {

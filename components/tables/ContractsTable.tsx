@@ -222,7 +222,7 @@ const ContractsTable: React.FC = () => {
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h4 className="font-semibold text-blue-900 mb-2">⚠️ توجه مهم</h4>
           <p className="text-blue-800 text-sm">
-            با تأیید این قرارداد، وضعیت آن به "تأیید شده" تغییر خواهد کرد و
+            با تأیید این قرارداد، وضعیت آن به   تغییر خواهد کرد و
             مشتری از این موضوع مطلع خواهد شد. در صورت رد قرارداد، دلیل رد برای
             مشتری ارسال خواهد شد.
           </p>
@@ -263,7 +263,7 @@ const ContractsTable: React.FC = () => {
             تأیید حذف قرارداد
           </h4>
           <p className="text-gray-600 mb-4">
-            آیا از حذف قرارداد "{contract.title}" اطمینان دارید؟
+            آیا از حذف قرارداد اطمینان دارید؟
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
             <p className="text-red-700 text-sm">

@@ -103,17 +103,17 @@ const HeroSection = () => {
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.85,
+      opacity: 0 as const,
+      scale: 0.85 as const,
     }),
     center: {
       x: 0,
       opacity: 1,
       scale: 1,
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.8 },
-        scale: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] },
+        x: { type: "spring" as const, stiffness: 300, damping: 30 } as const,
+        opacity: { duration: 0.8 } as const,
+        scale: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] } as const,
       },
     },
     exit: (direction: number) => ({
@@ -121,7 +121,7 @@ const HeroSection = () => {
       opacity: 0,
       scale: 0.85,
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
+        x: { type: "spring" as const, stiffness: 300, damping: 30 },
         opacity: { duration: 0.5 },
         scale: { duration: 0.5 },
       },
@@ -136,13 +136,13 @@ const HeroSection = () => {
       transition: {
         delay: 0.3,
         duration: 1,
-        ease: [0.19, 1.0, 0.22, 1.0],
+        ease: [0.19, 1.0, 0.22, 1.0] as const,
       },
     },
     exit: {
       y: -30,
       opacity: 0,
-      transition: { duration: 0.5, ease: "easeIn" },
+      transition: { duration: 0.5, ease: "easeIn" } as const,
     },
   };
 
@@ -154,13 +154,13 @@ const HeroSection = () => {
       transition: {
         delay: 0.5,
         duration: 1,
-        ease: [0.19, 1.0, 0.22, 1.0],
+        ease: [0.19, 1.0, 0.22, 1.0] as const,
       },
     },
     exit: {
       y: -20,
       opacity: 0,
-      transition: { duration: 0.4, ease: "easeIn" },
+      transition: { duration: 0.4, ease: "easeIn" as const },
     },
   };
 
@@ -183,12 +183,12 @@ const HeroSection = () => {
   const videoItemVariants = {
     hidden: { opacity: 0, scale: 0.9, y: 20 },
     visible: {
-      opacity: 1,
-      scale: 1,
+      opacity: 1 as const,
+      scale: 1 as const,
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.19, 1.0, 0.22, 1.0],
+        ease: [0.19, 1.0, 0.22, 1.0] as const,
       },
     },
   };

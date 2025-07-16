@@ -145,14 +145,34 @@ const UserTasksPage = () => {
   };
 
   // Handle Google Drive upload button click
-  const handleGoogleDriveUpload = (row: any) => {
+  const handleGoogleDriveUpload = (row: {
+    _id: string;
+    title: string;
+    description: string;
+    status: string;
+    priority: string;
+    dueDate: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  }) => {
     console.log('Google Drive upload button clicked for task:', row._id);
     setSelectedTaskId(row._id);
     setShowGoogleDriveModal(true);
   };
 
   // Handle upload file button click - FIXED
-  const handleUploadFile = (row: any) => {
+  const handleUploadFile = (row: {
+    _id: string;
+    title: string;
+    description: string;
+    status: string;
+    priority: string;
+    dueDate: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  }) => {
     console.log('Upload button clicked for task:', row._id);
     console.log('Current showFileUpload state:', showFileUpload);
     setSelectedTaskId(row._id);
@@ -161,7 +181,17 @@ const UserTasksPage = () => {
   };
 
   // Handle view task
-  const handleViewTask = (row: any) => {
+  const handleViewTask = (row: {
+    _id: string;
+    title: string;
+    description: string;
+    status: string;
+    priority: string;
+    dueDate: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  }) => {
     const viewConfig: ModalConfig = {
       title: `جزئیات وظیفه: ${row.title}`,
       type: "view",
@@ -184,13 +214,13 @@ const UserTasksPage = () => {
           key: "status",
           label: "وضعیت",
           type: "text",
-          render: (value: string) => getStatusLabel(value),
+          render: (value: unknown) => getStatusLabel(value as string),
         },
         {
           key: "priority",
           label: "اولویت",
           type: "text",
-          render: (value: string) => getPriorityLabel(value),
+          render: (value: unknown) => getPriorityLabel(value as string),
         },
         {
           key: "startDate",
@@ -221,7 +251,17 @@ const UserTasksPage = () => {
   };
 
   // Handle edit task
-  const handleEditTask = (row: any) => {
+  const handleEditTask = (row: {
+    _id: string;
+    title: string;
+    description: string;
+    status: string;
+    priority: string;
+    startDate: string;
+    dueDate: string;
+    notes: string;
+    deliverables: string;
+  }) => {
     const editConfig: ModalConfig = {
       title: `ویرایش وظیفه: ${row.title}`,
       type: "edit",
@@ -278,10 +318,20 @@ const UserTasksPage = () => {
   };
 
   // Custom action renderer for upload button
-  const renderUploadAction = (row: any) => {
+  const renderUploadAction = (row: {
+    _id: string;
+    title: string;
+    description: string;
+    status: string;
+    priority: string;
+    dueDate: string;
+    createdAt: string;
+    updatedAt:string
+    __v: number;
+  }) => {
     return (
       <button
-        onClick={() => handleUploadFile(row)}
+        onClick={() => handleUploadFile(row )}
         className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
         title="آپلود فایل"
       >
@@ -292,7 +342,17 @@ const UserTasksPage = () => {
   };
 
   // Custom action renderer for Google Drive upload button
-  const renderGoogleDriveAction = (row: any) => {
+  const renderGoogleDriveAction = (row: {
+    _id: string;
+    title: string;
+    description: string;
+    status: string;
+    priority: string;
+    dueDate: string;
+    createdAt: string;
+    updatedAt:string
+    __v: number;
+  }) => {
     return (
       <button
         onClick={() => handleGoogleDriveUpload(row)}
@@ -345,7 +405,20 @@ const UserTasksPage = () => {
         key: "actions",
         label: "عملیات",
         type: "custom",
-        render: (value: any, row: any) => (
+        render: ( row:{
+          _id: string;
+          title: string;
+          description: string;
+          status: string;
+          priority: string;
+          startDate: string;
+          dueDate: string;
+          notes: string;
+          deliverables: string;
+          createdAt: string;
+          updatedAt: string;
+          __v: number;
+        }) => (
           <div className="flex items-center space-x-2">
             {renderUploadAction(row)}
             {renderGoogleDriveAction(row)}
